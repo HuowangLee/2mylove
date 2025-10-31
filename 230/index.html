@@ -19,8 +19,20 @@
         <canvas id="gameCanvas"></canvas>
         
         <div class="controls">
-            <p>使用 <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 控制移动</p>
+            <p class="pc-controls">使用 <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 控制移动</p>
+            <p class="mobile-controls">使用屏幕方向键或滑动屏幕控制移动</p>
             <p>吃掉所有豆子，躲避幽灵！</p>
+        </div>
+        
+        <!-- 虚拟方向键 -->
+        <div class="virtual-controls">
+            <div class="dpad">
+                <button class="dpad-btn up" id="btnUp">▲</button>
+                <button class="dpad-btn left" id="btnLeft">◄</button>
+                <button class="dpad-btn center"></button>
+                <button class="dpad-btn right" id="btnRight">►</button>
+                <button class="dpad-btn down" id="btnDown">▼</button>
+            </div>
         </div>
         
         <div id="victoryModal" class="modal">

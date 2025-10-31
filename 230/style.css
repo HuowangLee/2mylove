@@ -221,3 +221,154 @@ button:active {
     background: linear-gradient(135deg, #330000 0%, #660000 100%);
 }
 
+/* 移动端控制 */
+.virtual-controls {
+    margin-top: 20px;
+    display: none;
+}
+
+.dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 70px);
+    grid-template-rows: repeat(3, 70px);
+    gap: 5px;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.dpad-btn {
+    background: linear-gradient(135deg, rgba(255, 102, 0, 0.8), rgba(255, 51, 0, 0.8));
+    color: white;
+    border: 3px solid #ff6600;
+    border-radius: 10px;
+    font-size: 1.8em;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
+    transition: all 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.dpad-btn:active {
+    background: linear-gradient(135deg, rgba(255, 51, 0, 1), rgba(255, 0, 0, 1));
+    box-shadow: 0 0 25px rgba(255, 102, 0, 1);
+    transform: scale(0.95);
+}
+
+.dpad-btn.up {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.dpad-btn.left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.dpad-btn.center {
+    grid-column: 2;
+    grid-row: 2;
+    background: transparent;
+    border: 2px dashed rgba(255, 102, 0, 0.3);
+    box-shadow: none;
+    cursor: default;
+    pointer-events: none;
+}
+
+.dpad-btn.right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.dpad-btn.down {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+        max-width: 100vw;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .game-info {
+        font-size: 1em;
+        flex-wrap: wrap;
+    }
+
+    .score, .lives {
+        padding: 8px 15px;
+        margin: 5px;
+    }
+
+    #gameCanvas {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .controls {
+        font-size: 0.9em;
+    }
+
+    .pc-controls {
+        display: none;
+    }
+
+    .mobile-controls {
+        display: block;
+    }
+
+    .virtual-controls {
+        display: block;
+    }
+
+    .modal-content {
+        width: 90%;
+        padding: 30px 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 2em;
+    }
+
+    .love-message {
+        font-size: 1.5em;
+    }
+
+    button {
+        padding: 12px 30px;
+        font-size: 1em;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-controls {
+        display: none;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .virtual-controls {
+        display: block;
+    }
+
+    .pc-controls {
+        display: none;
+    }
+
+    .mobile-controls {
+        display: block;
+    }
+}
+

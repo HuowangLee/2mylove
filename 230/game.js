@@ -61,13 +61,20 @@ let ghosts = [
     { x: 16, y: 9, targetX: 16, targetY: 9, color: '#ffb852', direction: { x: 0, y: 1 }, name: 'Clyde' }
 ];
 
+// 触摸控制变量
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+const minSwipeDistance = 30; // 最小滑动距离
+
 // 初始化游戏
 function init() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
     
-    canvas.width = MAP[0].length * TILE_SIZE;
-    canvas.height = MAP.length * TILE_SIZE;
+    // 根据屏幕大小调整画布尺寸
+    adjustCanvasSize();
     
     // 计算总豆子数
     totalDots = 0;
@@ -80,11 +87,133 @@ function init() {
     // 键盘控制
     document.addEventListener('keydown', handleKeyPress);
     
+    // 触摸控制（滑动）
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // 虚拟方向键控制
+    setupVirtualControls();
+    
     // 重启按钮
     document.getElementById('restartBtn').addEventListener('click', restartGame);
     document.getElementById('restartBtn2').addEventListener('click', restartGame);
     
+    // 窗口大小改变时重新调整画布
+    window.addEventListener('resize', adjustCanvasSize);
+    
     gameLoop();
+}
+
+// 调整画布大小以适应屏幕
+function adjustCanvasSize() {
+    const baseWidth = MAP[0].length * TILE_SIZE;
+    const baseHeight = MAP.length * TILE_SIZE;
+    
+    // 在移动设备上缩小画布以适应屏幕
+    if (window.innerWidth <= 768) {
+        const maxWidth = window.innerWidth - 40;
+        const scale = maxWidth / baseWidth;
+        canvas.width = baseWidth;
+        canvas.height = baseHeight;
+        canvas.style.width = (baseWidth * scale) + 'px';
+        canvas.style.height = (baseHeight * scale) + 'px';
+    } else {
+        canvas.width = baseWidth;
+        canvas.height = baseHeight;
+        canvas.style.width = baseWidth + 'px';
+        canvas.style.height = baseHeight + 'px';
+    }
+}
+
+// 设置虚拟控制按键
+function setupVirtualControls() {
+    const btnUp = document.getElementById('btnUp');
+    const btnDown = document.getElementById('btnDown');
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+    
+    // 使用 touchstart 代替 click 以获得更快的响应
+    btnUp.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        setDirection(0, -1);
+    });
+    
+    btnDown.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        setDirection(0, 1);
+    });
+    
+    btnLeft.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        setDirection(-1, 0);
+    });
+    
+    btnRight.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        setDirection(1, 0);
+    });
+    
+    // 为PC用户也添加点击事件
+    btnUp.addEventListener('click', () => setDirection(0, -1));
+    btnDown.addEventListener('click', () => setDirection(0, 1));
+    btnLeft.addEventListener('click', () => setDirection(-1, 0));
+    btnRight.addEventListener('click', () => setDirection(1, 0));
+}
+
+// 设置移动方向
+function setDirection(x, y) {
+    if (!gameRunning) return;
+    pacman.nextDirection = { x, y };
+}
+
+// 处理触摸开始
+function handleTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+}
+
+// 处理触摸移动
+function handleTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchEndX = touch.clientX;
+    touchEndY = touch.clientY;
+}
+
+// 处理触摸结束
+function handleTouchEnd(e) {
+    e.preventDefault();
+    
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    
+    // 判断滑动方向
+    if (Math.abs(deltaX) > minSwipeDistance || Math.abs(deltaY) > minSwipeDistance) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // 水平滑动
+            if (deltaX > 0) {
+                setDirection(1, 0); // 右
+            } else {
+                setDirection(-1, 0); // 左
+            }
+        } else {
+            // 垂直滑动
+            if (deltaY > 0) {
+                setDirection(0, 1); // 下
+            } else {
+                setDirection(0, -1); // 上
+            }
+        }
+    }
+    
+    // 重置触摸位置
+    touchStartX = 0;
+    touchStartY = 0;
+    touchEndX = 0;
+    touchEndY = 0;
 }
 
 // 键盘控制
