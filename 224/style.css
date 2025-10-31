@@ -1,0 +1,310 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.game-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+}
+
+.header h1 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-item .label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.stat-item .value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.game-area {
+    background: #f5f7fa;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 700px;
+}
+
+#gameCanvas {
+    border: 3px solid #667eea;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #e0f7ff 0%, #ffffff 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.controls {
+    padding: 20px 30px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-info {
+    flex: 1;
+}
+
+.control-info p {
+    margin: 5px 0;
+    color: #4b5563;
+}
+
+.control-info strong {
+    color: #1f2937;
+}
+
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* 弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.5s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.victory-animation {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.victory-animation h2 {
+    font-size: 36px;
+    color: #667eea;
+    margin-bottom: 20px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.fireworks {
+    position: relative;
+    height: 100px;
+}
+
+.firework {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    animation: explode 2s ease-out infinite;
+}
+
+.firework:nth-child(1) {
+    left: 20%;
+    animation-delay: 0s;
+    background: #ff6b6b;
+}
+
+.firework:nth-child(2) {
+    left: 50%;
+    animation-delay: 0.6s;
+    background: #4ecdc4;
+}
+
+.firework:nth-child(3) {
+    left: 80%;
+    animation-delay: 1.2s;
+    background: #ffe66d;
+}
+
+@keyframes explode {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 currentColor;
+    }
+    50% {
+        transform: translateY(-30px) scale(1.5);
+        opacity: 0.8;
+        box-shadow: 0 0 20px 10px currentColor;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.5);
+        opacity: 0;
+        box-shadow: 0 0 40px 20px currentColor;
+    }
+}
+
+.victory-message h3 {
+    font-size: 28px;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.celebration-text {
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 20px 0;
+}
+
+.sub-text {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.final-stats {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.final-stats p {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #4b5563;
+}
+
+.final-stats strong {
+    color: #667eea;
+    font-size: 20px;
+}
+
+.btn-large {
+    padding: 15px 40px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 24px;
+    }
+    
+    .stat-item .value {
+        font-size: 20px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .modal-content {
+        padding: 30px 20px;
+    }
+    
+    .victory-animation h2 {
+        font-size: 28px;
+    }
+    
+    .victory-message h3 {
+        font-size: 22px;
+    }
+}
+

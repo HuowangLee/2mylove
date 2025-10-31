@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 可爱解密小游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🌟 数字解密大冒险 🌟</h1>
+            <p class="subtitle">帮助小兔子找到神秘的数字密码！</p>
+        </div>
+
+        <div class="game-area">
+            <div class="character">
+                <div class="rabbit">🐰</div>
+                <div class="speech-bubble">
+                    <p>你好！我需要你的帮助！</p>
+                    <p>请帮我解开这个数字谜题吧～</p>
+                </div>
+            </div>
+
+            <div class="puzzle-container">
+                <div class="interactive-puzzle">
+                    <h3>🎮 互动解密游戏</h3>
+                    
+                    <!-- 数字拼图区域 -->
+                    <div class="puzzle-area">
+                        <div class="puzzle-slots">
+                            <div class="slot" id="slot1">?</div>
+                            <div class="slot" id="slot2">?</div>
+                            <div class="slot" id="slot3">?</div>
+                        </div>
+                        <p class="puzzle-hint">拖拽数字到正确位置</p>
+                    </div>
+                    
+                    <!-- 数字选择区域 -->
+                    <div class="number-pool">
+                        <div class="number-item" draggable="true" data-value="1">1</div>
+                        <div class="number-item" draggable="true" data-value="2">2</div>
+                        <div class="number-item" draggable="true" data-value="3">3</div>
+                        <div class="number-item" draggable="true" data-value="4">4</div>
+                        <div class="number-item" draggable="true" data-value="5">5</div>
+                        <div class="number-item" draggable="true" data-value="6">6</div>
+                        <div class="number-item" draggable="true" data-value="7">7</div>
+                        <div class="number-item" draggable="true" data-value="8">8</div>
+                        <div class="number-item" draggable="true" data-value="9">9</div>
+                    </div>
+                    
+                    <!-- 线索提示区域 -->
+                    <div class="clue-hints">
+                        <div class="hint-item" id="hint1">
+                            <span class="hint-icon">💡</span>
+                            <span class="hint-text">点击查看第一个提示</span>
+                        </div>
+                        <div class="hint-item" id="hint2">
+                            <span class="hint-icon">💡</span>
+                            <span class="hint-text">点击查看第二个提示</span>
+                        </div>
+                        <div class="hint-item" id="hint3">
+                            <span class="hint-icon">💡</span>
+                            <span class="hint-text">点击查看第三个提示</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-section">
+                    <h3>🎯 输入你的答案</h3>
+                    <div class="input-container">
+                        <input type="number" id="answerInput" placeholder="输入三位数字" maxlength="3">
+                        <button id="submitBtn">提交答案</button>
+                    </div>
+                    <div class="hint" id="hint">💡 提示：仔细观察线索，它们会告诉你答案！</div>
+                </div>
+            </div>
+
+            <div class="celebration" id="celebration" style="display: none;">
+                <div class="confetti"></div>
+                <div class="success-message">
+                    <h2>🎉 恭喜你！🎉</h2>
+                    <p>你成功帮助小兔子找到了密码！</p>
+                    <p>答案就是：<strong>222</strong></p>
+                    <p>√2≈1.414→2, 二进制10=十进制2, 1+1=2 → 222</p>
+                    <button id="playAgainBtn">再玩一次</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+    background: linear-gradient(135deg, #a8e6cf 0%, #ffd3b6 50%, #ffaaa5 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.game-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    height: 100vh;
+    max-height: 700px;
+}
+
+/* 屏幕切换 */
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+}
+
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 开始界面 */
+#startScreen h1 {
+    font-size: 3em;
+    color: #ff6b9d;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.subtitle {
+    font-size: 1.3em;
+    color: #666;
+    text-align: center;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.game-button {
+    padding: 15px 40px;
+    font-size: 1.3em;
+    background: linear-gradient(135deg, #ff6b9d, #ffa07a);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.game-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+}
+
+.instructions {
+    margin-top: 40px;
+    text-align: center;
+    color: #666;
+}
+
+.instructions h3 {
+    color: #ff6b9d;
+    margin-bottom: 15px;
+}
+
+.instructions p {
+    margin: 8px 0;
+    font-size: 1.1em;
+}
+
+/* 游戏界面 */
+#gameScreen {
+    background: linear-gradient(to bottom, #87ceeb 0%, #90EE90 60%, #98FB98 100%);
+}
+
+.task-hint {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #ff6b9d;
+    font-weight: bold;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.progress-bar {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.progress-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.progress-item .icon {
+    font-size: 1.5em;
+}
+
+#gameCanvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    background: #90EE90;
+}
+
+.interact-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #ff6b9d;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+    animation: pulse 1.5s infinite;
+    z-index: 100;
+}
+
+.interact-hint .key {
+    display: inline-block;
+    background: #ff6b9d;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+}
+
+/* 结局界面 */
+#endScreen {
+    background: linear-gradient(to bottom, #ff9a76 0%, #ffeaa7 50%, #ffa07a 100%);
+}
+
+.ending-animation {
+    text-align: center;
+    animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ending-title {
+    font-size: 2.5em;
+    color: #ff6b9d;
+    margin-bottom: 30px;
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(255, 107, 157, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(255, 107, 157, 0.8); }
+}
+
+.ending-cows {
+    font-size: 5em;
+    margin: 20px 0;
+    animation: swing 3s infinite;
+}
+
+@keyframes swing {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.ending-text {
+    margin: 30px 0;
+    color: #fff;
+    font-size: 1.3em;
+    line-height: 1.8;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ending-line {
+    animation: slideIn 1s forwards;
+    opacity: 0;
+}
+
+.ending-line:nth-child(1) { animation-delay: 0.5s; }
+.ending-line:nth-child(2) { animation-delay: 1s; }
+
+.ending-final {
+    animation: slideIn 1s forwards;
+    opacity: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.ending-final:nth-child(4) { animation-delay: 2s; }
+.ending-final:nth-child(5) { animation-delay: 2.5s; }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hearts-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.heart-particle {
+    position: absolute;
+    font-size: 2em;
+    animation: floatHeart 4s forwards;
+    opacity: 0;
+}
+
+@keyframes floatHeart {
+    0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-500px) rotate(360deg);
+    }
+}
+
+#restartButton {
+    margin-top: 40px;
+    animation: fadeIn 1s 3s forwards;
+    opacity: 0;
+}
+
+/* 彩蛋 */
+.easter-egg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    padding: 20px 40px;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ff6b9d;
+    z-index: 1000;
+    animation: easterEggPop 3s forwards;
+}
+
+@keyframes easterEggPop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    #startScreen h1 {
+        font-size: 2em;
+    }
+    
+    .subtitle {
+        font-size: 1em;
+    }
+    
+    .progress-bar {
+        gap: 10px;
+        padding: 8px 15px;
+    }
+    
+    .progress-item {
+        font-size: 1em;
+    }
+}
+

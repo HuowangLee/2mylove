@@ -1,0 +1,386 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+header h1 {
+    font-size: 3.5em;
+    margin-bottom: 10px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+    opacity: 0.95;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.game-info {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.info-box {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-3px);
+}
+
+.label {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    animation: fadeIn 1s ease-out;
+}
+
+.btn {
+    flex: 1;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.game-container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 30px;
+    animation: fadeInUp 1s ease-out;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    background: #bbada0;
+    padding: 15px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.tile {
+    aspect-ratio: 1;
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 8px;
+}
+
+.tile-cell {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.15s ease-in-out;
+    animation: tileAppear 0.2s ease-out;
+}
+
+/* 数字颜色方案 - 基于15的倍数 */
+.tile-15 { background: #eee4da; color: #776e65; }
+.tile-30 { background: #ede0c8; color: #776e65; }
+.tile-45 { background: #f2b179; color: #f9f6f2; }
+.tile-60 { background: #f59563; color: #f9f6f2; }
+.tile-75 { background: #f67c5f; color: #f9f6f2; }
+.tile-90 { background: #f65e3b; color: #f9f6f2; }
+.tile-105 { background: #edcf72; color: #f9f6f2; font-size: 1.6em; }
+.tile-120 { background: #edcc61; color: #f9f6f2; font-size: 1.6em; }
+.tile-135 { background: #edc850; color: #f9f6f2; font-size: 1.6em; }
+.tile-150 { background: #edc53f; color: #f9f6f2; font-size: 1.5em; }
+.tile-165 { background: #edc22e; color: #f9f6f2; font-size: 1.5em; }
+.tile-180 { background: #3c3a32; color: #f9f6f2; font-size: 1.5em; }
+.tile-195 { background: #2c2a24; color: #f9f6f2; font-size: 1.4em; }
+.tile-210 { background: #1c1a14; color: #f9f6f2; font-size: 1.4em; }
+.tile-225 { 
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: #ffffff; 
+    font-size: 1.4em;
+    box-shadow: 0 0 30px rgba(245, 87, 108, 0.6);
+    animation: tile225 1s ease-in-out infinite;
+}
+
+@keyframes tile225 {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.tile-merged {
+    animation: tileMerge 0.2s ease-out;
+}
+
+@keyframes tileAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes tileMerge {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(238, 228, 218, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+    z-index: 100;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.game-over.hidden {
+    display: none;
+}
+
+.game-over-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.game-over-content h2 {
+    font-size: 2.5em;
+    color: #776e65;
+    margin-bottom: 15px;
+}
+
+.game-over-content p {
+    font-size: 1.3em;
+    color: #776e65;
+    margin-bottom: 25px;
+}
+
+.instructions {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    animation: fadeIn 1.2s ease-out;
+}
+
+.instructions h3 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.instruction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.instruction-item:hover {
+    transform: translateX(5px);
+}
+
+.instruction-item .icon {
+    font-size: 1.5em;
+}
+
+.tips {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    animation: fadeIn 1.4s ease-out;
+}
+
+.tips h4 {
+    color: #f5576c;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.tips ul {
+    list-style: none;
+}
+
+.tips li {
+    padding: 10px 0;
+    padding-left: 25px;
+    position: relative;
+    color: #555;
+    line-height: 1.6;
+}
+
+.tips li:before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #f5576c;
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    opacity: 0.9;
+    animation: fadeIn 1.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2.5em;
+    }
+    
+    .game-board {
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .tile-cell {
+        font-size: 1.5em;
+    }
+    
+    .instruction-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

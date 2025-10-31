@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐮💕 228号恋爱牧场</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 开始界面 -->
+        <div id="startScreen" class="screen">
+            <h1>🐮💕 228号恋爱牧场 💕🐮</h1>
+            <p class="subtitle">今天是我们恋爱第 228 天<br>一起寻找专属的幸福吧</p>
+            <button id="startButton" class="game-button">开始游戏</button>
+            <div class="instructions">
+                <h3>📖 操作说明</h3>
+                <p>↑ ↓ ← → 方向键移动</p>
+                <p>空格键 互动/捡起物品</p>
+                <p><br>🎯 收集目标：2只大牛 + 2杯牛奶 + 8朵心形花 = 228</p>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="gameScreen" class="screen hidden">
+            <!-- 任务提示 -->
+            <div id="taskHint" class="task-hint"></div>
+            
+            <!-- 收集进度 -->
+            <div class="progress-bar">
+                <div class="progress-item">
+                    <span class="icon">🐄</span>
+                    <span id="cowCount">0/2</span>
+                </div>
+                <div class="progress-item">
+                    <span class="icon">🥛</span>
+                    <span id="milkCount">0/2</span>
+                </div>
+                <div class="progress-item">
+                    <span class="icon">💐</span>
+                    <span id="flowerCount">0/8</span>
+                </div>
+            </div>
+
+            <!-- 游戏画布 -->
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- 互动提示 -->
+            <div id="interactHint" class="interact-hint hidden">
+                按 <span class="key">空格</span> 互动
+            </div>
+        </div>
+
+        <!-- 结局界面 -->
+        <div id="endScreen" class="screen hidden">
+            <div class="ending-animation">
+                <h1 class="ending-title">🌅 恋爱第 228 天 🌅</h1>
+                <div class="ending-cows">🐄💕🐄</div>
+                <div class="ending-text">
+                    <p class="ending-line">谢谢你陪我吃草、看夕阳，</p>
+                    <p class="ending-line">和我一起哞哞叫。</p>
+                    <br>
+                    <p class="ending-final">未来的228天、2280天、22800天，</p>
+                    <p class="ending-final">也请多多指教。❤️</p>
+                </div>
+                <div class="hearts-container" id="heartsContainer"></div>
+                <button id="restartButton" class="game-button">再玩一次</button>
+            </div>
+        </div>
+
+        <!-- 彩蛋提示 -->
+        <div id="easterEgg" class="easter-egg hidden">
+            <p>✨ 偷偷多喜欢你一点 ✨</p>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+

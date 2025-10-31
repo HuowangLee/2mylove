@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>224层跳跃挑战</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🎮 224层跳跃挑战</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="label">当前层数:</span>
+                    <span class="value" id="currentFloor">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">目标:</span>
+                    <span class="value">224层</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">进度:</span>
+                    <span class="value" id="progress">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="control-info">
+                <p><strong>操作说明:</strong></p>
+                <p>← → 方向键移动 | 空格键跳跃</p>
+            </div>
+            <button id="restartBtn" class="btn">重新开始</button>
+        </div>
+    </div>
+
+    <!-- 胜利弹窗 -->
+    <div id="victoryModal" class="modal">
+        <div class="modal-content">
+            <div class="victory-animation">
+                <h2>🎉 恭喜通关！🎉</h2>
+                <div class="fireworks">
+                    <div class="firework"></div>
+                    <div class="firework"></div>
+                    <div class="firework"></div>
+                </div>
+            </div>
+            <div class="victory-message">
+                <h3>祝贺你成功挑战224层！</h3>
+                <p class="celebration-text">🌟 通关224天纪念 🌟</p>
+                <p class="sub-text">你展现了惊人的毅力和技巧！</p>
+                <div class="final-stats">
+                    <p>总层数: <strong>224层</strong></p>
+                    <p>完成时间: <strong id="completionTime">0</strong>秒</p>
+                </div>
+            </div>
+            <button id="playAgainBtn" class="btn btn-large">再玩一次</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+

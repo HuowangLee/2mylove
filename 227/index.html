@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的227天 ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            position: relative;
+        }
+
+        canvas {
+            border: 3px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .title {
+            color: #FF69B4;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .info {
+            margin-top: 15px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #FF6B9D, #FFA07A);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            animation: modalPop 0.5s ease-out;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-message {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-button {
+            background: white;
+            color: #FF69B4;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        .modal-button:hover {
+            transform: scale(1.1);
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+
+        .start-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .start-button {
+            background: #FF69B4;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-button:hover {
+            background: #FF1493;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="title">💕 我们的227天 💕</div>
+        <canvas id="gameCanvas" width="480" height="640"></canvas>
+        <div class="info">按 <strong>空格键</strong> 控制小心心飞翔 ❤️</div>
+        
+        <div class="start-screen" id="startScreen">
+            <div class="start-title">准备好开始我们的旅程了吗？</div>
+            <button class="start-button" onclick="startGame()">开始游戏</button>
+        </div>
+    </div>
+
+    <div class="modal" id="celebrationModal">
+        <div class="modal-content">
+            <div class="modal-title">🎉 恭喜 🎉</div>
+            <div class="modal-message">
+                我们已经一起飞了227天 ❤️<br>
+                愿我们继续一起飞翔，<br>
+                飞向更美好的未来！
+            </div>
+            <button class="modal-button" onclick="restartGame()">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 游戏状态
+        let gameStarted = false;
+        let gameOver = false;
+        let score = 0;
+        let celebration227Shown = false;
+
+        // 小心心
+        const heart = {
+            x: 100,
+            y: canvas.height / 2,
+            width: 20,
+            height: 20,
+            velocity: 0,
+            gravity: 0.4,
+            jump: -6
+        };
+
+        // 障碍物数组
+        let obstacles = [];
+        const obstacleWidth = 60;
+        const obstacleGap = 360;
+        let frameCount = 0;
+
+        // 绘制心形
+        function drawHeart(x, y, size) {
+            ctx.save();
+            ctx.fillStyle = '#FF69B4';
+            ctx.beginPath();
+            
+            const topCurveHeight = size * 0.3;
+            
+            // 左半边心形
+            ctx.moveTo(x, y + topCurveHeight);
+            ctx.bezierCurveTo(
+                x, y, 
+                x - size / 2, y, 
+                x - size / 2, y + topCurveHeight
+            );
+            ctx.bezierCurveTo(
+                x - size / 2, y + (size + topCurveHeight) / 2, 
+                x, y + (size + topCurveHeight) / 1.2, 
+                x, y + size
+            );
+            
+            // 右半边心形
+            ctx.bezierCurveTo(
+                x, y + (size + topCurveHeight) / 1.2,
+                x + size / 2, y + (size + topCurveHeight) / 2,
+                x + size / 2, y + topCurveHeight
+            );
+            ctx.bezierCurveTo(
+                x + size / 2, y,
+                x, y,
+                x, y + topCurveHeight
+            );
+            
+            ctx.closePath();
+            ctx.fill();
+            
+            // 添加光晕效果
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#FF69B4';
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 获取背景颜色（根据分数变化）
+        function getBackgroundGradient() {
+            const progress = Math.min(score / 227, 1);
+            
+            // 白天颜色
+            const dayTopR = 135, dayTopG = 206, dayTopB = 235;
+            const dayBottomR = 224, dayBottomG = 246, dayBottomB = 255;
+            
+            // 夜晚颜色
+            const nightTopR = 25, nightTopG = 25, nightTopB = 112;
+            const nightBottomR = 70, nightBottomG = 70, nightBottomB = 150;
+            
+            // 插值计算
+            const topR = Math.floor(dayTopR + (nightTopR - dayTopR) * progress);
+            const topG = Math.floor(dayTopG + (nightTopG - dayTopG) * progress);
+            const topB = Math.floor(dayTopB + (nightTopB - dayTopB) * progress);
+            
+            const bottomR = Math.floor(dayBottomR + (nightBottomR - dayBottomR) * progress);
+            const bottomG = Math.floor(dayBottomG + (nightBottomG - dayBottomG) * progress);
+            const bottomB = Math.floor(dayBottomB + (nightBottomB - dayBottomB) * progress);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, `rgb(${topR}, ${topG}, ${topB})`);
+            gradient.addColorStop(1, `rgb(${bottomR}, ${bottomG}, ${bottomB})`);
+            
+            return gradient;
+        }
+
+        // 绘制星星（夜晚效果）
+        function drawStars() {
+            const progress = Math.min(score / 227, 1);
+            if (progress > 0.3) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${(progress - 0.3) * 1.4})`;
+                for (let i = 0; i < 50; i++) {
+                    const x = (i * 47) % canvas.width;
+                    const y = (i * 73) % canvas.height;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // 创建障碍物
+        function createObstacle() {
+            const minHeight = 50;
+            const maxHeight = canvas.height - obstacleGap - minHeight;
+            const height = Math.random() * (maxHeight - minHeight) + minHeight;
+            
+            obstacles.push({
+                x: canvas.width,
+                topHeight: height,
+                bottomY: height + obstacleGap,
+                passed: false
+            });
+        }
+
+        // 更新游戏
+        function update() {
+            if (!gameStarted || gameOver) return;
+
+            // 更新心形位置
+            heart.velocity += heart.gravity;
+            heart.y += heart.velocity;
+
+            // 检查边界
+            if (heart.y + heart.height > canvas.height || heart.y < 0) {
+                endGame();
+                return;
+            }
+
+            // 生成障碍物
+            frameCount++;
+            if (frameCount % 45 === 0) {
+                createObstacle();
+            }
+
+            // 更新障碍物
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= 3;
+
+                // 检查碰撞
+                if (
+                    heart.x + heart.width > obstacles[i].x &&
+                    heart.x < obstacles[i].x + obstacleWidth
+                ) {
+                    if (
+                        heart.y < obstacles[i].topHeight ||
+                        heart.y + heart.height > obstacles[i].bottomY
+                    ) {
+                        endGame();
+                        return;
+                    }
+                }
+
+                // 计分
+                if (!obstacles[i].passed && obstacles[i].x + obstacleWidth < heart.x) {
+                    obstacles[i].passed = true;
+                    score++;
+                    
+                    // 检查是否达到227分
+                    if (score === 227 && !celebration227Shown) {
+                        celebration227Shown = true;
+                        showCelebration();
+                    }
+                }
+
+                // 删除离开屏幕的障碍物
+                if (obstacles[i].x + obstacleWidth < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+        }
+
+        // 绘制游戏
+        function draw() {
+            // 绘制背景
+            ctx.fillStyle = getBackgroundGradient();
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制星星
+            drawStars();
+
+            // 绘制小心心
+            drawHeart(heart.x + heart.width / 2, heart.y + heart.height / 2, 25);
+
+            // 绘制障碍物
+            ctx.fillStyle = '#FFB6C1';
+            obstacles.forEach(obstacle => {
+                // 上方障碍
+                ctx.fillRect(obstacle.x, 0, obstacleWidth, obstacle.topHeight);
+                // 下方障碍
+                ctx.fillRect(obstacle.x, obstacle.bottomY, obstacleWidth, canvas.height - obstacle.bottomY);
+                
+                // 障碍物边框
+                ctx.strokeStyle = '#FF69B4';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(obstacle.x, 0, obstacleWidth, obstacle.topHeight);
+                ctx.strokeRect(obstacle.x, obstacle.bottomY, obstacleWidth, canvas.height - obstacle.bottomY);
+            });
+
+            // 绘制分数
+            ctx.fillStyle = score > 150 ? 'white' : '#333';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${score} 天`, canvas.width / 2, 50);
+
+            // 如果游戏结束
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 40px Arial';
+                ctx.fillText('游戏结束', canvas.width / 2, canvas.height / 2 - 40);
+                
+                ctx.font = '24px Arial';
+                ctx.fillText(`你们一起飞了 ${score} 天`, canvas.width / 2, canvas.height / 2 + 10);
+                
+                ctx.font = '20px Arial';
+                ctx.fillText('按空格键重新开始', canvas.width / 2, canvas.height / 2 + 60);
+            }
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 跳跃
+        function jump() {
+            if (!gameStarted) return;
+            if (gameOver) {
+                restartGame();
+                return;
+            }
+            heart.velocity = heart.jump;
+        }
+
+        // 开始游戏
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameStarted = true;
+        }
+
+        // 结束游戏
+        function endGame() {
+            gameOver = true;
+        }
+
+        // 重新开始
+        function restartGame() {
+            document.getElementById('celebrationModal').classList.remove('active');
+            gameOver = false;
+            score = 0;
+            obstacles = [];
+            heart.y = canvas.height / 2;
+            heart.velocity = 0;
+            frameCount = 0;
+            celebration227Shown = false;
+        }
+
+        // 显示庆祝弹窗
+        function showCelebration() {
+            gameOver = true;
+            setTimeout(() => {
+                document.getElementById('celebrationModal').classList.add('active');
+            }, 500);
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        // 触摸控制（移动端）
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameStarted) {
+                startGame();
+            }
+            jump();
+        });
+
+        // 鼠标点击控制
+        canvas.addEventListener('click', () => {
+            if (gameStarted) {
+                jump();
+            }
+        });
+
+        // 开始游戏循环
+        gameLoop();
+    </script>
+</body>
+</html>
+

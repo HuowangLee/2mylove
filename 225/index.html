@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>225挑战 - 数字合并游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 225 挑战</h1>
+            <p class="subtitle">合并相同数字，达到目标 225！</p>
+        </header>
+
+        <div class="game-info">
+            <div class="info-box">
+                <div class="label">分数</div>
+                <div class="value" id="score">0</div>
+            </div>
+            <div class="info-box">
+                <div class="label">最高分</div>
+                <div class="value" id="best">0</div>
+            </div>
+            <div class="info-box">
+                <div class="label">移动次数</div>
+                <div class="value" id="moves">0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="newGame" class="btn btn-primary">🎯 新游戏</button>
+            <button id="undoBtn" class="btn btn-secondary">↶ 撤销</button>
+        </div>
+
+        <div class="game-container">
+            <div id="gameBoard" class="game-board"></div>
+            <div id="gameOver" class="game-over hidden">
+                <div class="game-over-content">
+                    <h2 id="gameOverTitle">游戏结束！</h2>
+                    <p id="gameOverMessage"></p>
+                    <button id="restartBtn" class="btn btn-primary">再来一局</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🎮 游戏说明</h3>
+            <div class="instruction-grid">
+                <div class="instruction-item">
+                    <span class="icon">⌨️</span>
+                    <span>使用方向键 ↑↓←→ 移动方块</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="icon">🔢</span>
+                    <span>相同数字合并：15+15=30, 30+30=60</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="icon">✨</span>
+                    <span>相近数字也能合并：30+15=45, 150+75=225</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="icon">🎯</span>
+                    <span>目标：创造出 225 方块！</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips">
+            <h4>💡 游戏技巧</h4>
+            <ul>
+                <li>将大数字保持在角落位置</li>
+                <li>尽量让数字按顺序排列</li>
+                <li>不要盲目移动，提前规划</li>
+                <li>善用撤销功能（最多撤销3步）</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>🎲 225 = 15 × 15 | Made with ❤️</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
