@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金铲铲S15天下无双 - 猜阵容小游戏 ❤️ 229天纪念</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 游戏标题 -->
+        <header class="game-header">
+            <h1>⚔️ 金铲铲S15 天下无双 ⚔️</h1>
+            <h2>格斗大会 - 猜阵容小游戏</h2>
+            <div class="love-counter">
+                <span>❤️ 恋爱第229天纪念 ❤️</span>
+            </div>
+        </header>
+
+        <!-- 游戏进度 -->
+        <div class="game-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                关卡 <span id="currentLevel">1</span> / <span id="totalLevels">5</span>
+            </div>
+        </div>
+
+        <!-- 游戏主体 -->
+        <div class="game-content" id="gameContent">
+            <div class="question-card">
+                <h3 class="question-title">根据以下棋子和羁绊，猜猜是什么阵容？</h3>
+                
+                <!-- 棋子展示区 -->
+                <div class="pieces-section">
+                    <h4>主要棋子：</h4>
+                    <div class="pieces-grid" id="piecesGrid"></div>
+                </div>
+
+                <!-- 羁绊展示区 -->
+                <div class="bonds-section">
+                    <h4>核心羁绊：</h4>
+                    <div class="bonds-grid" id="bondsGrid"></div>
+                </div>
+
+                <!-- 提示信息 -->
+                <div class="hint-section" id="hintSection" style="display: none;">
+                    <p class="hint-text" id="hintText"></p>
+                </div>
+
+                <!-- 答案选项 -->
+                <div class="options-grid" id="optionsGrid"></div>
+
+                <!-- 提示按钮 -->
+                <button class="hint-btn" id="hintBtn">💡 需要提示？</button>
+            </div>
+        </div>
+
+        <!-- 通关纪念页面 -->
+        <div class="victory-screen" id="victoryScreen" style="display: none;">
+            <div class="victory-content">
+                <h2 class="victory-title">🎉 恭喜通关！🎉</h2>
+                <div class="love-message">
+                    <p class="love-text">亲爱的，</p>
+                    <p class="love-text">感谢你陪我走过这美好的229天</p>
+                    <p class="love-text">就像游戏中的完美阵容</p>
+                    <p class="love-text">我们在一起也是最佳搭配 ❤️</p>
+                    <div class="love-number">229</div>
+                    <p class="love-subtitle">天天开心，天天爱你</p>
+                </div>
+                <div class="fireworks" id="fireworks"></div>
+                <button class="restart-btn" id="restartBtn">🔄 再玩一次</button>
+            </div>
+        </div>
+
+        <!-- 反馈提示 -->
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
