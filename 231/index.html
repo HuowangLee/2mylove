@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>甜蜜贪吃蛇 ❤️ 恋爱231天</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe4f3 50%, #ffd4ec 100%);
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        /* 爱心背景装饰 */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.15;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        #gameContainer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 20px 10px;
+            z-index: 1;
+        }
+
+        #topBar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .score-value {
+            font-size: 20px;
+            color: #ff1493;
+            font-weight: bold;
+        }
+
+        #gameCanvas {
+            border: 4px solid #ff69b4;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.4);
+            max-width: 400px;
+            width: 100%;
+            aspect-ratio: 1;
+        }
+
+        /* 虚拟摇杆 */
+        #joystickContainer {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            z-index: 10;
+        }
+
+        #joystickBase {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 182, 193, 0.4);
+            border: 3px solid #ff69b4;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        #joystickStick {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 10px rgba(255, 20, 147, 0.5);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* 开始/重新开始按钮 */
+        #startButton {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5);
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        /* 游戏结束和通关弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fff0f6, #ffe4f1);
+            padding: 40px 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.6);
+            animation: modalPop 0.5s;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 32px;
+            color: #ff1493;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            color: #ff69b4;
+            margin: 10px 0;
+        }
+
+        .modal-love {
+            font-size: 48px;
+            margin: 20px 0;
+            animation: heartBeat 1s infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.2);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+
+        .modal-button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5);
+        }
+
+        .modal-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 特殊文字效果 */
+        .special-text {
+            font-size: 24px;
+            color: #ff1493;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 爱心背景 -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- 游戏容器 -->
+    <div id="gameContainer">
+        <!-- 顶部信息栏 -->
+        <div id="topBar">
+            <div class="score-item">
+                <span class="score-label">分数 💕</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">最高分 ⭐</span>
+                <span class="score-value" id="highScore">0</span>
+            </div>
+        </div>
+
+        <!-- 游戏画布 -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- 虚拟摇杆 -->
+        <div id="joystickContainer">
+            <div id="joystickBase"></div>
+            <div id="joystickStick">❤️</div>
+        </div>
+    </div>
+
+    <!-- 开始按钮 -->
+    <button id="startButton">开始游戏 ❤️</button>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">游戏结束 💔</div>
+            <div class="modal-text">得分：<span id="finalScore" class="special-text">0</span></div>
+            <div class="modal-love">😢</div>
+            <button class="modal-button" onclick="restartGame()">再来一次 💖</button>
+        </div>
+    </div>
+
+    <!-- 通关弹窗 -->
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">恭喜通关！🎉</div>
+            <div class="modal-love">❤️💕💖</div>
+            <div class="special-text" style="font-size: 28px; margin: 20px 0;">
+                🎊 恋爱第 231 天 🎊
+            </div>
+            <div class="modal-text" style="font-size: 20px;">
+                愿我们的爱情<br>
+                像这贪吃蛇一样<br>
+                越来越长，永不结束 💝
+            </div>
+            <div class="modal-love">💑</div>
+            <button class="modal-button" onclick="restartGame()">再玩一次 💕</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏配置
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置画布大小
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const topBar = document.getElementById('topBar');
+            const maxSize = Math.min(window.innerWidth - 20, window.innerHeight - topBar.offsetHeight - 200);
+            canvas.width = maxSize;
+            canvas.height = maxSize;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 游戏变量
+        const gridSize = 20;
+        let tileCount;
+        let snake;
+        let food;
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let gameRunning = false;
+        let gameLoop;
+        const winScore = 23; // 通关分数设置为23（代表231）
+
+        document.getElementById('highScore').textContent = highScore;
+
+        // 初始化游戏
+        function initGame() {
+            tileCount = Math.floor(canvas.width / gridSize);
+            snake = [
+                { x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) }
+            ];
+            dx = 0;
+            dy = 0;
+            score = 0;
+            document.getElementById('score').textContent = score;
+            placeFood();
+        }
+
+        // 放置食物
+        function placeFood() {
+            do {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
+        }
+
+        // 绘制游戏
+        function drawGame() {
+            // 清空画布
+            ctx.fillStyle = '#fff9fc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制网格
+            ctx.strokeStyle = '#ffe4f1';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= tileCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * gridSize);
+                ctx.lineTo(canvas.width, i * gridSize);
+                ctx.stroke();
+            }
+
+            // 绘制蛇
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    // 蛇头
+                    const gradient = ctx.createLinearGradient(
+                        segment.x * gridSize, segment.y * gridSize,
+                        (segment.x + 1) * gridSize, (segment.y + 1) * gridSize
+                    );
+                    gradient.addColorStop(0, '#ff69b4');
+                    gradient.addColorStop(1, '#ff1493');
+                    ctx.fillStyle = gradient;
+                } else {
+                    // 蛇身
+                    const gradient = ctx.createLinearGradient(
+                        segment.x * gridSize, segment.y * gridSize,
+                        (segment.x + 1) * gridSize, (segment.y + 1) * gridSize
+                    );
+                    gradient.addColorStop(0, '#ffb6c1');
+                    gradient.addColorStop(1, '#ff69b4');
+                    ctx.fillStyle = gradient;
+                }
+                
+                ctx.fillRect(
+                    segment.x * gridSize + 2,
+                    segment.y * gridSize + 2,
+                    gridSize - 4,
+                    gridSize - 4
+                );
+                
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    segment.x * gridSize + 2,
+                    segment.y * gridSize + 2,
+                    gridSize - 4,
+                    gridSize - 4
+                );
+
+                // 蛇头加眼睛
+                if (index === 0) {
+                    ctx.fillStyle = '#ffffff';
+                    const eyeSize = 3;
+                    const eyeOffset = 5;
+                    if (dx !== 0 || dy === 0) {
+                        ctx.fillRect(segment.x * gridSize + eyeOffset, segment.y * gridSize + eyeOffset, eyeSize, eyeSize);
+                        ctx.fillRect(segment.x * gridSize + gridSize - eyeOffset - eyeSize, segment.y * gridSize + eyeOffset, eyeSize, eyeSize);
+                    }
+                }
+            });
+
+            // 绘制食物（爱心）
+            ctx.fillStyle = '#ff1493';
+            ctx.font = `${gridSize - 4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💖', food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
+        }
+
+        // 更新游戏
+        function updateGame() {
+            if (!gameRunning) return;
+
+            // 移动蛇
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // 检查碰撞墙壁
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+
+            // 检查碰撞自己
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(head);
+
+            // 检查是否吃到食物
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('score').textContent = score;
+                
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('snakeHighScore', highScore);
+                    document.getElementById('highScore').textContent = highScore;
+                }
+
+                // 检查是否通关
+                if (score >= winScore) {
+                    winGame();
+                    return;
+                }
+
+                placeFood();
+                createHeartEffect(food.x * gridSize, food.y * gridSize);
+            } else {
+                snake.pop();
+            }
+
+            drawGame();
+        }
+
+        // 游戏结束
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOverModal').style.display = 'flex';
+        }
+
+        // 通关
+        function winGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            document.getElementById('winModal').style.display = 'flex';
+            createFireworks();
+        }
+
+        // 重新开始
+        function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            document.getElementById('winModal').style.display = 'none';
+            document.getElementById('startButton').style.display = 'block';
+            initGame();
+            drawGame();
+        }
+
+        // 开始游戏
+        document.getElementById('startButton').addEventListener('click', function() {
+            this.style.display = 'none';
+            gameRunning = true;
+            dx = 1;
+            dy = 0;
+            gameLoop = setInterval(updateGame, 250);
+        });
+
+        // 虚拟摇杆控制
+        const joystickContainer = document.getElementById('joystickContainer');
+        const joystickStick = document.getElementById('joystickStick');
+        let joystickActive = false;
+        let joystickStartPos = { x: 0, y: 0 };
+
+        function handleJoystickStart(e) {
+            joystickActive = true;
+            const touch = e.touches ? e.touches[0] : e;
+            const rect = joystickContainer.getBoundingClientRect();
+            joystickStartPos = {
+                x: touch.clientX - rect.left - 75,
+                y: touch.clientY - rect.top - 75
+            };
+        }
+
+        function handleJoystickMove(e) {
+            if (!joystickActive || !gameRunning) return;
+            e.preventDefault();
+            
+            const touch = e.touches ? e.touches[0] : e;
+            const rect = joystickContainer.getBoundingClientRect();
+            const deltaX = touch.clientX - rect.left - 75;
+            const deltaY = touch.clientY - rect.top - 75;
+            
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = 40;
+            
+            let finalX = deltaX;
+            let finalY = deltaY;
+            
+            if (distance > maxDistance) {
+                finalX = (deltaX / distance) * maxDistance;
+                finalY = (deltaY / distance) * maxDistance;
+            }
+            
+            joystickStick.style.transform = `translate(${finalX}px, ${finalY}px)`;
+            
+            // 确定方向
+            const angle = Math.atan2(deltaY, deltaX);
+            const direction = Math.round(angle / (Math.PI / 2));
+            
+            let newDx = dx;
+            let newDy = dy;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 15) {
+                    newDx = 1;
+                    newDy = 0;
+                } else if (deltaX < -15) {
+                    newDx = -1;
+                    newDy = 0;
+                }
+            } else {
+                if (deltaY > 15) {
+                    newDx = 0;
+                    newDy = 1;
+                } else if (deltaY < -15) {
+                    newDx = 0;
+                    newDy = -1;
+                }
+            }
+            
+            // 防止反向
+            if (!(newDx === -dx && dx !== 0) && !(newDy === -dy && dy !== 0)) {
+                dx = newDx;
+                dy = newDy;
+            }
+        }
+
+        function handleJoystickEnd() {
+            joystickActive = false;
+            joystickStick.style.transform = 'translate(0, 0)';
+        }
+
+        joystickContainer.addEventListener('touchstart', handleJoystickStart);
+        joystickContainer.addEventListener('touchmove', handleJoystickMove);
+        joystickContainer.addEventListener('touchend', handleJoystickEnd);
+        joystickContainer.addEventListener('mousedown', handleJoystickStart);
+        document.addEventListener('mousemove', handleJoystickMove);
+        document.addEventListener('mouseup', handleJoystickEnd);
+
+        // 键盘控制（备用）
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            let newDx = dx;
+            let newDy = dy;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    newDx = 0;
+                    newDy = -1;
+                    break;
+                case 'ArrowDown':
+                    newDx = 0;
+                    newDy = 1;
+                    break;
+                case 'ArrowLeft':
+                    newDx = -1;
+                    newDy = 0;
+                    break;
+                case 'ArrowRight':
+                    newDx = 1;
+                    newDy = 0;
+                    break;
+                default:
+                    return;
+            }
+            
+            // 防止反向
+            if (!(newDx === -dx && dx !== 0) && !(newDy === -dy && dy !== 0)) {
+                dx = newDx;
+                dy = newDy;
+            }
+        });
+
+        // 创建爱心特效
+        function createHeartEffect(x, y) {
+            const heart = document.createElement('div');
+            heart.textContent = '💕';
+            heart.style.position = 'fixed';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            heart.style.fontSize = '30px';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            heart.style.animation = 'floatUp 1s ease-out';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        // 创建烟花效果
+        function createFireworks() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.textContent = ['❤️', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
+                    heart.style.position = 'fixed';
+                    heart.style.left = Math.random() * window.innerWidth + 'px';
+                    heart.style.top = Math.random() * window.innerHeight + 'px';
+                    heart.style.fontSize = '40px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.zIndex = '1000';
+                    heart.style.animation = 'floatUp 2s ease-out';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // 添加浮动动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-100px) scale(1.5);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 初始化背景爱心
+        const heartsBg = document.getElementById('heartsBg');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            heart.textContent = '❤️';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 15 + 's';
+            heart.style.animationDuration = (10 + Math.random() * 10) + 's';
+            heartsBg.appendChild(heart);
+        }
+
+        // 初始化游戏
+        initGame();
+        drawGame();
+    </script>
+</body>
+</html>
