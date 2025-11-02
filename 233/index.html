@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>233射击游戏 - 恋爱233天纪念</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100%;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            touch-action: none;
+        }
+
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            padding: 0 20px;
+            text-shadow: 0 0 20px #ff6b9d;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px #ff6b9d, 0 0 30px #ff6b9d; }
+            50% { text-shadow: 0 0 30px #ff6b9d, 0 0 40px #ff6b9d, 0 0 50px #ff6b9d; }
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 10px;
+            padding: 0 20px;
+            color: #ffd93d;
+        }
+
+        .love-message {
+            font-size: 18px;
+            margin: 10px 0;
+            padding: 0 20px;
+            color: #ff6b9d;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 18px 50px;
+            font-size: 22px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 3px 10px rgba(255, 107, 157, 0.6);
+        }
+
+        .controls {
+            margin-top: 20px;
+            font-size: 14px;
+            padding: 0 20px;
+            color: #a0a0a0;
+        }
+
+        .heart {
+            color: #ff6b9d;
+            font-size: 30px;
+            display: inline-block;
+            animation: heartbeat 1.2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+        }
+
+        #score, #lives {
+            position: absolute;
+            top: 15px;
+            font-size: 18px;
+            color: white;
+            z-index: 5;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        #score {
+            left: 10px;
+        }
+
+        #lives {
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="score">得分: 0</div>
+        <div id="lives">生命: ❤️❤️❤️</div>
+        
+        <div id="startScreen">
+            <h1>233射击游戏 😂🎮</h1>
+            <div class="subtitle">哈哈哈哈哈！大笑出击！</div>
+            <div style="font-size: 16px; color: #ffd93d; margin: 10px 20px;">
+                💡 233 = 捶地大笑 = 笑到停不下来
+            </div>
+            <div class="love-message">
+                <span class="heart">❤️</span>
+                纪念我们恋爱233天
+                <span class="heart">❤️</span>
+            </div>
+            <div class="love-message">233天，每天都在笑！😄</div>
+            <button id="startBtn">开始游戏 2333</button>
+            <div class="controls">
+                <p>👆 触摸屏幕移动飞机</p>
+                <p style="margin-top: 10px; color: #ffd93d;">自动发射笑声攻击！</p>
+                <p style="margin-top: 5px; color: #ffd93d;">用笑声击败不开心的敌人！</p>
+            </div>
+        </div>
+
+        <div id="gameOverScreen" class="hidden">
+            <h1>游戏结束！😅</h1>
+            <div class="subtitle" id="finalScore"></div>
+            <div class="love-message">
+                <span class="heart">❤️</span>
+                233天的爱永远不会结束
+                <span class="heart">❤️</span>
+            </div>
+            <div style="font-size: 16px; color: #ffd93d; margin: 10px 20px;">
+                笑声永不停歇！2333333
+            </div>
+            <button id="restartBtn">再笑一次 😂</button>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const finalScoreDisplay = document.getElementById('finalScore');
+
+        // 设置画布大小为屏幕大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let gameRunning = false;
+        let score = 0;
+        let lives = 3;
+        let animationId;
+        
+        // 触摸位置
+        let touchX = null;
+        let touchY = null;
+
+        // 玩家
+        const player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 100,
+            width: 50,
+            height: 50,
+            speed: 6,
+            dx: 0
+        };
+
+        // 子弹数组
+        let bullets = [];
+        
+        // 敌机数组
+        let enemies = [];
+
+        // 爱心粒子数组
+        let hearts = [];
+
+        // 射击冷却
+        let shootCooldown = 0;
+
+        // 触摸事件监听
+        canvas.addEventListener('touchstart', handleTouch, { passive: false });
+        canvas.addEventListener('touchmove', handleTouch, { passive: false });
+        canvas.addEventListener('touchend', () => {
+            touchX = null;
+            touchY = null;
+        }, { passive: false });
+
+        function handleTouch(e) {
+            e.preventDefault();
+            if (e.touches.length > 0 && gameRunning) {
+                const rect = canvas.getBoundingClientRect();
+                touchX = e.touches[0].clientX - rect.left;
+                touchY = e.touches[0].clientY - rect.top;
+            }
+        }
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            startGame();
+        });
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            resizeCanvas(); // 确保画布大小正确
+            score = 0;
+            lives = 3;
+            bullets = [];
+            enemies = [];
+            hearts = [];
+            player.x = canvas.width / 2 - 25;
+            player.y = canvas.height - 100;
+            shootCooldown = 0;
+            touchX = null;
+            touchY = null;
+            gameRunning = true;
+            updateScore();
+            updateLives();
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景星星
+            drawStars();
+
+            // 更新和绘制爱心粒子
+            updateHearts();
+
+            // 移动玩家（跟随触摸位置）
+            if (touchX !== null && touchY !== null) {
+                // 平滑移动到触摸位置
+                const targetX = touchX - player.width / 2;
+                const targetY = touchY - player.height / 2;
+                
+                const dx = targetX - player.x;
+                const dy = targetY - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 5) {
+                    const moveSpeed = Math.min(player.speed, distance);
+                    player.x += (dx / distance) * moveSpeed;
+                    player.y += (dy / distance) * moveSpeed;
+                }
+                
+                // 限制玩家在屏幕内
+                player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+                player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+            }
+
+            // 自动射击
+            if (shootCooldown <= 0) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 3,
+                    y: player.y,
+                    width: 6,
+                    height: 20,
+                    speed: 8
+                });
+                shootCooldown = 10; // 更快的射击频率
+            }
+            if (shootCooldown > 0) shootCooldown--;
+
+            // 绘制玩家
+            drawPlayer();
+
+            // 更新子弹
+            updateBullets();
+
+            // 生成敌机（根据屏幕大小调整生成频率）
+            const spawnRate = 0.015 + (canvas.width / 10000);
+            if (Math.random() < spawnRate) {
+                const enemySize = Math.min(50, canvas.width / 8);
+                enemies.push({
+                    x: Math.random() * (canvas.width - enemySize),
+                    y: -enemySize,
+                    width: enemySize,
+                    height: enemySize,
+                    speed: 2 + Math.random() * 2,
+                    health: 1
+                });
+            }
+
+            // 更新敌机
+            updateEnemies();
+
+            // 碰撞检测
+            checkCollisions();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function drawPlayer() {
+            // 绘制飞机主体（圆形背景）
+            ctx.fillStyle = '#00d4ff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00d4ff';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width / 2, player.y + player.height / 2, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // 绘制机翼
+            ctx.fillStyle = '#00d4ff';
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2, player.y + 10);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+
+            // 绘制大笑表情
+            ctx.font = 'bold 35px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('😂', player.x + player.width / 2, player.y + player.height / 2);
+        }
+
+        function updateBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= bullets[i].speed;
+
+                // 绘制子弹（笑声）
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ffff00';
+                ctx.fillStyle = '#ffff00';
+                // 随机显示"哈"或"233"
+                const laughText = i % 2 === 0 ? '哈' : '233';
+                ctx.fillText(laughText, bullets[i].x, bullets[i].y);
+                ctx.shadowBlur = 0;
+
+                // 移除屏幕外的子弹
+                if (bullets[i].y < 0) {
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+
+        function updateEnemies() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].y += enemies[i].speed;
+
+                // 绘制敌机（圆形背景）
+                ctx.fillStyle = '#ff4757';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ff4757';
+                ctx.beginPath();
+                ctx.arc(enemies[i].x + enemies[i].width / 2, enemies[i].y + enemies[i].height / 2, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // 绘制机翼
+                ctx.fillStyle = '#ff4757';
+                ctx.beginPath();
+                ctx.moveTo(enemies[i].x + enemies[i].width / 2, enemies[i].y + enemies[i].height - 10);
+                ctx.lineTo(enemies[i].x, enemies[i].y);
+                ctx.lineTo(enemies[i].x + enemies[i].width, enemies[i].y);
+                ctx.closePath();
+                ctx.fill();
+
+                // 随机显示不开心的表情
+                const angryEmojis = ['😠', '😡', '😤', '😭', '😰'];
+                ctx.font = 'bold 30px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(angryEmojis[i % angryEmojis.length], enemies[i].x + enemies[i].width / 2, enemies[i].y + enemies[i].height / 2);
+
+                // 敌机离开屏幕
+                if (enemies[i].y > canvas.height) {
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+
+        function checkCollisions() {
+            // 子弹击中敌机
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (bullets[i] && enemies[j] &&
+                        bullets[i].x < enemies[j].x + enemies[j].width &&
+                        bullets[i].x + bullets[i].width > enemies[j].x &&
+                        bullets[i].y < enemies[j].y + enemies[j].height &&
+                        bullets[i].y + bullets[i].height > enemies[j].y) {
+                        
+                        // 显示233爆炸效果
+                        show233Explosion(enemies[j].x + enemies[j].width / 2, enemies[j].y + enemies[j].height / 2);
+                        
+                        bullets.splice(i, 1);
+                        enemies.splice(j, 1);
+                        score += 233;
+                        updateScore();
+                        break;
+                    }
+                }
+            }
+
+            // 敌机撞到玩家
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                if (enemies[i].x < player.x + player.width &&
+                    enemies[i].x + enemies[i].width > player.x &&
+                    enemies[i].y < player.y + player.height &&
+                    enemies[i].y + enemies[i].height > player.y) {
+                    
+                    enemies.splice(i, 1);
+                    lives--;
+                    updateLives();
+
+                    if (lives <= 0) {
+                        endGame();
+                    }
+                }
+            }
+        }
+
+        function show233Explosion(x, y) {
+            // 创建233文字爆炸效果
+            const laughTexts = ['233', '哈哈', '😂', '2333', '笑', 'hhh'];
+            for (let i = 0; i < 8; i++) {
+                hearts.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6 - 2,
+                    life: 60,
+                    text: laughTexts[Math.floor(Math.random() * laughTexts.length)]
+                });
+            }
+        }
+
+        function updateHearts() {
+            for (let i = hearts.length - 1; i >= 0; i--) {
+                hearts[i].x += hearts[i].vx;
+                hearts[i].y += hearts[i].vy;
+                hearts[i].vy += 0.1; // 重力
+                hearts[i].life--;
+
+                ctx.save();
+                ctx.globalAlpha = hearts[i].life / 60;
+                ctx.fillStyle = '#ffd93d';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(hearts[i].text, hearts[i].x, hearts[i].y);
+                ctx.restore();
+
+                if (hearts[i].life <= 0) {
+                    hearts.splice(i, 1);
+                }
+            }
+        }
+
+        function drawStars() {
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 50; i++) {
+                const x = (Date.now() * 0.02 + i * 100) % canvas.width;
+                const y = (i * 157) % canvas.height;
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `得分: ${score}`;
+        }
+
+        function updateLives() {
+            const hearts = '❤️'.repeat(lives);
+            livesDisplay.textContent = `生命: ${hearts}`;
+        }
+
+        function endGame() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            finalScoreDisplay.textContent = `最终得分: ${score}`;
+            gameOverScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
