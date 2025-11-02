@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>黑白键 ❤️ 恋爱232天</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe4f3 50%, #ffd4ec 100%);
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        /* 爱心背景装饰 */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.15;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        #gameContainer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 10px;
+            z-index: 1;
+        }
+
+        #topBar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+
+        .score-value {
+            font-size: 22px;
+            color: #ff1493;
+            font-weight: bold;
+        }
+
+        #gameBoard {
+            width: 100%;
+            max-width: 400px;
+            height: calc(100vh - 100px);
+            max-height: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 4px solid #ff69b4;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.4);
+            overflow: hidden;
+            position: relative;
+            touch-action: none; /* 防止触摸滚动 */
+        }
+
+        #gameTrack {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
+        .column {
+            flex: 1;
+            position: relative;
+            border-right: 2px solid #ffb6c1;
+        }
+
+        .column:last-child {
+            border-right: none;
+        }
+
+        .tile {
+            position: absolute;
+            width: 100%;
+            height: 150px;
+            border-bottom: 2px solid #ffb6c1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.1s;
+            z-index: 10; /* 确保在点击区域上方 */
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .tile:active {
+            opacity: 0.8;
+        }
+
+        .tile.white {
+            background: #ffffff;
+        }
+
+        .tile.black {
+            background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .tile.black::before {
+            content: '♪';
+            font-size: 40px;
+            color: #ff69b4;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+            animation: noteFloat 2s infinite;
+            pointer-events: none; /* 不阻挡点击事件 */
+        }
+
+        @keyframes noteFloat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .tile.clicked {
+            background: linear-gradient(135deg, #ff69b4, #ff1493) !important;
+            animation: clickEffect 0.2s;
+        }
+
+        @keyframes clickEffect {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .tile.wrong {
+            background: #ff6666 !important;
+            animation: wrongEffect 0.3s;
+        }
+
+        @keyframes wrongEffect {
+            0%, 100% {
+                background: #ffcccc;
+            }
+            50% {
+                background: #ff6666;
+            }
+        }
+
+        /* 底部点击区域提示 */
+        .click-zone {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 225px; /* 1.5倍方块高度 */
+            border-top: 3px dashed #ff69b4;
+            pointer-events: none;
+            z-index: 5;
+            background: linear-gradient(to top, rgba(255, 105, 180, 0.15), transparent);
+        }
+
+        /* 开始界面 */
+        #startScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .start-content {
+            background: linear-gradient(135deg, #fff0f6, #ffe4f1);
+            padding: 40px 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.6);
+            animation: modalPop 0.5s;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .start-title {
+            font-size: 36px;
+            color: #ff1493;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
+        }
+
+        .start-subtitle {
+            font-size: 20px;
+            color: #ff69b4;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .start-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .love-message {
+            font-size: 48px;
+            margin: 20px 0;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.2);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+
+        #startButton, .modal-button {
+            padding: 18px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        #startButton:active, .modal-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 游戏结束/通关弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fff0f6, #ffe4f1);
+            padding: 40px 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.6);
+            animation: modalPop 0.5s;
+        }
+
+        .modal-title {
+            font-size: 32px;
+            color: #ff1493;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            color: #ff69b4;
+            margin: 10px 0;
+        }
+
+        .modal-love {
+            font-size: 48px;
+            margin: 20px 0;
+            animation: heartBeat 1s infinite;
+        }
+
+        .special-text {
+            font-size: 24px;
+            color: #ff1493;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.5);
+        }
+
+        .love-poem {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #ff69b4;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .modal-button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 18px;
+        }
+
+        /* 连击提示 */
+        #comboDisplay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff1493;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .combo-show {
+            animation: comboShow 0.8s ease-out;
+        }
+
+        @keyframes comboShow {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 爱心背景 -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- 开始界面 -->
+    <div id="startScreen">
+        <div class="start-content">
+            <div class="start-title">🎹 黑白键 🎹</div>
+            <div class="start-subtitle">❤️ 恋爱第 232 天 ❤️</div>
+            <div class="love-message">💕</div>
+            <div class="start-description">
+                黑色方块从上往下掉落<br>
+                当它们进入底部粉色区域时<br>
+                快速点击黑色方块！<br>
+                不要点到白色方块！<br>
+                就像我们的爱情旋律<br>
+                把握每一个美好的瞬间 💖
+            </div>
+            <button id="startButton">开始游戏 ❤️</button>
+        </div>
+    </div>
+
+    <!-- 游戏容器 -->
+    <div id="gameContainer">
+        <!-- 顶部信息栏 -->
+        <div id="topBar">
+            <div class="score-item">
+                <span class="score-label">分数 💕</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">最高分 ⭐</span>
+                <span class="score-value" id="highScore">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">连击 🔥</span>
+                <span class="score-value" id="combo">0</span>
+            </div>
+        </div>
+
+        <!-- 游戏板 -->
+        <div id="gameBoard">
+            <div id="gameTrack"></div>
+            <div class="click-zone"></div>
+            <div id="comboDisplay"></div>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">游戏结束 💔</div>
+            <div class="modal-text">得分：<span id="finalScore" class="special-text">0</span></div>
+            <div class="modal-text">最高连击：<span id="finalCombo" class="special-text">0</span></div>
+            <div class="modal-love">😢</div>
+            <div class="modal-text">不要气馁，再试一次！</div>
+            <button class="modal-button" onclick="restartGame()">再来一次 💖</button>
+        </div>
+    </div>
+
+    <!-- 通关弹窗 -->
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">恭喜通关！🎉</div>
+            <div class="modal-love">❤️💕💖</div>
+            <div class="special-text" style="font-size: 28px; margin: 20px 0;">
+                🎊 恋爱第 232 天 🎊
+            </div>
+            <div class="love-poem">
+                黑白键盘奏响爱的乐章<br>
+                每一个音符都是对你的思念<br>
+                232天的相伴<br>
+                愿我们的旋律永不停歇 💝
+            </div>
+            <div class="modal-text">得分：<span id="winScore" class="special-text">0</span></div>
+            <div class="modal-love">💑</div>
+            <button class="modal-button" onclick="restartGame()">再玩一次 💕</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏配置
+        const COLS = 4;
+        const WIN_SCORE = 232; // 通关分数
+        const TILE_HEIGHT = 150; // 方块高度（像素）
+        const FALL_SPEED_INITIAL = 2; // 初始下落速度（像素/帧）
+        const FALL_SPEED_MAX = 5; // 最大下落速度
+        const SPEED_INCREASE_INTERVAL = 20; // 每20分加速一次
+
+        // 游戏变量
+        let score = 0;
+        let highScore = localStorage.getItem('pianoHighScore') || 0;
+        let combo = 0;
+        let maxCombo = 0;
+        let gameRunning = false;
+        let fallSpeed = FALL_SPEED_INITIAL;
+        let columns = [];
+        let gameBoard;
+        let gameTrack;
+        let animationId;
+        let lastTileTime = 0;
+        let tileGenerateInterval = 1000; // 生成方块的间隔（毫秒）
+
+        // 音效频率（使用Web Audio API）
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 初始化
+        document.getElementById('highScore').textContent = highScore;
+
+        // 播放音效
+        function playNote(frequency = 523.25) {
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch(e) {
+                // 忽略音频错误
+            }
+        }
+
+        // 创建游戏轨道
+        function createGameBoard() {
+            gameBoard = document.getElementById('gameBoard');
+            gameTrack = document.getElementById('gameTrack');
+            gameTrack.innerHTML = '';
+            columns = [];
+            
+            for (let i = 0; i < COLS; i++) {
+                const column = document.createElement('div');
+                column.className = 'column';
+                column.dataset.col = i;
+                gameTrack.appendChild(column);
+                columns.push({
+                    element: column,
+                    tiles: []
+                });
+            }
+        }
+
+        // 创建方块
+        function createTile(colIndex, isBlack) {
+            const tile = document.createElement('div');
+            tile.className = isBlack ? 'tile black' : 'tile white';
+            tile.style.top = '-150px'; // 从上方开始
+            tile.dataset.col = colIndex;
+            tile.dataset.clicked = 'false';
+            
+            // 添加点击和触摸事件
+            tile.addEventListener('click', handleTileClick);
+            tile.addEventListener('touchstart', handleTileClick);
+            
+            columns[colIndex].element.appendChild(tile);
+            columns[colIndex].tiles.push({
+                element: tile,
+                isBlack: isBlack,
+                clicked: false
+            });
+            
+            return tile;
+        }
+
+        // 生成新的一行方块
+        function generateTileRow() {
+            const blackCol = Math.floor(Math.random() * COLS);
+            
+            for (let i = 0; i < COLS; i++) {
+                createTile(i, i === blackCol);
+            }
+        }
+
+        // 更新游戏（动画帧）
+        function updateGame(timestamp) {
+            if (!gameRunning) return;
+            
+            // 生成新方块
+            if (timestamp - lastTileTime > tileGenerateInterval) {
+                generateTileRow();
+                lastTileTime = timestamp;
+            }
+            
+            // 移动所有方块
+            let shouldGameOver = false;
+            
+            columns.forEach(column => {
+                column.tiles = column.tiles.filter(tileData => {
+                    const tile = tileData.element;
+                    let currentTop = parseFloat(tile.style.top);
+                    currentTop += fallSpeed;
+                    tile.style.top = currentTop + 'px';
+                    
+                    // 检查是否到达底部
+                    const boardHeight = gameBoard.offsetHeight;
+                    if (currentTop >= boardHeight - TILE_HEIGHT) {
+                        // 如果是黑色方块且未被点击，游戏结束
+                        if (tileData.isBlack && !tileData.clicked) {
+                            shouldGameOver = true;
+                        }
+                        // 移除方块
+                        tile.remove();
+                        return false;
+                    }
+                    
+                    return true;
+                });
+            });
+            
+            if (shouldGameOver) {
+                gameOver();
+                return;
+            }
+            
+            animationId = requestAnimationFrame(updateGame);
+        }
+
+        // 处理方块点击
+        function handleTileClick(e) {
+            if (!gameRunning) return;
+            
+            // 防止触摸事件的默认行为和事件冒泡
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const tile = e.target;
+            if (!tile.classList.contains('tile')) return; // 确保点击的是方块
+            if (tile.dataset.clicked === 'true') return; // 已经点击过
+            
+            const colIndex = parseInt(tile.dataset.col);
+            const tileData = columns[colIndex].tiles.find(t => t.element === tile);
+            
+            if (!tileData) return;
+            
+            const tileTop = parseFloat(tile.style.top);
+            const boardHeight = gameBoard.offsetHeight;
+            const clickZoneTop = boardHeight - TILE_HEIGHT * 1.5; // 放宽点击区域到1.5倍方块高度
+            
+            // 方块必须至少下落到一半位置才能点击
+            if (tileTop < clickZoneTop) {
+                return; // 太早点击，不算
+            }
+            
+            if (tileData.isBlack) {
+                // 点击黑色方块 - 正确
+                tile.classList.remove('black');
+                tile.classList.add('clicked');
+                tileData.clicked = true;
+                tile.dataset.clicked = 'true';
+                
+                score++;
+                combo++;
+                maxCombo = Math.max(maxCombo, combo);
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('combo').textContent = combo;
+                
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('pianoHighScore', highScore);
+                    document.getElementById('highScore').textContent = highScore;
+                }
+
+                // 播放音效（不同音高）
+                const frequencies = [523.25, 587.33, 659.25, 698.46, 783.99];
+                playNote(frequencies[Math.floor(Math.random() * frequencies.length)]);
+
+                // 显示连击
+                if (combo % 10 === 0 && combo > 0) {
+                    showCombo(combo);
+                }
+
+                // 增加速度
+                if (score % SPEED_INCREASE_INTERVAL === 0 && score > 0) {
+                    fallSpeed = Math.min(FALL_SPEED_MAX, fallSpeed + 0.3);
+                    tileGenerateInterval = Math.max(500, tileGenerateInterval - 50);
+                }
+
+                // 检查是否通关
+                if (score >= WIN_SCORE) {
+                    winGame();
+                    return;
+                }
+
+                // 获取触摸或点击位置
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                createHeartEffect(x, y);
+                
+            } else {
+                // 点击白色方块 - 错误
+                tile.classList.add('wrong');
+                combo = 0;
+                document.getElementById('combo').textContent = combo;
+                setTimeout(() => gameOver(), 300);
+            }
+        }
+
+        // 显示连击
+        function showCombo(comboCount) {
+            const comboDisplay = document.getElementById('comboDisplay');
+            comboDisplay.textContent = `${comboCount} COMBO! 🔥`;
+            comboDisplay.className = 'combo-show';
+            setTimeout(() => {
+                comboDisplay.className = '';
+            }, 800);
+        }
+
+        // 创建爱心特效
+        function createHeartEffect(x, y) {
+            const heart = document.createElement('div');
+            heart.textContent = ['💕', '💖', '💗', '💝'][Math.floor(Math.random() * 4)];
+            heart.style.position = 'fixed';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            heart.style.fontSize = '30px';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            heart.style.animation = 'floatUp 1s ease-out';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        // 创建烟花效果
+        function createFireworks() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.textContent = ['❤️', '💕', '💖', '💗', '💝', '🎵', '🎶'][Math.floor(Math.random() * 7)];
+                    heart.style.position = 'fixed';
+                    heart.style.left = Math.random() * window.innerWidth + 'px';
+                    heart.style.top = Math.random() * window.innerHeight + 'px';
+                    heart.style.fontSize = '40px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.zIndex = '1000';
+                    heart.style.animation = 'floatUp 2s ease-out';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // 添加浮动动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1) rotate(0deg);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-150px) scale(1.5) rotate(360deg);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 开始游戏
+        document.getElementById('startButton').addEventListener('click', function() {
+            document.getElementById('startScreen').style.display = 'none';
+            // 激活音频上下文（需要用户交互）
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            startGame();
+        });
+
+        function startGame() {
+            gameRunning = true;
+            score = 0;
+            combo = 0;
+            maxCombo = 0;
+            fallSpeed = FALL_SPEED_INITIAL;
+            lastTileTime = 0;
+            tileGenerateInterval = 1000;
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('combo').textContent = combo;
+            
+            createGameBoard();
+            
+            // 开始游戏循环
+            animationId = requestAnimationFrame(updateGame);
+        }
+
+        // 游戏结束
+        function gameOver() {
+            gameRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalCombo').textContent = maxCombo;
+            document.getElementById('gameOverModal').style.display = 'flex';
+        }
+
+        // 通关
+        function winGame() {
+            gameRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            document.getElementById('winScore').textContent = score;
+            document.getElementById('winModal').style.display = 'flex';
+            createFireworks();
+            
+            // 播放胜利音效
+            [523.25, 587.33, 659.25, 783.99].forEach((freq, index) => {
+                setTimeout(() => playNote(freq), index * 150);
+            });
+        }
+
+        // 重新开始
+        function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            document.getElementById('winModal').style.display = 'none';
+            startGame();
+        }
+
+        // 初始化背景爱心
+        const heartsBg = document.getElementById('heartsBg');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            heart.textContent = ['❤️', '💕', '🎵', '🎶'][Math.floor(Math.random() * 4)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 15 + 's';
+            heart.style.animationDuration = (10 + Math.random() * 10) + 's';
+            heartsBg.appendChild(heart);
+        }
+    </script>
+</body>
+</html>
+
