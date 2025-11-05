@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❤️ 235天的爱 - 音乐节奏游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 背景动画 */
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+        }
+
+        .hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 开始屏幕 */
+        .start-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .title {
+            font-size: 64px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.8);
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .description {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            padding: 20px 60px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+            transition: all 0.3s ease;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.7);
+        }
+
+        /* 游戏界面 */
+        .game-area {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        /* 分数和信息栏 */
+        .info-bar {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .score {
+            font-size: 36px;
+            color: #ffd700;
+        }
+
+        /* 游戏目标圆圈 */
+        .target {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .target::before {
+            content: '♥';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+
+        .target.pink {
+            background: radial-gradient(circle, #ff6b9d, #c06c84);
+            border: 4px solid #fff;
+        }
+
+        .target.purple {
+            background: radial-gradient(circle, #a770ef, #764ba2);
+            border: 4px solid #fff;
+        }
+
+        .target.gold {
+            background: radial-gradient(circle, #ffd700, #ffaa00);
+            border: 4px solid #fff;
+        }
+
+        /* 点击效果 */
+        .hit-effect {
+            position: absolute;
+            pointer-events: none;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            animation: hitAnim 0.8s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes hitAnim {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2) translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        /* 连击显示 */
+        .combo {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            z-index: 20;
+            display: none;
+        }
+
+        .combo.show {
+            display: block;
+            animation: comboAnim 0.5s ease-out;
+        }
+
+        @keyframes comboAnim {
+            0% { transform: translateX(-50%) scale(0.5); }
+            50% { transform: translateX(-50%) scale(1.2); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        /* 结束屏幕 */
+        .end-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .end-screen.show {
+            display: flex;
+        }
+
+        .end-title {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        .end-title.win {
+            color: #ffd700;
+            animation: winAnim 1s ease-in-out infinite;
+        }
+
+        .end-title.lose {
+            color: #ff6b9d;
+        }
+
+        @keyframes winAnim {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .end-message {
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #ffd700;
+            margin-bottom: 40px;
+        }
+
+        .restart-btn {
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background"></div>
+        <div class="hearts" id="hearts"></div>
+
+        <!-- 开始屏幕 -->
+        <div class="start-screen" id="startScreen">
+            <div class="title">❤️ 235天的爱 ❤️</div>
+            <div class="subtitle">🎵 音乐节奏游戏 🎵</div>
+            <div class="description">
+                在我们相爱的第235天，<br>
+                让我们用音乐来庆祝这份美好！<br>
+                <br>
+                🎯 游戏规则：<br>
+                • 点击屏幕上出现的爱心<br>
+                • 爱心会逐渐缩小，越小越难点<br>
+                • 在最佳时机点击获得完美判定<br>
+                • 错过爱心会重置连击<br>
+                <br>
+                ⭐ 评分系统：<br>
+                GOOD +1分 | PERFECT +2分<br>
+                每10连击额外+1分<br>
+                达到235分通关！(45秒限时)
+            </div>
+            <button class="start-btn" onclick="startGame()">开始游戏 ▶</button>
+        </div>
+
+        <!-- 游戏区域 -->
+        <div class="game-area" id="gameArea">
+            <div class="info-bar">
+                <div class="info-item">时间: <span id="timer">45</span>s</div>
+                <div class="info-item score">分数: <span id="score">0</span></div>
+                <div class="info-item">连击: <span id="combo">0</span></div>
+            </div>
+            <div class="combo" id="comboDisplay">0 COMBO!</div>
+            <div id="targets"></div>
+        </div>
+
+        <!-- 结束屏幕 -->
+        <div class="end-screen" id="endScreen">
+            <div class="end-title" id="endTitle">恭喜通关！</div>
+            <div class="end-message" id="endMessage">
+                我们的爱情就像这个游戏一样，<br>
+                充满了节奏和美好！<br>
+                愿我们的235天只是开始，<br>
+                未来还有无数个235天！
+            </div>
+            <div class="final-score">最终分数: <span id="finalScore">0</span></div>
+            <button class="restart-btn" onclick="restartGame()">再玩一次 ♻</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let combo = 0;
+        let timeLeft = 45; // 缩短到45秒
+        let gameActive = false;
+        let timerInterval;
+        let spawnInterval;
+        let targetId = 0;
+        let perfectHits = 0;
+        let totalHits = 0;
+
+        // 创建飘落的爱心背景
+        function createFloatingHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = '❤️';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                heartsContainer.appendChild(heart);
+                
+                setTimeout(() => heart.remove(), 6000);
+            }, 500);
+        }
+
+        // 开始游戏
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameArea').classList.add('active');
+            
+            score = 0;
+            combo = 0;
+            timeLeft = 45;
+            gameActive = true;
+            targetId = 0;
+            perfectHits = 0;
+            totalHits = 0;
+            
+            updateDisplay();
+            
+            // 开始计时器
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+            
+            // 开始生成目标 - 更快的节奏
+            spawnTargets();
+            spawnInterval = setInterval(spawnTargets, 1200);
+        }
+
+        // 生成目标
+        function spawnTargets() {
+            if (!gameActive) return;
+            
+            // 每次生成2-3个目标
+            const numTargets = Math.random() > 0.5 ? 3 : 2;
+            
+            for (let i = 0; i < numTargets; i++) {
+                setTimeout(() => {
+                    if (!gameActive) return;
+                    
+                    const target = document.createElement('div');
+                    target.className = 'target';
+                    target.id = 'target-' + targetId++;
+                    
+                    // 随机类型（仅用于视觉效果）
+                    const rand = Math.random();
+                    let type;
+                    if (rand < 0.4) {
+                        type = 'pink';
+                    } else if (rand < 0.8) {
+                        type = 'purple';
+                    } else {
+                        type = 'gold';
+                    }
+                    
+                    target.classList.add(type);
+                    
+                    // 初始大小较大，会逐渐缩小
+                    const initialSize = 120;
+                    target.style.width = initialSize + 'px';
+                    target.style.height = initialSize + 'px';
+                    target.dataset.initialSize = initialSize;
+                    
+                    // 随机位置
+                    const maxX = window.innerWidth - initialSize - 40;
+                    const maxY = window.innerHeight - initialSize - 200;
+                    const minY = 150;
+                    
+                    target.style.left = (Math.random() * maxX + 20) + 'px';
+                    target.style.top = (Math.random() * (maxY - minY) + minY) + 'px';
+                    
+                    // 点击事件
+                    target.addEventListener('click', () => hitTarget(target));
+                    
+                    // 添加到游戏区域
+                    document.getElementById('targets').appendChild(target);
+                    
+                    // 淡入动画
+                    target.style.opacity = '0';
+                    target.style.transform = 'scale(0)';
+                    setTimeout(() => {
+                        target.style.transition = 'opacity 0.2s ease';
+                        target.style.opacity = '1';
+                        target.style.transform = 'scale(1)';
+                    }, 10);
+                    
+                    // 开始缩小动画（2秒内缩小到30%）
+                    const shrinkDuration = 2000;
+                    const startTime = Date.now();
+                    const shrinkInterval = setInterval(() => {
+                        if (!target.parentNode || !gameActive) {
+                            clearInterval(shrinkInterval);
+                            return;
+                        }
+                        
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / shrinkDuration, 1);
+                        
+                        // 从100%缩小到30%
+                        const scale = 1 - (progress * 0.7);
+                        const newSize = initialSize * scale;
+                        target.style.width = newSize + 'px';
+                        target.style.height = newSize + 'px';
+                        target.dataset.currentSize = newSize;
+                        
+                        if (progress >= 1) {
+                            clearInterval(shrinkInterval);
+                        }
+                    }, 16);
+                    
+                    // 2.2秒后消失（如果没被点击）
+                    setTimeout(() => {
+                        if (target.parentNode) {
+                            // 错过目标，重置连击
+                            combo = 0;
+                            updateDisplay();
+                            
+                            target.style.transition = 'all 0.2s ease';
+                            target.style.opacity = '0';
+                            target.style.transform = 'scale(0)';
+                            setTimeout(() => {
+                                if (target.parentNode) {
+                                    target.remove();
+                                }
+                            }, 200);
+                        }
+                    }, 2200);
+                }, i * 150);
+            }
+        }
+
+        // 击中目标
+        function hitTarget(target) {
+            if (!gameActive || !target.parentNode) return;
+            
+            // 判断是否完美点击（基于当前大小）
+            const currentSize = parseFloat(target.dataset.currentSize || target.dataset.initialSize);
+            const initialSize = parseFloat(target.dataset.initialSize);
+            const sizeRatio = currentSize / initialSize;
+            
+            let points = 1; // 基础分
+            let isPerfect = false;
+            
+            // 当目标大小在60%-80%之间时为完美点击
+            if (sizeRatio >= 0.6 && sizeRatio <= 0.8) {
+                points = 2;
+                isPerfect = true;
+                perfectHits++;
+            }
+            
+            // 增加分数和连击
+            score += points;
+            combo++;
+            totalHits++;
+            
+            // 每10个combo额外+1分
+            if (combo % 10 === 0) {
+                score += 1;
+                showComboBonus(target);
+            }
+            
+            // 显示得分效果
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            if (isPerfect) {
+                effect.textContent = 'PERFECT +2';
+                effect.style.color = '#ffd700';
+            } else {
+                effect.textContent = 'GOOD +1';
+                effect.style.color = '#fff';
+            }
+            effect.style.left = target.style.left;
+            effect.style.top = target.style.top;
+            document.getElementById('targets').appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 800);
+            
+            // 显示连击
+            if (combo > 1) {
+                const comboDisplay = document.getElementById('comboDisplay');
+                comboDisplay.textContent = combo + ' COMBO!';
+                comboDisplay.classList.remove('show');
+                void comboDisplay.offsetWidth; // 强制重绘
+                comboDisplay.classList.add('show');
+            }
+            
+            // 移除目标
+            target.style.transform = 'scale(0)';
+            setTimeout(() => {
+                if (target.parentNode) {
+                    target.remove();
+                }
+            }, 100);
+            
+            updateDisplay();
+            
+            // 检查是否达到235分
+            if (score >= 235) {
+                endGame(true);
+            }
+        }
+
+        // 显示连击奖励
+        function showComboBonus(target) {
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            effect.textContent = 'COMBO BONUS +1';
+            effect.style.color = '#ff69b4';
+            effect.style.fontSize = '24px';
+            effect.style.left = target.style.left;
+            effect.style.top = (parseFloat(target.style.top) + 40) + 'px';
+            document.getElementById('targets').appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 800);
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('combo').textContent = combo;
+        }
+
+        // 结束游戏
+        function endGame(win) {
+            gameActive = false;
+            clearInterval(timerInterval);
+            clearInterval(spawnInterval);
+            
+            // 清除所有目标
+            document.getElementById('targets').innerHTML = '';
+            
+            // 显示结束屏幕
+            const endScreen = document.getElementById('endScreen');
+            const endTitle = document.getElementById('endTitle');
+            const endMessage = document.getElementById('endMessage');
+            
+            document.getElementById('finalScore').textContent = score;
+            
+            const accuracy = totalHits > 0 ? ((perfectHits / totalHits) * 100).toFixed(1) : 0;
+            
+            if (win) {
+                endTitle.textContent = '🎉 恭喜通关！🎉';
+                endTitle.className = 'end-title win';
+                endMessage.innerHTML = `
+                    我们的爱情就像这个游戏一样，<br>
+                    充满了节奏和美好！<br>
+                    完美率: ${accuracy}% | 最高连击: ${combo}<br>
+                    愿我们的235天只是开始，<br>
+                    未来还有无数个235天！❤️
+                `;
+            } else {
+                endTitle.textContent = '💔 时间到！💔';
+                endTitle.className = 'end-title lose';
+                endMessage.innerHTML = `
+                    虽然这次没有达到235分，<br>
+                    但我们的爱情永远不会结束！<br>
+                    得分: ${score} | 完美率: ${accuracy}%<br>
+                    再试一次吧！加油！💪
+                `;
+            }
+            
+            endScreen.classList.add('show');
+        }
+
+        // 重新开始
+        function restartGame() {
+            document.getElementById('endScreen').classList.remove('show');
+            document.getElementById('gameArea').classList.remove('active');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        // 初始化
+        createFloatingHearts();
+    </script>
+</body>
+</html>
