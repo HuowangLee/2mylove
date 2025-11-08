@@ -270,7 +270,7 @@
             y: canvas.height / 2,
             size: 25,
             velocityY: 0,
-            gravity: 0.5,
+            gravity: 0.2,
             gravityDirection: 1, // 1 for down, -1 for up
             color: '#ff1493'
         };
@@ -367,7 +367,7 @@
             }
 
             update() {
-                this.x -= obstacleSpeed * 0.7; // 爱心移动速度降低到障碍物的70%
+                this.x -= obstacleSpeed * 0.3; // 爱心移动速度降低到障碍物的70%
                 this.pulse += 0.1;
             }
 
@@ -486,7 +486,7 @@
             }
 
             // 生成障碍物
-            if (frameCount % 120 === 0) {
+            if (frameCount % 180 === 0) {
                 obstacles.push(new Obstacle());
             }
 
@@ -546,8 +546,8 @@
             });
 
             // 难度递增
-            if (frameCount % 300 === 0 && obstacleSpeed < 6) {
-                obstacleSpeed += 0.2;
+            if (frameCount % 400 === 0 && obstacleSpeed < 4) {
+                obstacleSpeed += 0.1;
             }
         }
 
