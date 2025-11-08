@@ -85,9 +85,13 @@
             width: 40px;
             height: 40px;
             font-size: 35px;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.2s ease, filter 0.1s ease, transform 0.1s ease;
             z-index: 5;
             filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+        }
+
+        .arrow.in-range {
+            filter: drop-shadow(0 0 8px rgba(255, 59, 48, 0.8)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
         }
 
         /* 控制按钮区域 */
@@ -378,9 +382,13 @@
             arrows: [],
             currentArrow: null,
             difficulty: 1,
-            arrowSpeed: 2000, // 箭矢飞行时间（毫秒）
-            spawnInterval: 2500, // 生成间隔
-            spawnTimer: null
+            baseArrowSpeed: 1800, // 基础箭矢飞行时间（毫秒）
+            speedVariation: 200, // 速度随机变化范围
+            spawnInterval: 2200, // 生成间隔
+            spawnTimer: null,
+            startTime: 0, // 游戏开始时间
+            dodgeWindow: 500, // 闪避判定窗口（毫秒）- 箭头到达中心前后的有效闪避时间
+            collisionRadius: 35 // 碰撞半径（像素）- 箭头与玩家中心的距离小于此值才判定碰撞
         };
 
         // DOM 元素
@@ -430,8 +438,12 @@
             game.isPlaying = true;
             game.arrows = [];
             game.difficulty = 1;
-            game.arrowSpeed = 2000;
-            game.spawnInterval = 2500;
+            game.baseArrowSpeed = 1800;
+            game.speedVariation = 200;
+            game.spawnInterval = 2200;
+            game.startTime = Date.now();
+            game.dodgeWindow = 500;
+            game.collisionRadius = 35;
 
             updateUI();
             elements.startScreen.classList.add('hidden');
@@ -449,6 +461,16 @@
         function spawnArrow() {
             if (!game.isPlaying) return;
 
+            // 计算游戏进行时间（秒）
+            const elapsedTime = (Date.now() - game.startTime) / 1000;
+            
+            // 随着时间增加速度变化范围（每10秒增加100ms变化范围）
+            const currentVariation = game.speedVariation + Math.floor(elapsedTime / 10) * 100;
+            
+            // 随机速度：基础速度 ± 变化范围
+            const randomSpeed = game.baseArrowSpeed + (Math.random() * 2 - 1) * currentVariation;
+            const arrowSpeed = Math.max(800, Math.min(2500, randomSpeed)); // 限制在800-2500ms之间
+
             const directionKeys = Object.keys(directions);
             const randomDirection = directionKeys[Math.floor(Math.random() * directionKeys.length)];
             const config = directions[randomDirection];
@@ -458,6 +480,7 @@
             arrow.innerHTML = config.emoji;
             arrow.dataset.direction = randomDirection;
             arrow.dataset.dodged = 'false';
+            arrow.dataset.speed = arrowSpeed; // 记录这个箭头的速度
 
             // 设置初始位置
             if (randomDirection === 'up' || randomDirection === 'down') {
@@ -474,7 +497,7 @@
 
             // 动画飞向中心，然后继续飞过去
             setTimeout(() => {
-                arrow.style.transition = `all ${game.arrowSpeed}ms linear`;
+                arrow.style.transition = `all ${arrowSpeed}ms linear`;
                 arrow.style.left = config.endX;
                 arrow.style.top = config.endY;
                 arrow.style.transform = 'translate(-50%, -50%)';
@@ -484,50 +507,105 @@
             game.currentArrow = {
                 element: arrow,
                 direction: randomDirection,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                speed: arrowSpeed,
+                arrivalTime: Date.now() + arrowSpeed + 50 // 预计到达中心的时间
             };
 
-            // 箭矢到达中心时判断
-            setTimeout(() => {
-                if (arrow.parentNode && game.isPlaying && arrow.dataset.dodged === 'false') {
-                    // 未闪避，失去生命
-                    loseLife();
+            // 持续检查碰撞
+            const collisionCheckInterval = setInterval(() => {
+                if (!arrow.parentNode || !game.isPlaying) {
+                    clearInterval(collisionCheckInterval);
+                    return;
                 }
                 
-                // 继续飞过去
-                if (arrow.parentNode) {
-                    arrow.style.transition = `all ${game.arrowSpeed}ms linear`;
-                    if (randomDirection === 'up' || randomDirection === 'down') {
-                        arrow.style.top = config.passY + 'px';
-                    } else {
-                        arrow.style.left = config.passX + 'px';
+                const distance = getDistanceToPlayer(arrow);
+                
+                // 箭头进入可闪避范围时添加视觉提示
+                if (distance <= game.collisionRadius * 2.5 && distance > game.collisionRadius) {
+                    arrow.classList.add('in-range');
+                } else {
+                    arrow.classList.remove('in-range');
+                }
+                
+                // 箭头进入碰撞半径
+                if (distance <= game.collisionRadius) {
+                    clearInterval(collisionCheckInterval);
+                    arrow.classList.remove('in-range');
+                    
+                    if (arrow.dataset.dodged === 'false') {
+                        // 未闪避，失去生命
+                        loseLife();
                     }
+                    
+                    // 继续飞过去
+                    setTimeout(() => {
+                        if (arrow.parentNode) {
+                            arrow.style.transition = `all ${arrowSpeed}ms linear`;
+                            if (randomDirection === 'up' || randomDirection === 'down') {
+                                arrow.style.top = config.passY + 'px';
+                            } else {
+                                arrow.style.left = config.passX + 'px';
+                            }
+                        }
+                    }, 100);
+                    
+                    game.currentArrow = null;
                 }
-                
-                game.currentArrow = null;
-            }, game.arrowSpeed + 50);
+            }, 16); // 每16ms检查一次（约60fps）
+            
+            // 保险机制：箭头飞行时间结束后强制清除检查
+            setTimeout(() => {
+                clearInterval(collisionCheckInterval);
+                if (game.currentArrow?.element === arrow) {
+                    game.currentArrow = null;
+                }
+            }, arrowSpeed + 200);
 
             // 箭矢飞出屏幕后移除
             setTimeout(() => {
                 if (arrow.parentNode) {
                     arrow.remove();
                 }
-            }, game.arrowSpeed * 2 + 100);
+            }, arrowSpeed * 2 + 100);
         }
 
         // 安排下一个箭矢
         function scheduleNextArrow() {
             if (!game.isPlaying) return;
 
-            // 随着分数增加难度
-            const speedIncrease = Math.floor(game.score / 10) * 100;
-            game.arrowSpeed = Math.max(1200, 2000 - speedIncrease);
-            game.spawnInterval = Math.max(1500, 2500 - speedIncrease);
+            // 计算游戏进行时间（秒）
+            const elapsedTime = (Date.now() - game.startTime) / 1000;
+            
+            // 随着时间增加难度：基础速度变快，生成间隔变短
+            const difficultyIncrease = Math.floor(elapsedTime / 15) * 100; // 每15秒增加100ms难度
+            game.baseArrowSpeed = Math.max(1200, 1800 - difficultyIncrease);
+            game.spawnInterval = Math.max(1300, 2200 - difficultyIncrease * 1.2);
+            
+            // 缩小闪避窗口，让判定越来越严格
+            game.dodgeWindow = Math.max(280, 500 - Math.floor(elapsedTime / 20) * 35);
 
             game.spawnTimer = setTimeout(() => {
                 spawnArrow();
                 scheduleNextArrow();
             }, game.spawnInterval);
+        }
+
+        // 计算箭头与玩家中心的距离
+        function getDistanceToPlayer(arrowElement) {
+            const arrowRect = arrowElement.getBoundingClientRect();
+            const playerRect = elements.player.getBoundingClientRect();
+            
+            // 计算箭头和玩家的中心点
+            const arrowCenterX = arrowRect.left + arrowRect.width / 2;
+            const arrowCenterY = arrowRect.top + arrowRect.height / 2;
+            const playerCenterX = playerRect.left + playerRect.width / 2;
+            const playerCenterY = playerRect.top + playerRect.height / 2;
+            
+            // 计算欧几里得距离
+            const dx = arrowCenterX - playerCenterX;
+            const dy = arrowCenterY - playerCenterY;
+            return Math.sqrt(dx * dx + dy * dy);
         }
 
         // 判断闪避方向是否正确
@@ -549,10 +627,36 @@
 
             const arrow = game.currentArrow;
             const btn = document.querySelector(`[data-direction="${clickedDirection}"]`);
+            
+            // 计算箭头与玩家的实际距离
+            const distance = getDistanceToPlayer(arrow.element);
+            
+            // 距离判定：箭头必须足够接近玩家才能闪避（允许距离=碰撞半径的2.5倍）
+            if (distance > game.collisionRadius * 2.5) {
+                // 箭头还太远，不算
+                return;
+            }
+            
+            // 计算当前时间与箭头到达时间的差距
+            const currentTime = Date.now();
+            const timeUntilArrival = arrow.arrivalTime - currentTime;
+            
+            // 判断是否在有效闪避窗口内（箭头到达中心前后的一段时间）
+            const isInDodgeWindow = Math.abs(timeUntilArrival) <= game.dodgeWindow;
+
+            if (!isInDodgeWindow) {
+                // 太早或太晚按键，不算
+                return;
+            }
 
             if (isCorrectDodge(arrow.direction, clickedDirection)) {
                 // 正确闪避
-                game.score += (1 + Math.floor(game.combo / 5));
+                // 根据时机给分：越接近完美时机分数越高
+                const perfectBonus = Math.max(0, 1 - Math.abs(timeUntilArrival) / game.dodgeWindow);
+                const baseScore = 1 + Math.floor(game.combo / 5);
+                const scoreGained = Math.ceil(baseScore * (1 + perfectBonus));
+                
+                game.score += scoreGained;
                 game.combo++;
                 
                 btn.classList.add('correct');
