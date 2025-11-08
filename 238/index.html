@@ -263,6 +263,11 @@
         let score = 0;
         let bestScore = localStorage.getItem('gravitySwapBest') || 0;
         bestScoreElement.textContent = `最高: ${bestScore}`;
+        
+        // 时间控制（帧率独立）
+        let lastTime = 0;
+        const targetFPS = 60;
+        const targetFrameTime = 1000 / targetFPS; // 约16.67ms
 
         // 玩家
         const player = {
@@ -299,11 +304,11 @@
                 this.size = Math.random() * 5 + 3;
             }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life -= 0.02;
-                this.size *= 0.98;
+            update(deltaMultiplier = 1) {
+                this.x += this.vx * deltaMultiplier;
+                this.y += this.vy * deltaMultiplier;
+                this.life -= 0.02 * deltaMultiplier;
+                this.size *= Math.pow(0.98, deltaMultiplier);
             }
 
             draw() {
@@ -324,8 +329,8 @@
                 this.passed = false;
             }
 
-            update() {
-                this.x -= obstacleSpeed;
+            update(deltaMultiplier = 1) {
+                this.x -= obstacleSpeed * deltaMultiplier;
             }
 
             draw() {
@@ -366,9 +371,9 @@
                 this.pulse = 0;
             }
 
-            update() {
-                this.x -= obstacleSpeed * 0.3; // 爱心移动速度降低到障碍物的70%
-                this.pulse += 0.1;
+            update(deltaMultiplier = 1) {
+                this.x -= obstacleSpeed * 0.3 * deltaMultiplier; // 爱心移动速度降低到障碍物的30%
+                this.pulse += 0.1 * deltaMultiplier;
             }
 
             draw() {
@@ -470,14 +475,17 @@
             createParticles(player.x, player.y, '#ffb3d9', 15);
         }
 
-        function updateGame() {
+        function updateGame(deltaTime) {
             if (gameState !== 'playing') return;
+
+            // deltaTime是以毫秒为单位，我们将其归一化到60fps标准
+            const normalizedDelta = deltaTime / targetFrameTime;
 
             frameCount++;
 
-            // 更新玩家
-            player.velocityY += player.gravity * player.gravityDirection;
-            player.y += player.velocityY;
+            // 更新玩家（使用归一化的时间增量）
+            player.velocityY += player.gravity * player.gravityDirection * normalizedDelta;
+            player.y += player.velocityY * normalizedDelta;
 
             // 边界碰撞
             if (player.y - player.size < 0 || player.y + player.size > canvas.height) {
@@ -498,7 +506,7 @@
 
             // 更新障碍物
             obstacles.forEach((obstacle, index) => {
-                obstacle.update();
+                obstacle.update(normalizedDelta);
 
                 // 检测碰撞
                 if (obstacle.collidesWith(player)) {
@@ -522,7 +530,7 @@
 
             // 更新爱心
             hearts.forEach((heart, index) => {
-                heart.update();
+                heart.update(normalizedDelta);
 
                 if (!heart.collected && heart.collidesWith(player)) {
                     heart.collected = true;
@@ -539,7 +547,7 @@
 
             // 更新粒子
             particles.forEach((particle, index) => {
-                particle.update();
+                particle.update(normalizedDelta);
                 if (particle.life <= 0) {
                     particles.splice(index, 1);
                 }
@@ -617,6 +625,7 @@
             obstacles = [];
             hearts = [];
             particles = [];
+            lastTime = 0; // 重置时间
             
             player.y = canvas.height / 2;
             player.velocityY = 0;
@@ -646,8 +655,15 @@
             createParticles(player.x, player.y, '#ff1493', 30);
         }
 
-        function gameLoop() {
-            updateGame();
+        function gameLoop(currentTime) {
+            // 计算时间增量
+            if (lastTime === 0) {
+                lastTime = currentTime;
+            }
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            updateGame(deltaTime);
             drawGame();
             requestAnimationFrame(gameLoop);
         }
