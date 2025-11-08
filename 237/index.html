@@ -177,12 +177,12 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // 防止浏览器滑动
-        document.addEventListener('touchmove', function(e) {
+        // 防止canvas区域的浏览器滑动
+        canvas.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
 
-        document.addEventListener('touchstart', function(e) {
+        canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
         }, { passive: false });
 
