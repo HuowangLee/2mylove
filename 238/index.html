@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gravity Swap - 恋爱238天纪念</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            touch-action: none;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            background: linear-gradient(180deg, #ffeef8 0%, #ffe5f1 100%);
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            touch-action: none;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: #ff1493;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #score, #bestScore {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            max-width: 90%;
+        }
+
+        #gameOver h2 {
+            color: #ff1493;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(255, 20, 147, 0.3);
+        }
+
+        #gameOver p {
+            color: #764ba2;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        #restartBtn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1493 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        #restartBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(255, 20, 147, 0.6);
+        }
+
+        #restartBtn:active {
+            transform: translateY(0);
+        }
+
+        #startScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            max-width: 90%;
+        }
+
+        #startScreen h1 {
+            color: #ff1493;
+            font-size: 36px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(255, 20, 147, 0.3);
+        }
+
+        #startScreen .subtitle {
+            color: #764ba2;
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #startScreen .love-message {
+            color: #ff6b9d;
+            font-size: 16px;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        #startBtn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff1493 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        #startBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(255, 20, 147, 0.6);
+        }
+
+        #instructions {
+            color: #764ba2;
+            font-size: 14px;
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            #gameOver h2, #startScreen h1 {
+                font-size: 24px;
+            }
+            
+            #gameOver p, #startScreen .subtitle {
+                font-size: 16px;
+            }
+            
+            #restartBtn, #startBtn {
+                font-size: 18px;
+                padding: 12px 30px;
+            }
+            
+            #score, #bestScore {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div id="score">分数: 0</div>
+            <div id="bestScore">最高: 0</div>
+        </div>
+
+        <div id="startScreen">
+            <h1>💗 Gravity Swap 💗</h1>
+            <div class="subtitle">恋爱 238 天纪念</div>
+            <div class="love-message">
+                ✨ 每一天都是爱的冒险 ✨<br>
+                愿我们的爱情像这个游戏一样<br>
+                充满惊喜与挑战，永不停歇 💕
+            </div>
+            <div id="instructions">
+                🎮 <strong>游戏玩法</strong><br>
+                点击/触摸屏幕切换重力方向<br>
+                躲避障碍物，收集爱心<br>
+                坚持得越久，分数越高！
+            </div>
+            <button id="startBtn">开始游戏 💖</button>
+        </div>
+
+        <div id="gameOver">
+            <h2>💔 游戏结束</h2>
+            <p id="finalScore">本次分数: 0</p>
+            <p id="finalBest">最高分数: 0</p>
+            <p style="color: #ff6b9d; margin-top: 15px;">
+                💕 爱你每一天 💕
+            </p>
+            <button id="restartBtn">再来一次 💖</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOver');
+        const scoreElement = document.getElementById('score');
+        const bestScoreElement = document.getElementById('bestScore');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 设置画布尺寸
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const maxWidth = Math.min(800, window.innerWidth - 20);
+            const maxHeight = Math.min(600, window.innerHeight - 20);
+            
+            canvas.width = maxWidth;
+            canvas.height = maxHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 游戏状态
+        let gameState = 'start'; // start, playing, gameOver
+        let score = 0;
+        let bestScore = localStorage.getItem('gravitySwapBest') || 0;
+        bestScoreElement.textContent = `最高: ${bestScore}`;
+
+        // 玩家
+        const player = {
+            x: 100,
+            y: canvas.height / 2,
+            size: 25,
+            velocityY: 0,
+            gravity: 0.5,
+            gravityDirection: 1, // 1 for down, -1 for up
+            color: '#ff1493'
+        };
+
+        // 障碍物
+        let obstacles = [];
+        const obstacleWidth = 60;
+        const obstacleGap = 250;
+        let obstacleSpeed = 2.5;
+        let frameCount = 0;
+
+        // 粒子效果
+        let particles = [];
+
+        // 爱心收集物
+        let hearts = [];
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.life = 1;
+                this.color = color;
+                this.size = Math.random() * 5 + 3;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.02;
+                this.size *= 0.98;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Obstacle {
+            constructor() {
+                this.x = canvas.width;
+                this.gapY = Math.random() * (canvas.height - obstacleGap - 100) + 50;
+                this.passed = false;
+            }
+
+            update() {
+                this.x -= obstacleSpeed;
+            }
+
+            draw() {
+                const gradient1 = ctx.createLinearGradient(this.x, 0, this.x + obstacleWidth, 0);
+                gradient1.addColorStop(0, '#ff6b9d');
+                gradient1.addColorStop(1, '#c44569');
+                
+                // 上方障碍物
+                ctx.fillStyle = gradient1;
+                ctx.fillRect(this.x, 0, obstacleWidth, this.gapY);
+                
+                // 下方障碍物
+                ctx.fillRect(this.x, this.gapY + obstacleGap, obstacleWidth, canvas.height);
+
+                // 边框
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(this.x, 0, obstacleWidth, this.gapY);
+                ctx.strokeRect(this.x, this.gapY + obstacleGap, obstacleWidth, canvas.height);
+            }
+
+            collidesWith(player) {
+                if (player.x + player.size > this.x && player.x - player.size < this.x + obstacleWidth) {
+                    if (player.y - player.size < this.gapY || player.y + player.size > this.gapY + obstacleGap) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        class Heart {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 15;
+                this.collected = false;
+                this.pulse = 0;
+            }
+
+            update() {
+                this.x -= obstacleSpeed * 0.7; // 爱心移动速度降低到障碍物的70%
+                this.pulse += 0.1;
+            }
+
+            draw() {
+                const scale = 1 + Math.sin(this.pulse) * 0.2;
+                const size = this.size * scale;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(scale, scale);
+                
+                // 绘制爱心
+                ctx.fillStyle = '#ff1493';
+                ctx.beginPath();
+                ctx.moveTo(0, 5);
+                ctx.bezierCurveTo(0, 0, -7, -5, -10, -5);
+                ctx.bezierCurveTo(-15, -5, -15, 2, -15, 2);
+                ctx.bezierCurveTo(-15, 7, -10, 12, 0, 18);
+                ctx.bezierCurveTo(10, 12, 15, 7, 15, 2);
+                ctx.bezierCurveTo(15, 2, 15, -5, 10, -5);
+                ctx.bezierCurveTo(7, -5, 0, 0, 0, 5);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            collidesWith(player) {
+                const dx = this.x - player.x;
+                const dy = this.y - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance < player.size + this.size;
+            }
+        }
+
+        function drawPlayer() {
+            // 玩家尾迹
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, player.size * 1.5);
+            gradient.addColorStop(0, '#ff1493');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size * 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 玩家主体（圆形）
+            const playerGradient = ctx.createRadialGradient(
+                player.x - 5, player.y - 5, 5,
+                player.x, player.y, player.size
+            );
+            playerGradient.addColorStop(0, '#ffb3d9');
+            playerGradient.addColorStop(1, '#ff1493');
+            
+            ctx.fillStyle = playerGradient;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 边框
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 重力方向指示器
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            if (player.gravityDirection === 1) {
+                // 向下箭头
+                ctx.moveTo(0, 8);
+                ctx.lineTo(-5, 0);
+                ctx.lineTo(5, 0);
+            } else {
+                // 向上箭头
+                ctx.moveTo(0, -8);
+                ctx.lineTo(-5, 0);
+                ctx.lineTo(5, 0);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function createParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function switchGravity() {
+            if (gameState !== 'playing') return;
+            
+            player.gravityDirection *= -1;
+            player.velocityY = 0;
+            
+            // 创建切换特效
+            createParticles(player.x, player.y, '#ffb3d9', 15);
+        }
+
+        function updateGame() {
+            if (gameState !== 'playing') return;
+
+            frameCount++;
+
+            // 更新玩家
+            player.velocityY += player.gravity * player.gravityDirection;
+            player.y += player.velocityY;
+
+            // 边界碰撞
+            if (player.y - player.size < 0 || player.y + player.size > canvas.height) {
+                endGame();
+                return;
+            }
+
+            // 生成障碍物
+            if (frameCount % 120 === 0) {
+                obstacles.push(new Obstacle());
+            }
+
+            // 生成爱心（概率生成）
+            if (frameCount % 180 === 0 && Math.random() > 0.5) {
+                const gapY = Math.random() * (canvas.height - 200) + 100;
+                hearts.push(new Heart(canvas.width, gapY));
+            }
+
+            // 更新障碍物
+            obstacles.forEach((obstacle, index) => {
+                obstacle.update();
+
+                // 检测碰撞
+                if (obstacle.collidesWith(player)) {
+                    endGame();
+                    return;
+                }
+
+                // 计分
+                if (!obstacle.passed && obstacle.x + obstacleWidth < player.x) {
+                    obstacle.passed = true;
+                    score++;
+                    scoreElement.textContent = `分数: ${score}`;
+                    createParticles(player.x, player.y, '#ffd700', 8);
+                }
+
+                // 移除屏幕外的障碍物
+                if (obstacle.x + obstacleWidth < 0) {
+                    obstacles.splice(index, 1);
+                }
+            });
+
+            // 更新爱心
+            hearts.forEach((heart, index) => {
+                heart.update();
+
+                if (!heart.collected && heart.collidesWith(player)) {
+                    heart.collected = true;
+                    score += 5;
+                    scoreElement.textContent = `分数: ${score}`;
+                    createParticles(heart.x, heart.y, '#ff1493', 20);
+                    hearts.splice(index, 1);
+                }
+
+                if (heart.x < -heart.size * 2) {
+                    hearts.splice(index, 1);
+                }
+            });
+
+            // 更新粒子
+            particles.forEach((particle, index) => {
+                particle.update();
+                if (particle.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            // 难度递增
+            if (frameCount % 300 === 0 && obstacleSpeed < 6) {
+                obstacleSpeed += 0.2;
+            }
+        }
+
+        function drawGame() {
+            // 清空画布
+            ctx.fillStyle = '#ffeef8';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景装饰（浮动爱心）
+            ctx.save();
+            ctx.globalAlpha = 0.1;
+            for (let i = 0; i < 5; i++) {
+                const x = (frameCount * 0.5 + i * 200) % (canvas.width + 100);
+                const y = 50 + i * 100 + Math.sin(frameCount * 0.02 + i) * 30;
+                drawHeart(x, y, 30);
+            }
+            ctx.restore();
+
+            // 绘制障碍物
+            obstacles.forEach(obstacle => obstacle.draw());
+
+            // 绘制爱心收集物
+            hearts.forEach(heart => heart.draw());
+
+            // 绘制粒子
+            particles.forEach(particle => particle.draw());
+
+            // 绘制玩家
+            drawPlayer();
+
+            // 绘制中心线（参考线）
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 20, 147, 0.1)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawHeart(x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(size / 20, size / 20);
+            
+            ctx.fillStyle = '#ff1493';
+            ctx.beginPath();
+            ctx.moveTo(0, 5);
+            ctx.bezierCurveTo(0, 0, -7, -5, -10, -5);
+            ctx.bezierCurveTo(-15, -5, -15, 2, -15, 2);
+            ctx.bezierCurveTo(-15, 7, -10, 12, 0, 18);
+            ctx.bezierCurveTo(10, 12, 15, 7, 15, 2);
+            ctx.bezierCurveTo(15, 2, 15, -5, 10, -5);
+            ctx.bezierCurveTo(7, -5, 0, 0, 0, 5);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function startGame() {
+            gameState = 'playing';
+            score = 0;
+            frameCount = 0;
+            obstacleSpeed = 1.5;
+            obstacles = [];
+            hearts = [];
+            particles = [];
+            
+            player.y = canvas.height / 2;
+            player.velocityY = 0;
+            player.gravityDirection = 1;
+            
+            scoreElement.textContent = `分数: ${score}`;
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+        }
+
+        function endGame() {
+            gameState = 'gameOver';
+            
+            // 更新最高分
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('gravitySwapBest', bestScore);
+                bestScoreElement.textContent = `最高: ${bestScore}`;
+            }
+            
+            // 显示游戏结束界面
+            document.getElementById('finalScore').textContent = `本次分数: ${score}`;
+            document.getElementById('finalBest').textContent = `最高分数: ${bestScore}`;
+            gameOverScreen.style.display = 'block';
+            
+            // 死亡特效
+            createParticles(player.x, player.y, '#ff1493', 30);
+        }
+
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 事件监听
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+                e.preventDefault();
+                switchGravity();
+            }
+        });
+
+        // 触摸控制
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            switchGravity();
+        });
+
+        // 鼠标控制
+        canvas.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchGravity();
+        });
+
+        // 防止双击缩放
+        document.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+        });
+
+        // 开始游戏循环
+        gameLoop();
+    </script>
+</body>
+</html>
