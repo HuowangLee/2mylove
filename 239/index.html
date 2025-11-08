@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Draw to Move - 恋爱239天纪念 ❤️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- 顶部UI -->
+        <div id="topUI">
+            <div id="levelInfo">
+                <span id="levelText">关卡 <span id="currentLevel">1</span></span>
+            </div>
+            <div id="loveCounter">
+                <span class="heart-icon">❤️</span>
+                <span id="heartsCollected">0</span> / <span id="totalHearts">3</span>
+            </div>
+        </div>
+
+        <!-- 游戏画布 -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- 底部控制按钮 -->
+        <div id="bottomUI">
+            <button id="clearBtn" class="game-btn">
+                <span>🗑️</span>
+                <span>清除路径</span>
+            </button>
+            <button id="startBtn" class="game-btn primary">
+                <span>▶️</span>
+                <span>开始移动</span>
+            </button>
+            <button id="resetBtn" class="game-btn">
+                <span>↺</span>
+                <span>重新开始</span>
+            </button>
+        </div>
+
+        <!-- 开始界面 -->
+        <div id="startScreen" class="screen">
+            <div class="screen-content">
+                <h1 class="game-title">Draw to Move</h1>
+                <div class="love-badge">
+                    <div class="big-heart">💕</div>
+                    <div class="days-count">239</div>
+                    <div class="days-text">天的爱恋</div>
+                </div>
+                <p class="game-desc">
+                    画出路径，引导爱心到达目的地<br>
+                    收集所有小心心，完成每个关卡
+                </p>
+                <button id="playBtn" class="big-btn">
+                    开始游戏 ❤️
+                </button>
+                <div class="instructions">
+                    <div class="instruction-item">
+                        <span class="emoji">✏️</span>
+                        <span>用手指画出路径</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="emoji">💖</span>
+                        <span>收集所有爱心</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="emoji">🎯</span>
+                        <span>到达目标点</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关卡完成界面 -->
+        <div id="levelCompleteScreen" class="screen hidden">
+            <div class="screen-content">
+                <h2 class="complete-title">关卡完成！🎉</h2>
+                <div class="stars">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                </div>
+                <p class="complete-msg">你成功引导爱心找到了归宿</p>
+                <button id="nextLevelBtn" class="big-btn">
+                    下一关 →
+                </button>
+            </div>
+        </div>
+
+        <!-- 游戏完成界面 -->
+        <div id="gameCompleteScreen" class="screen hidden">
+            <div class="screen-content">
+                <h2 class="complete-title">全部完成！💝</h2>
+                <div class="love-message">
+                    <p class="big-text">239天</p>
+                    <p class="romantic-text">
+                        每一天都是一条通往你的路径<br>
+                        每一步都充满了爱与温暖<br>
+                        愿我们的爱情之路<br>
+                        永远美好，永不停息<br>
+                        ❤️ 我爱你 ❤️
+                    </p>
+                </div>
+                <button id="replayBtn" class="big-btn">
+                    重新游戏 🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
