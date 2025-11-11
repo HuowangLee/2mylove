@@ -118,44 +118,6 @@
             transition: all 0.05s;
         }
 
-        /* 控制按钮 */
-        #controlButtons {
-            position: absolute;
-            bottom: 80px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 100;
-        }
-
-        .control-btn {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
-            border: 3px solid white;
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            cursor: pointer;
-            user-select: none;
-            touch-action: none;
-        }
-
-        .control-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.6);
-        }
-
-        .control-btn.small {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-        }
 
         /* 暂停按钮 */
         #pauseBtn {
@@ -289,12 +251,6 @@
             <div id="joystickStick"></div>
         </div>
 
-        <!-- 控制按钮 -->
-        <div id="controlButtons">
-            <div class="control-btn" id="upBtn">⬆️</div>
-            <div class="control-btn" id="downBtn">⬇️</div>
-        </div>
-
         <!-- 暂停按钮 -->
         <div id="pauseBtn">⏸️</div>
 
@@ -305,7 +261,7 @@
         </div>
 
         <!-- 提示文字 -->
-        <div class="hint-text">摇杆控制方向 | ⬆️加速上升 | ⬇️下降</div>
+        <div class="hint-text">👈 拖动摇杆控制气球飞行方向 👉</div>
 
         <!-- 游戏结束弹窗 -->
         <div id="gameOver">
@@ -381,12 +337,6 @@
             maxDistance: 35
         };
 
-        // 控制按钮状态
-        let controls = {
-            up: false,
-            down: false
-        };
-
         // 障碍物和爱心
         let obstacles = [];
         let hearts = [];
@@ -399,17 +349,17 @@
             const scale = Math.min(w / 800, h / 600);
             
             const levels = [
-                // 第1关
+                // 第1关 - 简单入门
                 {
                     obstacles: [
-                        { type: 'spike', x: w * 0.35, y: h * 0.7, width: 35 * scale, height: 35 * scale },
-                        { type: 'spike', x: w * 0.6, y: h * 0.5, width: 35 * scale, height: 35 * scale },
-                        { type: 'wall', x: w * 0.5, y: h * 0.25, width: 15 * scale, height: h * 0.35 }
+                        { type: 'spike', x: w * 0.3, y: h * 0.7, width: 35 * scale, height: 35 * scale },
+                        { type: 'spike', x: w * 0.65, y: h * 0.45, width: 35 * scale, height: 35 * scale },
+                        { type: 'wall', x: w * 0.45, y: h * 0.25, width: 15 * scale, height: h * 0.25 }
                     ],
                     hearts: [
-                        { x: w * 0.2, y: h * 0.65 },
-                        { x: w * 0.5, y: h * 0.15 },
-                        { x: w * 0.8, y: h * 0.55 }
+                        { x: w * 0.15, y: h * 0.75 },
+                        { x: w * 0.5, y: h * 0.1 },
+                        { x: w * 0.85, y: h * 0.55 }
                     ],
                     wind: []
                 },
@@ -472,6 +422,8 @@
 
             obstacles = JSON.parse(JSON.stringify(levelData.obstacles));
             hearts = JSON.parse(JSON.stringify(levelData.hearts));
+            
+            console.log(`初始化第${gameState.level}关，爱心数量：${hearts.length}`);
             
             balloon.x = canvas.width * 0.15;
             balloon.y = canvas.height * 0.85;
@@ -642,7 +594,7 @@
 
         // 绘制爱心
         function drawHearts() {
-            hearts.forEach(heart => {
+            hearts.forEach((heart, index) => {
                 ctx.save();
                 ctx.translate(heart.x, heart.y);
                 
@@ -650,7 +602,7 @@
                 ctx.translate(0, offset);
                 ctx.rotate(Math.sin(Date.now() * 0.002 + heart.x) * 0.15);
                 
-                const scale = 0.7;
+                const scale = 0.8;
                 ctx.fillStyle = '#ff6b9d';
                 ctx.beginPath();
                 ctx.moveTo(0, -5 * scale);
@@ -660,9 +612,15 @@
                 ctx.bezierCurveTo(15 * scale, -5 * scale, 10 * scale, -12 * scale, 0, -5 * scale);
                 ctx.fill();
                 
-                ctx.strokeStyle = 'rgba(255, 182, 193, 0.5)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(255, 182, 193, 0.6)';
+                ctx.lineWidth = 3;
                 ctx.stroke();
+                
+                // 添加光晕效果让爱心更明显
+                ctx.shadowColor = '#ff6b9d';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0;
                 
                 ctx.restore();
             });
@@ -674,15 +632,11 @@
 
             balloon.vy += balloon.buoyancy;
 
-            // 摇杆控制
+            // 摇杆控制（完全控制上下左右）
             if (joystick.active) {
-                balloon.vx += joystick.deltaX * balloon.controlForce;
-                balloon.vy += joystick.deltaY * balloon.controlForce * 0.5;
+                balloon.vx += joystick.deltaX * balloon.controlForce * 1.2;
+                balloon.vy += joystick.deltaY * balloon.controlForce * 1.2;
             }
-
-            // 按钮控制
-            if (controls.up) balloon.vy -= balloon.controlForce * 1.5;
-            if (controls.down) balloon.vy += balloon.controlForce * 0.8;
 
             // 风力
             const levelData = getLevelData(gameState.level);
@@ -736,21 +690,23 @@
                 const dy = balloon.y - heart.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < balloon.radius + 12) {
+                if (distance < balloon.radius + 20) {
                     gameState.hearts++;
+                    console.log(`收集爱心！剩余：${hearts.length - 1}`);
                     createParticles(heart.x, heart.y, '#ff6b9d');
-                    
-                    if (hearts.length === 0) {
-                        gameState.levelComplete = true;
-                        setTimeout(() => {
-                            document.getElementById('gameWin').style.display = 'block';
-                        }, 500);
-                    }
-                    
                     return false;
                 }
                 return true;
             });
+
+            // 检查是否收集完所有爱心（通关）
+            if (hearts.length === 0 && !gameState.levelComplete && !gameState.gameOver) {
+                gameState.levelComplete = true;
+                console.log('关卡完成！显示通关弹窗');
+                setTimeout(() => {
+                    document.getElementById('gameWin').style.display = 'block';
+                }, 500);
+            }
 
             // 障碍物碰撞
             obstacles.forEach(obs => {
@@ -851,6 +807,12 @@
             updateParticles();
             updateUI();
 
+            // 调试信息：显示当前关卡剩余爱心数
+            ctx.fillStyle = 'rgba(255, 107, 157, 0.6)';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`本关剩余: ${hearts.length}❤️`, 10, 25);
+
             requestAnimationFrame(gameLoop);
         }
 
@@ -896,25 +858,6 @@
                 joystickStick.style.left = '35px';
                 joystickStick.style.top = '35px';
             }
-        });
-
-        // 控制按钮
-        document.getElementById('upBtn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            controls.up = true;
-        });
-        document.getElementById('upBtn').addEventListener('touchend', (e) => {
-            e.preventDefault();
-            controls.up = false;
-        });
-
-        document.getElementById('downBtn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            controls.down = true;
-        });
-        document.getElementById('downBtn').addEventListener('touchend', (e) => {
-            e.preventDefault();
-            controls.down = false;
         });
 
         // 暂停按钮
