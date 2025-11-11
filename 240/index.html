@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>240天恋爱纪念 - 爱的试炼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            touch-action: none;
+        }
+
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #ff9a9e 0%, #fad0c4 50%, #ffecd2 100%);
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .health-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .health-bar {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .health-label {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .health-fill {
+            width: 100%;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .health-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff8787, #ffa5a5);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .health-inner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: health-shine 2s infinite;
+        }
+
+        @keyframes health-shine {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        .boss-health-inner {
+            background: linear-gradient(90deg, #ee5a6f, #f29263, #f7d08a);
+            box-shadow: 0 0 20px rgba(238, 90, 111, 0.6);
+        }
+
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 129, 0.98), rgba(255, 175, 189, 0.98));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        #gameOverScreen {
+            display: none;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.98), rgba(250, 208, 196, 0.98));
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            animation: title-float 3s ease-in-out infinite;
+            text-align: center;
+        }
+
+        @keyframes title-float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 50px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .instruction-box {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .instruction {
+            font-size: 18px;
+            color: white;
+            margin: 12px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .start-btn {
+            padding: 20px 60px;
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 8px 30px rgba(118, 75, 162, 0.5);
+            transition: all 0.3s;
+            pointer-events: auto;
+            font-weight: bold;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            animation: btn-pulse 2s infinite;
+        }
+
+        @keyframes btn-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 30px rgba(118, 75, 162, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 12px 40px rgba(118, 75, 162, 0.7);
+            }
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-hint {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            padding: 20px 50px;
+            background: rgba(255, 0, 0, 0.6);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            animation: hint-urgent 0.3s infinite;
+            z-index: 20;
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.6);
+        }
+
+        @keyframes hint-urgent {
+            0%, 100% {
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.15);
+            }
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 64px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 1),
+                         0 0 60px rgba(255, 215, 0, 0.8);
+            pointer-events: none;
+            z-index: 30;
+            display: none;
+            animation: combo-burst 0.6s ease-out;
+        }
+
+        @keyframes combo-burst {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3) rotate(5deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .tap-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            z-index: 15;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 30px;
+        }
+
+        .tap-indicator {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(255, 107, 129, 0.8), rgba(255, 175, 189, 0.8));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            color: white;
+            box-shadow: 0 10px 40px rgba(255, 107, 129, 0.6);
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            animation: tap-breathe 2s ease-in-out infinite;
+            transition: all 0.1s;
+        }
+
+        @keyframes tap-breathe {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 40px rgba(255, 107, 129, 0.6);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 15px 50px rgba(255, 107, 129, 0.8);
+            }
+        }
+
+        .tap-indicator.active {
+            transform: scale(0.85);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 235, 59, 0.9));
+        }
+
+        .tap-hint {
+            position: absolute;
+            bottom: 170px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 200px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .score-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            color: #FFD700;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        .day-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- 背景240天标记 -->
+        <div class="day-badge">240</div>
+
+        <!-- 游戏画布 -->
+        <canvas id="canvas"></canvas>
+        <canvas id="particleCanvas" class="particle-canvas"></canvas>
+        
+        <!-- UI叠加层 -->
+        <div class="ui-overlay">
+            <div class="health-container">
+                <div class="health-bar">
+                    <div class="health-label">
+                        <span>❤️</span>
+                        <span>你的真心</span>
+                    </div>
+                    <div class="health-fill">
+                        <div class="health-inner" id="playerHealth" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="health-bar">
+                    <div class="health-label">
+                        <span>💔</span>
+                        <span>爱的试炼</span>
+                    </div>
+                    <div class="health-fill">
+                        <div class="health-inner boss-health-inner" id="bossHealth" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分数显示 -->
+        <div class="score-display" style="display: none;" id="scoreDisplay">
+            <div class="score-label">连击</div>
+            <div class="score-value" id="comboCount">0</div>
+        </div>
+
+        <!-- 提示信息 -->
+        <div class="action-hint" id="actionHint">快点击！⚡</div>
+        <div class="combo-display" id="comboDisplay">PERFECT!</div>
+
+        <!-- 触摸区域 -->
+        <div class="tap-area" id="tapArea" style="display: none;">
+            <div class="tap-indicator" id="tapIndicator">👆</div>
+        </div>
+        <div class="tap-hint" id="tapHint" style="display: none;">点击屏幕防御</div>
+
+        <!-- 开始界面 -->
+        <div id="startScreen">
+            <div class="title">💖 240天的爱 💖</div>
+            <div class="subtitle">我们相恋的第240天纪念</div>
+            <div class="instruction-box">
+                <div class="instruction">⚡ 看到红色闪光时</div>
+                <div class="instruction">👆 快速点击屏幕</div>
+                <div class="instruction">⏰ 时机决定一切</div>
+                <div class="instruction">💕 守护我们的爱情</div>
+            </div>
+            <button class="start-btn" id="startBtn">开始游戏 ▶</button>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="gameOverScreen">
+            <div class="title" id="resultTitle">胜利！</div>
+            <div class="subtitle" id="resultMessage">我们的爱战胜了一切</div>
+            <div class="instruction-box" id="resultStats" style="display: none;">
+                <div class="instruction">💯 完美防御: <span id="perfectCount">0</span></div>
+                <div class="instruction">⭐ 最高连击: <span id="maxCombo">0</span></div>
+            </div>
+            <button class="start-btn" id="restartBtn">再来一次 ↻</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const particleCanvas = document.getElementById('particleCanvas');
+        const pCtx = particleCanvas.getContext('2d');
+
+        // 设置画布大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 游戏状态
+        let gameState = 'start'; // start, playing, gameover
+        let playerHP = 100;
+        let bossHP = 100;
+        let combo = 0;
+        let maxCombo = 0;
+        let perfectCount = 0;
+        let gameTime = 0;
+        let particles = [];
+        let floatingHearts = [];
+
+        // Boss攻击状态
+        let bossAttack = {
+            active: false,
+            type: '',
+            startTime: 0,
+            warningTime: 1200,
+            attackTime: 1800,
+            canDefend: false
+        };
+
+        // 玩家
+        const player = {
+            x: window.innerWidth * 0.3,
+            y: window.innerHeight * 0.7,
+            size: 50,
+            color: '#ff6b9d',
+            action: 'idle',
+            scale: 1
+        };
+
+        // Boss
+        const boss = {
+            x: window.innerWidth * 0.7,
+            y: window.innerHeight * 0.3,
+            size: 70,
+            color: '#c44569',
+            action: 'idle',
+            scale: 1
+        };
+
+        // 粒子类
+        class Particle {
+            constructor(x, y, color, size, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx || (Math.random() - 0.5) * 8;
+                this.vy = vy || (Math.random() - 0.5) * 8;
+                this.color = color;
+                this.size = size;
+                this.life = 1;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.3; // 重力
+                this.life -= 0.015;
+                this.size *= 0.98;
+                this.rotation += this.rotationSpeed;
+            }
+
+            draw() {
+                pCtx.save();
+                pCtx.globalAlpha = this.life;
+                pCtx.translate(this.x, this.y);
+                pCtx.rotate(this.rotation);
+                drawHeart(0, 0, this.size, this.color, pCtx);
+                pCtx.restore();
+            }
+        }
+
+        // 飘落的爱心
+        class FloatingHeart {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -50;
+                this.size = Math.random() * 20 + 10;
+                this.speed = Math.random() * 2 + 1;
+                this.swing = Math.random() * Math.PI * 2;
+                this.swingSpeed = Math.random() * 0.05 + 0.02;
+                this.opacity = Math.random() * 0.3 + 0.1;
+                this.color = Math.random() > 0.5 ? '#ff6b9d' : '#ffa5d8';
+            }
+
+            update() {
+                this.y += this.speed;
+                this.swing += this.swingSpeed;
+                if (this.y > canvas.height + 50) {
+                    this.y = -50;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const x = this.x + Math.sin(this.swing) * 30;
+                drawHeart(x, this.y, this.size, this.color, ctx);
+                ctx.restore();
+            }
+        }
+
+        // 初始化飘落的爱心
+        for (let i = 0; i < 15; i++) {
+            floatingHearts.push(new FloatingHeart());
+        }
+
+        // 创建粒子效果
+        function createParticles(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color, Math.random() * 15 + 5));
+            }
+        }
+
+        // 绘制爱心
+        function drawHeart(x, y, size, color, context) {
+            context.save();
+            context.fillStyle = color;
+            context.beginPath();
+            context.moveTo(x, y + size * 0.3);
+            context.bezierCurveTo(x, y, x - size * 0.5, y - size * 0.3, x - size * 0.5, y + size * 0.2);
+            context.bezierCurveTo(x - size * 0.5, y + size * 0.5, x, y + size * 0.8, x, y + size);
+            context.bezierCurveTo(x, y + size * 0.8, x + size * 0.5, y + size * 0.5, x + size * 0.5, y + size * 0.2);
+            context.bezierCurveTo(x + size * 0.5, y - size * 0.3, x, y, x, y + size * 0.3);
+            context.fill();
+            context.restore();
+        }
+
+        // 绘制玩家
+        function drawPlayer() {
+            const size = player.size * player.scale;
+            
+            // 防御光环
+            if (player.action === 'defend') {
+                ctx.save();
+                const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, size + 30);
+                gradient.addColorStop(0, 'rgba(255, 215, 0, 0.6)');
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, size + 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // 发光效果
+            ctx.save();
+            ctx.shadowColor = player.color;
+            ctx.shadowBlur = 20;
+            drawHeart(player.x, player.y, size, player.color, ctx);
+            ctx.restore();
+            
+            // 眼睛
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(player.x - size * 0.2, player.y + size * 0.1, size * 0.12, 0, Math.PI * 2);
+            ctx.arc(player.x + size * 0.2, player.y + size * 0.1, size * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(player.x - size * 0.2, player.y + size * 0.1, size * 0.08, 0, Math.PI * 2);
+            ctx.arc(player.x + size * 0.2, player.y + size * 0.1, size * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 微笑
+            if (combo > 0) {
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y + size * 0.25, size * 0.2, 0, Math.PI);
+                ctx.stroke();
+            }
+        }
+
+        // 绘制Boss
+        function drawBoss() {
+            const size = boss.size * boss.scale;
+            
+            // 警告光环
+            if (boss.action === 'warning') {
+                const pulse = Math.sin(Date.now() / 80) * 0.5 + 0.5;
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 0, 0, ${0.6 + pulse * 0.4})`;
+                ctx.lineWidth = 6;
+                ctx.shadowColor = 'red';
+                ctx.shadowBlur = 30;
+                ctx.beginPath();
+                ctx.arc(boss.x, boss.y, size + 30 + pulse * 20, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 攻击射线
+            if (boss.action === 'attacking') {
+                ctx.save();
+                const gradient = ctx.createLinearGradient(boss.x, boss.y, player.x, player.y);
+                gradient.addColorStop(0, 'rgba(255, 0, 0, 0.6)');
+                gradient.addColorStop(1, 'rgba(255, 0, 0, 0.1)');
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 15;
+                ctx.shadowColor = 'red';
+                ctx.shadowBlur = 20;
+                ctx.beginPath();
+                ctx.moveTo(boss.x, boss.y);
+                ctx.lineTo(player.x, player.y);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Boss本体
+            ctx.save();
+            ctx.shadowColor = boss.color;
+            ctx.shadowBlur = 25;
+            drawHeart(boss.x, boss.y, size, boss.color, ctx);
+            ctx.restore();
+            
+            // 裂痕
+            ctx.save();
+            ctx.strokeStyle = '#8e2738';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            ctx.moveTo(boss.x, boss.y - size * 0.5);
+            ctx.lineTo(boss.x - size * 0.2, boss.y + size * 0.2);
+            ctx.lineTo(boss.x + size * 0.2, boss.y + size * 0.5);
+            ctx.lineTo(boss.x, boss.y + size);
+            ctx.stroke();
+            ctx.restore();
+            
+            // 邪恶的眼睛
+            ctx.fillStyle = '#ff0000';
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(boss.x - size * 0.25, boss.y, size * 0.15, 0, Math.PI * 2);
+            ctx.arc(boss.x + size * 0.25, boss.y, size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 绘制背景
+        function drawBackground() {
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#ff9a9e');
+            gradient.addColorStop(0.5, '#fad0c4');
+            gradient.addColorStop(1, '#ffecd2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 飘落的爱心
+            floatingHearts.forEach(heart => {
+                heart.update();
+                heart.draw();
+            });
+        }
+
+        // Boss AI
+        function triggerBossAttack() {
+            if (bossAttack.active || gameState !== 'playing') return;
+
+            bossAttack.active = true;
+            bossAttack.startTime = Date.now();
+            bossAttack.canDefend = false;
+            boss.action = 'warning';
+            boss.scale = 1;
+
+            // 显示提示
+            setTimeout(() => {
+                if (bossAttack.active && gameState === 'playing') {
+                    bossAttack.canDefend = true;
+                    document.getElementById('actionHint').style.display = 'block';
+                    // 振动提示
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                }
+            }, bossAttack.warningTime - 400);
+
+            // 发动攻击
+            setTimeout(() => {
+                if (bossAttack.active && gameState === 'playing') {
+                    boss.action = 'attacking';
+                    document.getElementById('actionHint').style.display = 'none';
+                    
+                    // 如果玩家没有防御，扣血
+                    if (player.action !== 'defend') {
+                        playerHP -= 25;
+                        updateHealthBars();
+                        createParticles(player.x, player.y, 30, '#ff0000');
+                        combo = 0;
+                        updateCombo();
+                        document.getElementById('gameContainer').classList.add('shake');
+                        setTimeout(() => {
+                            document.getElementById('gameContainer').classList.remove('shake');
+                        }, 300);
+                        if (navigator.vibrate) {
+                            navigator.vibrate([100, 50, 100]);
+                        }
+                    }
+                }
+            }, bossAttack.attackTime);
+
+            // 攻击结束
+            setTimeout(() => {
+                bossAttack.active = false;
+                boss.action = 'idle';
+                boss.scale = 1;
+                player.action = 'idle';
+                player.scale = 1;
+                
+                // 安排下一次攻击
+                if (gameState === 'playing' && bossHP > 0 && playerHP > 0) {
+                    setTimeout(() => triggerBossAttack(), 
+                        Math.random() * 800 + 1200);
+                }
+            }, bossAttack.attackTime + 600);
+        }
+
+        // 玩家点击
+        function playerAction() {
+            if (gameState !== 'playing' || player.action !== 'idle') return;
+
+            if (bossAttack.canDefend && boss.action === 'warning') {
+                // 成功防御
+                player.action = 'defend';
+                player.scale = 1.2;
+                combo++;
+                perfectCount++;
+                maxCombo = Math.max(maxCombo, combo);
+                
+                // 反击伤害
+                bossHP -= 12;
+                boss.scale = 0.8;
+                updateHealthBars();
+                updateCombo();
+                createParticles(boss.x, boss.y, 40, '#FFD700');
+                
+                // 显示连击
+                showCombo('PERFECT! 💖');
+                
+                // 取消这次攻击
+                bossAttack.canDefend = false;
+                document.getElementById('actionHint').style.display = 'none';
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+                
+            } else if (bossAttack.active && !bossAttack.canDefend) {
+                // 时机不对
+                playerHP -= 8;
+                updateHealthBars();
+                createParticles(player.x, player.y, 15, '#ff6666');
+                combo = 0;
+                updateCombo();
+                showCombo('MISS! 💔');
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            }
+        }
+
+        // 显示连击提示
+        function showCombo(text) {
+            const comboEl = document.getElementById('comboDisplay');
+            comboEl.textContent = text;
+            comboEl.style.display = 'block';
+            
+            setTimeout(() => {
+                comboEl.style.display = 'none';
+            }, 600);
+        }
+
+        // 更新连击显示
+        function updateCombo() {
+            const comboCount = document.getElementById('comboCount');
+            comboCount.textContent = combo;
+            
+            if (combo > 0) {
+                comboCount.parentElement.parentElement.style.display = 'block';
+            }
+        }
+
+        // 更新血量显示
+        function updateHealthBars() {
+            document.getElementById('playerHealth').style.width = Math.max(0, playerHP) + '%';
+            document.getElementById('bossHealth').style.width = Math.max(0, bossHP) + '%';
+            
+            // 检查游戏结束
+            if (playerHP <= 0) {
+                endGame(false);
+            } else if (bossHP <= 0) {
+                endGame(true);
+            }
+        }
+
+        // 游戏主循环
+        function gameLoop() {
+            if (gameState === 'playing') {
+                gameTime += 0.016;
+            }
+
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            
+            // 绘制
+            drawBackground();
+
+            if (gameState === 'playing') {
+                drawPlayer();
+                drawBoss();
+            }
+
+            // 更新和绘制粒子
+            particles = particles.filter(p => {
+                p.update();
+                p.draw();
+                return p.life > 0;
+            });
+
+            // 平滑缩放恢复
+            player.scale += (1 - player.scale) * 0.1;
+            boss.scale += (1 - boss.scale) * 0.1;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 开始游戏
+        function startGame() {
+            gameState = 'playing';
+            playerHP = 100;
+            bossHP = 100;
+            combo = 0;
+            maxCombo = 0;
+            perfectCount = 0;
+            gameTime = 0;
+            player.action = 'idle';
+            player.scale = 1;
+            boss.action = 'idle';
+            boss.scale = 1;
+            bossAttack.active = false;
+            
+            // 更新位置（适配屏幕）
+            player.x = canvas.width * 0.3;
+            player.y = canvas.height * 0.7;
+            boss.x = canvas.width * 0.7;
+            boss.y = canvas.height * 0.3;
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('tapArea').style.display = 'flex';
+            document.getElementById('tapHint').style.display = 'block';
+            document.getElementById('scoreDisplay').style.display = 'block';
+            
+            updateHealthBars();
+            updateCombo();
+            
+            // 开始Boss攻击循环
+            setTimeout(() => triggerBossAttack(), 2500);
+        }
+
+        // 游戏结束
+        function endGame(victory) {
+            gameState = 'gameover';
+            
+            document.getElementById('tapArea').style.display = 'none';
+            document.getElementById('tapHint').style.display = 'none';
+            
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const resultStats = document.getElementById('resultStats');
+            
+            if (victory) {
+                resultTitle.textContent = '💖 胜利！💖';
+                resultMessage.textContent = '我们的爱战胜了一切试炼！';
+                createParticles(canvas.width / 2, canvas.height / 2, 100, '#FFD700');
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200, 100, 200]);
+                }
+            } else {
+                resultTitle.textContent = '💔 加油！💔';
+                resultMessage.textContent = '爱需要不断守护和努力！';
+            }
+
+            document.getElementById('perfectCount').textContent = perfectCount;
+            document.getElementById('maxCombo').textContent = maxCombo;
+            resultStats.style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('gameOverScreen').style.display = 'flex';
+            }, 500);
+        }
+
+        // 触摸事件
+        let touchStartTime = 0;
+        const tapIndicator = document.getElementById('tapIndicator');
+        const tapArea = document.getElementById('tapArea');
+
+        tapArea.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            touchStartTime = Date.now();
+            tapIndicator.classList.add('active');
+            playerAction();
+        });
+
+        tapArea.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            tapIndicator.classList.remove('active');
+        });
+
+        // 按钮事件
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', startGame);
+
+        // 防止默认触摸行为
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        // 启动游戏循环
+        gameLoop();
+    </script>
+</body>
+</html>
