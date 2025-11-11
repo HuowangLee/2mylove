@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>气球之恋 - 恋爱241天纪念 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        #header {
+            padding: 10px;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 100%);
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff6b9d;
+            font-size: 22px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #c44569;
+            font-size: 12px;
+        }
+
+        #gameCanvas {
+            flex: 1;
+            background: linear-gradient(180deg, #ffd1dc 0%, #ffe4e9 50%, #fff0f3 100%);
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        #gameInfo {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 5px;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 100%);
+        }
+
+        .info-item {
+            text-align: center;
+            color: #c44569;
+            font-weight: bold;
+        }
+
+        .info-item .label {
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .info-item .value {
+            font-size: 18px;
+            color: #ff6b9d;
+        }
+
+        /* 虚拟摇杆 */
+        #joystickContainer {
+            position: absolute;
+            bottom: 80px;
+            left: 30px;
+            width: 120px;
+            height: 120px;
+            z-index: 100;
+        }
+
+        #joystickBase {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, rgba(255, 107, 157, 0.1) 100%);
+            border: 3px solid rgba(255, 107, 157, 0.4);
+        }
+
+        #joystickStick {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff6b9d 0%, #ff8fab 100%);
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            left: 35px;
+            top: 35px;
+            transition: all 0.05s;
+        }
+
+        /* 控制按钮 */
+        #controlButtons {
+            position: absolute;
+            bottom: 80px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.6);
+        }
+
+        .control-btn.small {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        /* 暂停按钮 */
+        #pauseBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(255, 107, 157, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            z-index: 101;
+            cursor: pointer;
+        }
+
+        #pauseBtn:active {
+            transform: scale(0.9);
+        }
+
+        /* 游戏结束/胜利弹窗 */
+        #gameOver, #gameWin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            display: none;
+            z-index: 200;
+            max-width: 85%;
+        }
+
+        #gameOver h2, #gameWin h2 {
+            color: #ff6b9d;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        #gameOver p, #gameWin p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* 暂停遮罩 */
+        #pauseOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 150;
+        }
+
+        #pauseOverlay h2 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .hint-text {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 107, 157, 0.6);
+            font-size: 12px;
+            text-align: center;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="header">
+            <h1>🎈 气球之恋 💕</h1>
+            <div class="subtitle">纪念我们在一起的第241天 ✨</div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="gameInfo">
+            <div class="info-item">
+                <div class="label">❤️ 爱心</div>
+                <div class="value" id="hearts">0/241</div>
+            </div>
+            <div class="info-item">
+                <div class="label">🎮 关卡</div>
+                <div class="value" id="level">1</div>
+            </div>
+            <div class="info-item">
+                <div class="label">💖 生命</div>
+                <div class="value" id="lives">3</div>
+            </div>
+        </div>
+
+        <!-- 虚拟摇杆 -->
+        <div id="joystickContainer">
+            <div id="joystickBase"></div>
+            <div id="joystickStick"></div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div id="controlButtons">
+            <div class="control-btn" id="upBtn">⬆️</div>
+            <div class="control-btn" id="downBtn">⬇️</div>
+        </div>
+
+        <!-- 暂停按钮 -->
+        <div id="pauseBtn">⏸️</div>
+
+        <!-- 暂停遮罩 -->
+        <div id="pauseOverlay">
+            <h2>⏸️ 游戏暂停</h2>
+            <button onclick="togglePause()">继续游戏</button>
+        </div>
+
+        <!-- 提示文字 -->
+        <div class="hint-text">摇杆控制方向 | ⬆️加速上升 | ⬇️下降</div>
+
+        <!-- 游戏结束弹窗 -->
+        <div id="gameOver">
+            <h2>💔 气球爆了！</h2>
+            <p>别灰心，爱需要小心呵护~</p>
+            <button onclick="restartGame()">重新开始</button>
+        </div>
+
+        <!-- 通关弹窗 -->
+        <div id="gameWin">
+            <h2>🎉 恭喜通关！</h2>
+            <p>我们的爱情也会像这样，克服所有困难！</p>
+            <button onclick="nextLevel()">下一关</button>
+            <button onclick="restartGame()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 调整canvas尺寸适配屏幕
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            const infoHeight = document.getElementById('gameInfo').offsetHeight;
+            const headerHeight = document.getElementById('header').offsetHeight;
+            
+            canvas.width = rect.width;
+            canvas.height = rect.height - infoHeight - headerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 游戏状态
+        let gameState = {
+            level: 1,
+            hearts: 0,
+            totalHearts: 241,
+            lives: 3,
+            paused: false,
+            gameOver: false,
+            levelComplete: false
+        };
+
+        // 气球对象
+        let balloon = {
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            radius: 20,
+            buoyancy: -0.15,
+            gravity: 0.1,
+            airResistance: 0.98,
+            maxSpeed: 6,
+            controlForce: 0.25,
+            alive: true,
+            exploding: false,
+            explosionFrame: 0
+        };
+
+        // 虚拟摇杆状态
+        let joystick = {
+            active: false,
+            startX: 0,
+            startY: 0,
+            currentX: 0,
+            currentY: 0,
+            deltaX: 0,
+            deltaY: 0,
+            maxDistance: 35
+        };
+
+        // 控制按钮状态
+        let controls = {
+            up: false,
+            down: false
+        };
+
+        // 障碍物和爱心
+        let obstacles = [];
+        let hearts = [];
+        let particles = [];
+
+        // 关卡设计（根据屏幕尺寸动态调整）
+        function getLevelData(levelNum) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const scale = Math.min(w / 800, h / 600);
+            
+            const levels = [
+                // 第1关
+                {
+                    obstacles: [
+                        { type: 'spike', x: w * 0.35, y: h * 0.7, width: 35 * scale, height: 35 * scale },
+                        { type: 'spike', x: w * 0.6, y: h * 0.5, width: 35 * scale, height: 35 * scale },
+                        { type: 'wall', x: w * 0.5, y: h * 0.25, width: 15 * scale, height: h * 0.35 }
+                    ],
+                    hearts: [
+                        { x: w * 0.2, y: h * 0.65 },
+                        { x: w * 0.5, y: h * 0.15 },
+                        { x: w * 0.8, y: h * 0.55 }
+                    ],
+                    wind: []
+                },
+                // 第2关
+                {
+                    obstacles: [
+                        { type: 'spike', x: w * 0.25, y: h * 0.75, width: 35 * scale, height: 35 * scale },
+                        { type: 'spike', x: w * 0.5, y: h * 0.6, width: 35 * scale, height: 35 * scale },
+                        { type: 'spike', x: w * 0.75, y: h * 0.45, width: 35 * scale, height: 35 * scale },
+                        { type: 'rotating', x: w * 0.5, y: h * 0.35, radius: 50 * scale, speed: 0.02 },
+                        { type: 'wall', x: w * 0.35, y: h * 0.2, width: w * 0.3, height: 15 * scale }
+                    ],
+                    hearts: [
+                        { x: w * 0.15, y: h * 0.7 },
+                        { x: w * 0.4, y: h * 0.45 },
+                        { x: w * 0.65, y: h * 0.2 },
+                        { x: w * 0.85, y: h * 0.6 }
+                    ],
+                    wind: [
+                        { x: w * 0.1, y: h * 0.4, width: w * 0.25, height: h * 0.2, direction: 1 }
+                    ]
+                },
+                // 第3关
+                {
+                    obstacles: [
+                        { type: 'wall', x: w * 0.25, y: h * 0.75, width: 15 * scale, height: h * 0.2 },
+                        { type: 'wall', x: w * 0.25, y: h * 0.65, width: w * 0.25, height: 15 * scale },
+                        { type: 'wall', x: w * 0.47, y: h * 0.4, width: 15 * scale, height: h * 0.28 },
+                        { type: 'wall', x: w * 0.25, y: h * 0.4, width: w * 0.25, height: 15 * scale },
+                        { type: 'spike', x: w * 0.6, y: h * 0.75, width: 35 * scale, height: 35 * scale },
+                        { type: 'spike', x: w * 0.75, y: h * 0.55, width: 35 * scale, height: 35 * scale },
+                        { type: 'rotating', x: w * 0.75, y: h * 0.3, radius: 45 * scale, speed: 0.03 }
+                    ],
+                    hearts: [
+                        { x: w * 0.18, y: h * 0.85 },
+                        { x: w * 0.35, y: h * 0.55 },
+                        { x: w * 0.55, y: h * 0.3 },
+                        { x: w * 0.8, y: h * 0.7 },
+                        { x: w * 0.9, y: h * 0.2 }
+                    ],
+                    wind: [
+                        { x: w * 0.55, y: h * 0.5, width: w * 0.25, height: h * 0.25, direction: -1 }
+                    ]
+                }
+            ];
+            
+            return levels[levelNum - 1];
+        }
+
+        // 初始化关卡
+        function initLevel() {
+            const levelData = getLevelData(gameState.level);
+            if (!levelData) {
+                alert('🎉 恭喜完成所有关卡！我们的爱情天长地久！');
+                gameState.level = 1;
+                gameState.hearts = 0;
+                initLevel();
+                return;
+            }
+
+            obstacles = JSON.parse(JSON.stringify(levelData.obstacles));
+            hearts = JSON.parse(JSON.stringify(levelData.hearts));
+            
+            balloon.x = canvas.width * 0.15;
+            balloon.y = canvas.height * 0.85;
+            balloon.vx = 0;
+            balloon.vy = 0;
+            balloon.alive = true;
+            balloon.exploding = false;
+            
+            gameState.levelComplete = false;
+            gameState.gameOver = false;
+            
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameWin').style.display = 'none';
+        }
+
+        // 绘制气球（心形）
+        function drawBalloon() {
+            if (balloon.exploding) {
+                ctx.save();
+                ctx.translate(balloon.x, balloon.y);
+                
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 * i) / 8 + balloon.explosionFrame * 0.2;
+                    const distance = balloon.explosionFrame * 3;
+                    ctx.fillStyle = `rgba(255, ${107 - balloon.explosionFrame * 5}, ${157 - balloon.explosionFrame * 5}, ${1 - balloon.explosionFrame / 20})`;
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(angle) * distance, Math.sin(angle) * distance, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+                
+                balloon.explosionFrame++;
+                if (balloon.explosionFrame > 20) {
+                    balloon.alive = false;
+                    balloon.exploding = false;
+                    gameState.lives--;
+                    
+                    if (gameState.lives <= 0) {
+                        gameState.gameOver = true;
+                        document.getElementById('gameOver').style.display = 'block';
+                    } else {
+                        setTimeout(() => {
+                            balloon.x = canvas.width * 0.15;
+                            balloon.y = canvas.height * 0.85;
+                            balloon.vx = 0;
+                            balloon.vy = 0;
+                            balloon.alive = true;
+                            balloon.explosionFrame = 0;
+                        }, 500);
+                    }
+                }
+                return;
+            }
+
+            ctx.save();
+            ctx.translate(balloon.x, balloon.y);
+
+            // 绳子
+            ctx.strokeStyle = '#ff6b9d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, balloon.radius);
+            ctx.quadraticCurveTo(3, balloon.radius + 12, 0, balloon.radius + 20);
+            ctx.stroke();
+
+            // 心形气球
+            const scale = balloon.radius / 20;
+            ctx.fillStyle = 'rgba(255, 107, 157, 0.9)';
+            ctx.beginPath();
+            ctx.moveTo(0, -5 * scale);
+            ctx.bezierCurveTo(-12 * scale, -15 * scale, -20 * scale, -5 * scale, -20 * scale, 5 * scale);
+            ctx.bezierCurveTo(-20 * scale, 12 * scale, -12 * scale, 18 * scale, 0, 25 * scale);
+            ctx.bezierCurveTo(12 * scale, 18 * scale, 20 * scale, 12 * scale, 20 * scale, 5 * scale);
+            ctx.bezierCurveTo(20 * scale, -5 * scale, 12 * scale, -15 * scale, 0, -5 * scale);
+            ctx.fill();
+
+            // 高光
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.ellipse(-5, -5, 6, 5, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 绘制障碍物
+        function drawObstacles() {
+            obstacles.forEach(obs => {
+                if (obs.type === 'spike') {
+                    ctx.save();
+                    ctx.translate(obs.x + obs.width / 2, obs.y + obs.height / 2);
+                    
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -obs.width / 2);
+                    ctx.lineTo(obs.width / 2, obs.height / 2);
+                    ctx.lineTo(-obs.width / 2, obs.height / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#c0392b';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                } else if (obs.type === 'wall') {
+                    ctx.fillStyle = '#95a5a6';
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                    ctx.strokeStyle = '#7f8c8d';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+                } else if (obs.type === 'rotating') {
+                    obs.angle = (obs.angle || 0) + obs.speed;
+                    
+                    ctx.save();
+                    ctx.translate(obs.x, obs.y);
+                    ctx.rotate(obs.angle);
+                    
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    for (let i = 0; i < 4; i++) {
+                        ctx.save();
+                        ctx.rotate((Math.PI / 2) * i);
+                        
+                        ctx.fillStyle = '#e74c3c';
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(-12, obs.radius);
+                        ctx.lineTo(12, obs.radius);
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        ctx.restore();
+                    }
+                    
+                    ctx.restore();
+                }
+            });
+
+            // 风力区域
+            const levelData = getLevelData(gameState.level);
+            if (levelData && levelData.wind) {
+                levelData.wind.forEach(wind => {
+                    ctx.fillStyle = 'rgba(135, 206, 235, 0.15)';
+                    ctx.fillRect(wind.x, wind.y, wind.width, wind.height);
+                    
+                    const arrowY = wind.y + wind.height / 2;
+                    const arrowX = wind.x + (Date.now() % 1000) / 1000 * wind.width;
+                    ctx.fillStyle = 'rgba(135, 206, 235, 0.4)';
+                    ctx.beginPath();
+                    if (wind.direction > 0) {
+                        ctx.moveTo(arrowX, arrowY);
+                        ctx.lineTo(arrowX + 8, arrowY - 4);
+                        ctx.lineTo(arrowX + 8, arrowY + 4);
+                    } else {
+                        ctx.moveTo(arrowX, arrowY);
+                        ctx.lineTo(arrowX - 8, arrowY - 4);
+                        ctx.lineTo(arrowX - 8, arrowY + 4);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                });
+            }
+        }
+
+        // 绘制爱心
+        function drawHearts() {
+            hearts.forEach(heart => {
+                ctx.save();
+                ctx.translate(heart.x, heart.y);
+                
+                const offset = Math.sin(Date.now() * 0.003 + heart.x) * 4;
+                ctx.translate(0, offset);
+                ctx.rotate(Math.sin(Date.now() * 0.002 + heart.x) * 0.15);
+                
+                const scale = 0.7;
+                ctx.fillStyle = '#ff6b9d';
+                ctx.beginPath();
+                ctx.moveTo(0, -5 * scale);
+                ctx.bezierCurveTo(-10 * scale, -12 * scale, -15 * scale, -5 * scale, -15 * scale, 2 * scale);
+                ctx.bezierCurveTo(-15 * scale, 8 * scale, -10 * scale, 12 * scale, 0, 18 * scale);
+                ctx.bezierCurveTo(10 * scale, 12 * scale, 15 * scale, 8 * scale, 15 * scale, 2 * scale);
+                ctx.bezierCurveTo(15 * scale, -5 * scale, 10 * scale, -12 * scale, 0, -5 * scale);
+                ctx.fill();
+                
+                ctx.strokeStyle = 'rgba(255, 182, 193, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.restore();
+            });
+        }
+
+        // 更新物理
+        function updatePhysics() {
+            if (!balloon.alive || balloon.exploding) return;
+
+            balloon.vy += balloon.buoyancy;
+
+            // 摇杆控制
+            if (joystick.active) {
+                balloon.vx += joystick.deltaX * balloon.controlForce;
+                balloon.vy += joystick.deltaY * balloon.controlForce * 0.5;
+            }
+
+            // 按钮控制
+            if (controls.up) balloon.vy -= balloon.controlForce * 1.5;
+            if (controls.down) balloon.vy += balloon.controlForce * 0.8;
+
+            // 风力
+            const levelData = getLevelData(gameState.level);
+            if (levelData && levelData.wind) {
+                levelData.wind.forEach(wind => {
+                    if (balloon.x > wind.x && balloon.x < wind.x + wind.width &&
+                        balloon.y > wind.y && balloon.y < wind.y + wind.height) {
+                        balloon.vx += wind.direction * 0.15;
+                    }
+                });
+            }
+
+            balloon.vx *= balloon.airResistance;
+            balloon.vy *= balloon.airResistance;
+
+            const speed = Math.sqrt(balloon.vx ** 2 + balloon.vy ** 2);
+            if (speed > balloon.maxSpeed) {
+                balloon.vx = (balloon.vx / speed) * balloon.maxSpeed;
+                balloon.vy = (balloon.vy / speed) * balloon.maxSpeed;
+            }
+
+            balloon.x += balloon.vx;
+            balloon.y += balloon.vy;
+
+            // 边界
+            if (balloon.x - balloon.radius < 0) {
+                balloon.x = balloon.radius;
+                balloon.vx *= -0.5;
+            }
+            if (balloon.x + balloon.radius > canvas.width) {
+                balloon.x = canvas.width - balloon.radius;
+                balloon.vx *= -0.5;
+            }
+            if (balloon.y - balloon.radius < 0) {
+                balloon.y = balloon.radius;
+                balloon.vy *= -0.5;
+            }
+            if (balloon.y + balloon.radius > canvas.height) {
+                balloon.y = canvas.height - balloon.radius;
+                balloon.vy *= -0.5;
+            }
+        }
+
+        // 碰撞检测
+        function checkCollisions() {
+            if (!balloon.alive || balloon.exploding) return;
+
+            // 爱心收集
+            hearts = hearts.filter(heart => {
+                const dx = balloon.x - heart.x;
+                const dy = balloon.y - heart.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < balloon.radius + 12) {
+                    gameState.hearts++;
+                    createParticles(heart.x, heart.y, '#ff6b9d');
+                    
+                    if (hearts.length === 0) {
+                        gameState.levelComplete = true;
+                        setTimeout(() => {
+                            document.getElementById('gameWin').style.display = 'block';
+                        }, 500);
+                    }
+                    
+                    return false;
+                }
+                return true;
+            });
+
+            // 障碍物碰撞
+            obstacles.forEach(obs => {
+                let collision = false;
+
+                if (obs.type === 'spike') {
+                    const dx = balloon.x - (obs.x + obs.width / 2);
+                    const dy = balloon.y - (obs.y + obs.height / 2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < balloon.radius + obs.width / 3) {
+                        collision = true;
+                    }
+                } else if (obs.type === 'wall') {
+                    if (balloon.x + balloon.radius > obs.x &&
+                        balloon.x - balloon.radius < obs.x + obs.width &&
+                        balloon.y + balloon.radius > obs.y &&
+                        balloon.y - balloon.radius < obs.y + obs.height) {
+                        
+                        const speed = Math.sqrt(balloon.vx ** 2 + balloon.vy ** 2);
+                        if (speed > 2.5) {
+                            collision = true;
+                        } else {
+                            if (Math.abs(balloon.x - obs.x) < Math.abs(balloon.x - (obs.x + obs.width))) {
+                                balloon.x = obs.x - balloon.radius;
+                            } else {
+                                balloon.x = obs.x + obs.width + balloon.radius;
+                            }
+                            balloon.vx *= -0.3;
+                        }
+                    }
+                } else if (obs.type === 'rotating') {
+                    const dx = balloon.x - obs.x;
+                    const dy = balloon.y - obs.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < balloon.radius + obs.radius) {
+                        collision = true;
+                    }
+                }
+
+                if (collision) {
+                    balloon.exploding = true;
+                    balloon.explosionFrame = 0;
+                    createParticles(balloon.x, balloon.y, '#e74c3c');
+                }
+            });
+        }
+
+        // 粒子效果
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    life: 30,
+                    color
+                });
+            }
+        }
+
+        function updateParticles() {
+            particles = particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2;
+                p.life--;
+
+                ctx.globalAlpha = p.life / 30;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+
+                return p.life > 0;
+            });
+        }
+
+        // 更新UI
+        function updateUI() {
+            document.getElementById('hearts').textContent = `${gameState.hearts}/${gameState.totalHearts}`;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('lives').textContent = gameState.lives;
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!gameState.paused && !gameState.gameOver && !gameState.levelComplete) {
+                updatePhysics();
+                checkCollisions();
+            }
+
+            drawObstacles();
+            drawHearts();
+            drawBalloon();
+            updateParticles();
+            updateUI();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 虚拟摇杆事件
+        const joystickContainer = document.getElementById('joystickContainer');
+        const joystickStick = document.getElementById('joystickStick');
+
+        joystickContainer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = joystickContainer.getBoundingClientRect();
+            joystick.active = true;
+            joystick.startX = rect.left + rect.width / 2;
+            joystick.startY = rect.top + rect.height / 2;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!joystick.active) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            let dx = touch.clientX - joystick.startX;
+            let dy = touch.clientY - joystick.startY;
+            
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > joystick.maxDistance) {
+                dx = (dx / distance) * joystick.maxDistance;
+                dy = (dy / distance) * joystick.maxDistance;
+            }
+            
+            joystick.deltaX = dx / joystick.maxDistance;
+            joystick.deltaY = dy / joystick.maxDistance;
+            
+            joystickStick.style.left = (35 + dx) + 'px';
+            joystickStick.style.top = (35 + dy) + 'px';
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (joystick.active) {
+                joystick.active = false;
+                joystick.deltaX = 0;
+                joystick.deltaY = 0;
+                joystickStick.style.left = '35px';
+                joystickStick.style.top = '35px';
+            }
+        });
+
+        // 控制按钮
+        document.getElementById('upBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            controls.up = true;
+        });
+        document.getElementById('upBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            controls.up = false;
+        });
+
+        document.getElementById('downBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            controls.down = true;
+        });
+        document.getElementById('downBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            controls.down = false;
+        });
+
+        // 暂停按钮
+        document.getElementById('pauseBtn').addEventListener('click', togglePause);
+
+        function togglePause() {
+            if (gameState.gameOver || gameState.levelComplete) return;
+            gameState.paused = !gameState.paused;
+            document.getElementById('pauseOverlay').style.display = gameState.paused ? 'flex' : 'none';
+            document.getElementById('pauseBtn').textContent = gameState.paused ? '▶️' : '⏸️';
+        }
+
+        // 游戏控制
+        function restartGame() {
+            gameState.level = 1;
+            gameState.hearts = 0;
+            gameState.lives = 3;
+            gameState.paused = false;
+            gameState.gameOver = false;
+            gameState.levelComplete = false;
+            resizeCanvas();
+            initLevel();
+        }
+
+        function nextLevel() {
+            gameState.level++;
+            gameState.levelComplete = false;
+            resizeCanvas();
+            initLevel();
+        }
+
+        // 开始游戏
+        initLevel();
+        gameLoop();
+    </script>
+</body>
+</html>
