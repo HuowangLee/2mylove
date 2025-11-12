@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>242天的爱 - Swarm Avoider</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen active">
+            <div class="title-container">
+                <h1 class="game-title">💕 242天的爱 💕</h1>
+                <p class="subtitle">在时光洪流中守护我们的爱</p>
+            </div>
+            <div class="love-stats">
+                <div class="stat-item">
+                    <span class="stat-label">相恋天数</span>
+                    <span class="stat-value">242天</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">携手时光</span>
+                    <span class="stat-value">5808小时</span>
+                </div>
+            </div>
+            <div class="instructions">
+                <h3>🎮 游戏说明</h3>
+                <p>💗 你是粉色爱心，代表我们的爱情</p>
+                <p>⚫ 躲避灰色粒子的追逐（时光流逝）</p>
+                <p>📱 移动端：触摸屏幕移动</p>
+                <p>🖱️ PC端：鼠标移动控制</p>
+                <p>🎯 坚持越久，分数越高！</p>
+            </div>
+            <button id="start-btn" class="game-btn">开始游戏 ❤️</button>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="screen">
+            <canvas id="game-canvas"></canvas>
+            <div id="game-ui">
+                <div class="ui-top">
+                    <div class="ui-item">
+                        <span class="ui-label">关卡</span>
+                        <span id="level" class="ui-value">1</span>
+                    </div>
+                    <div class="ui-item">
+                        <span class="ui-label">分数</span>
+                        <span id="score" class="ui-value">0</span>
+                    </div>
+                    <div class="ui-item">
+                        <span class="ui-label">时间</span>
+                        <span id="time" class="ui-value">0s</span>
+                    </div>
+                </div>
+                <div class="ui-bottom">
+                    <button id="pause-btn" class="control-btn">⏸️ 暂停</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 暂停界面 -->
+        <div id="pause-screen" class="screen overlay">
+            <div class="modal">
+                <h2>⏸️ 游戏暂停</h2>
+                <p class="pause-message">爱情需要经营，但也需要休息~</p>
+                <button id="resume-btn" class="game-btn">继续游戏</button>
+                <button id="restart-btn" class="game-btn secondary">重新开始</button>
+                <button id="quit-btn" class="game-btn secondary">退出游戏</button>
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="gameover-screen" class="screen overlay">
+            <div class="modal">
+                <h2 class="gameover-title">💔 游戏结束</h2>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="final-label">最终关卡</span>
+                        <span id="final-level" class="final-value">1</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-label">最终分数</span>
+                        <span id="final-score" class="final-value">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-label">生存时间</span>
+                        <span id="final-time" class="final-value">0s</span>
+                    </div>
+                </div>
+                <div class="love-message">
+                    <p id="love-quote" class="love-quote"></p>
+                </div>
+                <button id="retry-btn" class="game-btn">再玩一次 💕</button>
+                <button id="back-btn" class="game-btn secondary">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 通关界面 -->
+        <div id="victory-screen" class="screen overlay">
+            <div class="modal victory">
+                <h2 class="victory-title">🎉 恭喜通关！</h2>
+                <p class="victory-message">就像我们的爱情，经历了242天的考验，依然如初！</p>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="final-label">最终分数</span>
+                        <span id="victory-score" class="final-value">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-label">总用时</span>
+                        <span id="victory-time" class="final-value">0s</span>
+                    </div>
+                </div>
+                <div class="love-message special">
+                    <p>💕 242天前，我们相遇</p>
+                    <p>💗 242天里，我们相知</p>
+                    <p>💖 未来的每一天，我们相守</p>
+                    <p class="highlight">爱你，永远！</p>
+                </div>
+                <button id="play-again-btn" class="game-btn">再次挑战 💕</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
