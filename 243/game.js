@@ -21,7 +21,7 @@ class Game {
         this.heartsLeft = 3;
         
         // 物理参数
-        this.gravity = 0.5;
+        this.gravity = 0.3;  // 降低重力，让爱心飞得更远
         
         // 玩家发射器（先初始化对象）
         this.launcher = {
@@ -95,7 +95,7 @@ class Game {
             {
                 target: { x: 0.75, y: 0.7 },
                 obstacles: [
-                    { x: 0.4, y: 0.6, width: 30, height: 300, type: 'wall' }
+                    { x: 0.45, y: 0.55, width: 30, height: 250, type: 'wall' }
                 ]
             },
             // 关卡4：移动目标
@@ -109,16 +109,16 @@ class Game {
             {
                 target: { x: 0.8, y: 0.3 },
                 obstacles: [
-                    { x: 0.35, y: 0.7, width: 20, height: 200, type: 'wall' },
-                    { x: 0.6, y: 0.4, width: 20, height: 180, type: 'wall' }
+                    { x: 0.45, y: 0.6, width: 20, height: 200, type: 'wall' },
+                    { x: 0.65, y: 0.3, width: 20, height: 180, type: 'wall' }
                 ]
             },
             // 关卡6：天花板
             {
                 target: { x: 0.85, y: 0.7 },
                 obstacles: [
-                    { x: 0.3, y: 0.0, width: 400, height: 20, type: 'ceiling' },
-                    { x: 0.5, y: 0.5, width: 20, height: 200, type: 'wall' }
+                    { x: 0.35, y: 0.0, width: 350, height: 20, type: 'ceiling' },
+                    { x: 0.55, y: 0.45, width: 20, height: 200, type: 'wall' }
                 ]
             },
             // 关卡7：狭窄通道
@@ -133,27 +133,26 @@ class Game {
             {
                 target: { x: 0.85, y: 0.2 },
                 obstacles: [
-                    { x: 0.4, y: 0.6, width: 25, height: 250, type: 'wall' },
-                    { x: 0.65, y: 0.0, width: 25, height: 280, type: 'wall' }
+                    { x: 0.45, y: 0.55, width: 25, height: 220, type: 'wall' },
+                    { x: 0.68, y: 0.0, width: 25, height: 250, type: 'wall' }
                 ]
             },
             // 关卡9：复杂迷宫
             {
-                target: { x: 0.85, y: 0.8, moving: true, speed: 1.5, range: 80 },
+                target: { x: 0.8, y: 0.5, moving: true, speed: 1, range: 50 },
                 obstacles: [
-                    { x: 0.3, y: 0.5, width: 20, height: 300, type: 'wall' },
-                    { x: 0.5, y: 0.2, width: 20, height: 250, type: 'wall' },
-                    { x: 0.7, y: 0.5, width: 20, height: 280, type: 'wall' }
+                    { x: 0.45, y: 0.55, width: 20, height: 250, type: 'wall' },
+                    { x: 0.65, y: 0.15, width: 20, height: 200, type: 'wall' }
                 ]
             },
             // 关卡10：最终挑战
             {
-                target: { x: 0.8, y: 0.5, moving: true, speed: 3, range: 150 },
+                target: { x: 0.8, y: 0.5, moving: true, speed: 3, range: 120 },
                 obstacles: [
-                    { x: 0.25, y: 0.0, width: 300, height: 25, type: 'ceiling' },
-                    { x: 0.35, y: 0.55, width: 25, height: 300, type: 'wall' },
-                    { x: 0.55, y: 0.25, width: 25, height: 250, type: 'wall' },
-                    { x: 0.75, y: 0.6, width: 25, height: 280, type: 'wall' }
+                    { x: 0.35, y: 0.0, width: 300, height: 25, type: 'ceiling' },
+                    { x: 0.42, y: 0.5, width: 25, height: 270, type: 'wall' },
+                    { x: 0.6, y: 0.2, width: 25, height: 230, type: 'wall' },
+                    { x: 0.77, y: 0.55, width: 25, height: 250, type: 'wall' }
                 ]
             }
         ];
@@ -224,18 +223,12 @@ class Game {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // 检查是否点击在发射器附近（增大可点击范围）
-        const dx = x - this.launcher.x;
-        const dy = y - this.launcher.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < this.launcher.radius + 100) {  // 增大可点击范围
-            this.isAiming = true;
-            this.aimStartX = x;
-            this.aimStartY = y;
-            this.aimEndX = x;
-            this.aimEndY = y;
-        }
+        // 允许在屏幕任意位置开始瞄准，更方便操作
+        this.isAiming = true;
+        this.aimStartX = x;
+        this.aimStartY = y;
+        this.aimEndX = x;
+        this.aimEndY = y;
     }
     
     handleMove(e) {
@@ -266,8 +259,9 @@ class Game {
         const dy = this.aimStartY - this.aimEndY;
         const power = Math.min(Math.sqrt(dx * dx + dy * dy) / 3, 20);
         
-        let vx = dx / 10;
-        let vy = dy / 10;
+        // 大幅提高速度，让发射更灵敏
+        let vx = dx / 3;  // 从 /10 改为 /3，速度提升3倍多
+        let vy = dy / 3;
         
         let px = this.launcher.x;
         let py = this.launcher.y;
@@ -290,22 +284,30 @@ class Game {
     updateAimUI() {
         const dx = this.aimStartX - this.aimEndX;
         const dy = this.aimStartY - this.aimEndY;
-        const power = Math.min(Math.sqrt(dx * dx + dy * dy) / 3, 20);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const power = Math.min(distance / 2, 100);  // 调整力度显示范围
         const angle = Math.atan2(-dy, dx) * 180 / Math.PI;
         
         document.getElementById('angle-display').textContent = Math.round(angle) + '°';
-        document.getElementById('power-display').textContent = Math.round(power / 20 * 100) + '%';
+        document.getElementById('power-display').textContent = Math.round(power) + '%';
     }
     
     launchHeart() {
         const dx = this.aimStartX - this.aimEndX;
         const dy = this.aimStartY - this.aimEndY;
         
+        // 检查拖拽距离，太小就不发射
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 10) {
+            this.isAiming = false;
+            return;  // 拖拽距离太小，取消发射
+        }
+        
         this.heart = {
             x: this.launcher.x,
             y: this.launcher.y,
-            vx: dx / 10,
-            vy: dy / 10,
+            vx: dx / 3,  // 从 /10 改为 /3，速度提升3倍多
+            vy: dy / 3,
             radius: 15,
             rotation: 0,
             trail: []
