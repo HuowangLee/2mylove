@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>❤️ 243天的爱 - 抛物线投爱心 ❤️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen active">
+            <h1 class="title">💕 抛物线投爱心 💕</h1>
+            <div class="love-counter">
+                <div class="heart-animation">❤️</div>
+                <h2>我们在一起</h2>
+                <div class="days-counter">243</div>
+                <p>天啦！</p>
+            </div>
+            <div class="game-intro">
+                <p>把你的爱心投递到对方心中 💌</p>
+                <p>拖拉屏幕调整角度和力度</p>
+            </div>
+            <button id="start-btn" class="btn-primary">开始游戏</button>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="level-info">
+                    <span>关卡 <span id="current-level">1</span>/10</span>
+                </div>
+                <div class="score-info">
+                    <span>💖 <span id="hearts-left">3</span></span>
+                    <span>⭐ <span id="score">0</span></span>
+                </div>
+            </div>
+
+            <canvas id="game-canvas"></canvas>
+
+            <div class="game-controls">
+                <div id="trajectory-info">
+                    <span>角度: <span id="angle-display">45°</span></span>
+                    <span>力度: <span id="power-display">50%</span></span>
+                </div>
+                <button id="reset-level" class="btn-small">重新开始</button>
+            </div>
+        </div>
+
+        <!-- 关卡完成界面 -->
+        <div id="level-complete-screen" class="screen">
+            <h2>💝 关卡完成！</h2>
+            <div class="level-stats">
+                <p>本关得分: <span id="level-score">0</span></p>
+                <p>总分: <span id="total-score">0</span></p>
+                <div class="stars" id="stars-earned"></div>
+            </div>
+            <button id="next-level-btn" class="btn-primary">下一关</button>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="game-over-screen" class="screen">
+            <h2>💔 再试一次吧</h2>
+            <p class="game-over-message">爱需要耐心和坚持哦~</p>
+            <div class="final-stats">
+                <p>关卡: <span id="failed-level">1</span></p>
+                <p>得分: <span id="final-score">0</span></p>
+            </div>
+            <button id="retry-btn" class="btn-primary">重新挑战</button>
+            <button id="back-menu-btn" class="btn-secondary">返回主菜单</button>
+        </div>
+
+        <!-- 游戏通关界面 -->
+        <div id="victory-screen" class="screen">
+            <h1>🎉 恭喜通关！🎉</h1>
+            <div class="victory-message">
+                <p>你成功将所有的爱心送达！</p>
+                <p class="love-quote">243天的每一天，都是爱的投递</p>
+                <div class="final-stats">
+                    <p>总得分: <span id="victory-score">0</span></p>
+                    <div class="stars" id="victory-stars"></div>
+                </div>
+            </div>
+            <button id="play-again-btn" class="btn-primary">再玩一次</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
