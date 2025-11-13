@@ -13,10 +13,6 @@ class Game {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
         
-        // 设置canvas尺寸
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-        
         // 游戏状态
         this.state = GameState.MENU;
         this.currentLevel = 1;
@@ -27,13 +23,17 @@ class Game {
         // 物理参数
         this.gravity = 0.5;
         
-        // 玩家发射器
+        // 玩家发射器（先初始化对象）
         this.launcher = {
-            x: 80,
+            x: 150,  // 增加x坐标，离左边缘更远
             y: 0,
             radius: 25,
             color: '#ff6b9d'
         };
+        
+        // 设置canvas尺寸（必须在launcher初始化之后）
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
         
         // 爱心抛物体
         this.heart = null;
@@ -73,8 +73,8 @@ class Game {
         this.canvas.width = container.clientWidth;
         this.canvas.height = container.clientHeight;
         
-        // 更新发射器位置
-        this.launcher.y = this.canvas.height - 80;
+        // 更新发射器位置（离底部更远，给手指留出操作空间）
+        this.launcher.y = this.canvas.height - 150;
     }
     
     createLevels() {
@@ -161,9 +161,17 @@ class Game {
     
     initEventListeners() {
         // 开始按钮
-        document.getElementById('start-btn').addEventListener('click', () => {
-            this.startGame();
-        });
+        const startBtn = document.getElementById('start-btn');
+        console.log('开始按钮元素:', startBtn);
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                console.log('点击了开始按钮！');
+                this.startGame();
+            });
+        } else {
+            console.error('找不到开始按钮！');
+        }
         
         // 下一关按钮
         document.getElementById('next-level-btn').addEventListener('click', () => {
@@ -216,12 +224,12 @@ class Game {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // 检查是否点击在发射器附近
+        // 检查是否点击在发射器附近（增大可点击范围）
         const dx = x - this.launcher.x;
         const dy = y - this.launcher.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < this.launcher.radius + 50) {
+        if (distance < this.launcher.radius + 100) {  // 增大可点击范围
             this.isAiming = true;
             this.aimStartX = x;
             this.aimStartY = y;
@@ -309,13 +317,21 @@ class Game {
     }
     
     startGame() {
+        console.log('开始游戏被调用！');
         this.currentLevel = 1;
         this.score = 0;
         this.heartsLeft = 3;
-        this.loadLevel(1);
         this.state = GameState.PLAYING;
         this.showScreen('game-screen');
-        this.gameLoop();
+        
+        // 等待屏幕切换完成后再初始化canvas和关卡
+        setTimeout(() => {
+            console.log('Canvas尺寸:', this.canvas.width, 'x', this.canvas.height);
+            this.resizeCanvas();
+            console.log('调整后Canvas尺寸:', this.canvas.width, 'x', this.canvas.height);
+            this.loadLevel(1);
+            this.gameLoop();
+        }, 100);
     }
     
     loadLevel(level) {
@@ -354,10 +370,14 @@ class Game {
             this.victory();
         } else {
             this.heartsLeft = 3;
-            this.loadLevel(this.currentLevel);
             this.state = GameState.PLAYING;
             this.showScreen('game-screen');
-            this.gameLoop();
+            
+            setTimeout(() => {
+                this.resizeCanvas();
+                this.loadLevel(this.currentLevel);
+                this.gameLoop();
+            }, 100);
         }
     }
     
@@ -370,10 +390,14 @@ class Game {
         this.currentLevel = 1;
         this.score = 0;
         this.heartsLeft = 3;
-        this.loadLevel(1);
         this.state = GameState.PLAYING;
         this.showScreen('game-screen');
-        this.gameLoop();
+        
+        setTimeout(() => {
+            this.resizeCanvas();
+            this.loadLevel(1);
+            this.gameLoop();
+        }, 100);
     }
     
     backToMenu() {
@@ -680,7 +704,15 @@ class Game {
 
 // 启动游戏
 let game;
+console.log('游戏脚本已加载');
+
 window.addEventListener('load', () => {
-    game = new Game();
+    console.log('页面加载完成，开始初始化游戏...');
+    try {
+        game = new Game();
+        console.log('游戏初始化成功！', game);
+    } catch (error) {
+        console.error('游戏初始化失败:', error);
+    }
 });
 
