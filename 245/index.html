@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>第245天 · 倾斜心动迷宫</title>
+  <style>
+    :root {
+      --bg: #0d030f;
+      --panel: #1a0b1f;
+      --panel-strong: #261031;
+      --accent: #ff6fa2;
+      --accent-soft: #ffb8d2;
+      --goal: #8ef6ff;
+      --text: #fff2f6;
+      --muted: #c6a6c6;
+      --gradient: radial-gradient(circle at 20% 20%, #40205a, transparent 55%), radial-gradient(circle at 80% 0%, rgba(255, 111, 162, 0.5), transparent 50%), radial-gradient(circle at 50% 80%, rgba(142, 246, 255, 0.35), transparent 60%), #080108;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: clamp(12px, 3vw, 32px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      font-family: "Poppins", "Noto Sans SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gradient);
+      color: var(--text);
+    }
+
+    .scene {
+      width: min(500px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(14px, 2vw, 22px);
+    }
+
+    .hero {
+      background: rgba(18, 8, 21, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      padding: 20px clamp(18px, 3vw, 28px);
+      box-shadow: 0 40px 90px rgba(255, 111, 162, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% 15%, rgba(255, 111, 162, 0.25), transparent 55%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-soft);
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      line-height: 1.2;
+      color: var(--accent-soft);
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .game-panel {
+      background: rgba(18, 8, 21, 0.85);
+      border-radius: 24px;
+      padding: clamp(14px, 3vw, 24px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 30px 70px rgba(8, 0, 12, 0.65);
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      background: #08010f;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 0 80px rgba(255, 111, 162, 0.08);
+      touch-action: none;
+    }
+
+    .hud {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: center;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 12px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat span {
+      display: block;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent-soft);
+    }
+
+    #statusText {
+      margin: 16px 0 10px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      font-size: 0.92rem;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      line-height: 1.5;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1 1 180px;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      background: linear-gradient(120deg, rgba(255, 111, 162, 0.9), rgba(255, 184, 210, 0.8));
+      box-shadow: 0 12px 30px rgba(255, 111, 162, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s;
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 8px 15px rgba(255, 111, 162, 0.25);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .tips {
+      background: rgba(18, 8, 21, 0.65);
+      border-radius: 20px;
+      padding: 18px clamp(16px, 3vw, 24px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tips h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      color: var(--accent-soft);
+    }
+
+    .tips ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    footer span {
+      color: var(--accent-soft);
+      font-weight: 600;
+    }
+
+    .floating-hearts {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .floating-hearts::before,
+    .floating-hearts::after {
+      content: "";
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 111, 162, 0.12), transparent 65%);
+      animation: drift 12s ease-in-out infinite;
+    }
+
+    .floating-hearts::after {
+      width: 320px;
+      height: 320px;
+      top: 30%;
+      right: 5%;
+      animation-duration: 18s;
+    }
+
+    @keyframes drift {
+      0% { transform: translateY(0) scale(1); opacity: 0.45; }
+      50% { transform: translateY(-30px) scale(1.1); opacity: 0.75; }
+      100% { transform: translateY(0) scale(1); opacity: 0.45; }
+    }
+
+    @media (min-height: 750px) {
+      body {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-hearts" aria-hidden="true"></div>
+  <main class="scene">
+    <header class="hero">
+      <div class="badge">LOVE · DAY 245</div>
+      <h1>倾斜心动迷宫</h1>
+      <p>把手机当作迷宫板，凭直觉引导小球穿越星光、避开坑洞，收集「245」颗心动，抵达终点去拥抱我们的第245天。</p>
+    </header>
+
+    <section class="game-panel">
+      <canvas id="maze" width="360" height="560" role="img" aria-label="倾斜迷宫画布"></canvas>
+
+      <div class="hud">
+        <div class="stat">
+          <span class="label">心动值</span>
+          <span class="value" id="heartCount">0 / 5</span>
+        </div>
+        <div class="stat">
+          <span class="label">用时</span>
+          <span class="value" id="timer">0.0s</span>
+        </div>
+        <div class="stat">
+          <span class="label">最佳</span>
+          <span class="value" id="bestTime">--</span>
+        </div>
+      </div>
+
+      <p id="statusText">倾斜手机或拖动画布，带着小球去遇见光，心越稳，路越长。</p>
+
+      <div class="buttons">
+        <button id="startBtn">开始第245天冒险</button>
+        <button id="tiltBtn" type="button">开启重力感应</button>
+      </div>
+      <small id="deviceStatus" style="display:block;margin-top:10px;color:var(--muted);line-height:1.4;">
+        若提示需要授权，请允许访问「方向/运动」传感器。
+      </small>
+    </section>
+
+    <section class="tips">
+      <h2>怎么玩</h2>
+      <ul>
+        <li>倾斜手机（或用手指拖动）驱动小球滚动，路线只有一条，却有无数次心跳。</li>
+        <li>收集沿途 5 颗心形道具，代表我们 2·4·5 个特别瞬间。</li>
+        <li>避开深紫色星洞与荧光墙，撞上会被弹回甚至掉落。</li>
+        <li>进入终点光域即可通关；若集齐所有心动，将记录你的最甜用时。</li>
+      </ul>
+    </section>
+
+    <footer>Made for <span>「我们恋爱第245天」</span> · 愿余生迷宫只有我们两人慢慢走。</footer>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("maze");
+    const ctx = canvas.getContext("2d");
+    const startBtn = document.getElementById("startBtn");
+    const tiltBtn = document.getElementById("tiltBtn");
+    const heartLabel = document.getElementById("heartCount");
+    const timerLabel = document.getElementById("timer");
+    const bestLabel = document.getElementById("bestTime");
+    const statusText = document.getElementById("statusText");
+    const deviceStatus = document.getElementById("deviceStatus");
+
+    const level = {
+      width: canvas.width,
+      height: canvas.height,
+      start: { x: 90, y: 500 },
+      goal: { x: 270, y: 40, w: 70, h: 70 },
+      walls: [
+        { x: 40, y: 120, w: 230, h: 14 },
+        { x: 90, y: 220, w: 230, h: 14 },
+        { x: 40, y: 320, w: 230, h: 14 },
+        { x: 90, y: 420, w: 230, h: 14 },
+        { x: 160, y: 150, w: 14, h: 60 },
+        { x: 200, y: 250, w: 14, h: 60 },
+        { x: 140, y: 350, w: 14, h: 60 }
+      ],
+      holes: [
+        { x: 210, y: 160, r: 20 },
+        { x: 140, y: 260, r: 20 },
+        { x: 240, y: 360, r: 22 }
+      ],
+      hearts: [
+        { x: 80, y: 90, r: 11, collected: false },
+        { x: 300, y: 190, r: 11, collected: false },
+        { x: 80, y: 290, r: 11, collected: false },
+        { x: 300, y: 390, r: 11, collected: false },
+        { x: 180, y: 480, r: 11, collected: false }
+      ]
+    };
+
+    const ball = {
+      radius: 12,
+      x: level.start.x,
+      y: level.start.y,
+      vx: 0,
+      vy: 0,
+      color: "#ffe4ed"
+    };
+
+    const physics = {
+      tilt: { x: 0, y: 0 },
+      pointer: { x: 0, y: 0, active: false },
+      gravity: 620,
+      damping: 0.984,
+      maxTilt: 1.3
+    };
+
+    let collected = 0;
+    let playing = false;
+    let startTime = 0;
+    let elapsed = 0;
+    let lastFrame = 0;
+    let animationId;
+    const bestKey = "love245_best_time";
+
+    function formatTime(ms) {
+      return (ms / 1000).toFixed(1) + "s";
+    }
+
+    function loadBestTime() {
+      const raw = localStorage.getItem(bestKey);
+      if (raw) {
+        bestLabel.textContent = formatTime(Number(raw));
+      }
+    }
+
+    function saveBestTime(ms) {
+      const raw = localStorage.getItem(bestKey);
+      if (!raw || Number(raw) > ms) {
+        localStorage.setItem(bestKey, String(ms));
+        bestLabel.textContent = formatTime(ms);
+      }
+    }
+
+    function resetLevel() {
+      ball.x = level.start.x;
+      ball.y = level.start.y;
+      ball.vx = 0;
+      ball.vy = 0;
+      level.hearts.forEach((h) => (h.collected = false));
+      collected = 0;
+      elapsed = 0;
+      heartLabel.textContent = `${collected} / ${level.hearts.length}`;
+      timerLabel.textContent = "0.0s";
+      statusText.textContent = "把心稳稳握住，再出发去寻找第245次怦然心动。";
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function handleOrientation(event) {
+      const { beta = 0, gamma = 0 } = event;
+      const normalizedX = clamp(gamma / 45, -physics.maxTilt, physics.maxTilt);
+      const normalizedY = clamp(beta / 45, -physics.maxTilt, physics.maxTilt);
+      physics.tilt.x = normalizedX;
+      physics.tilt.y = normalizedY;
+    }
+
+    async function enableTilt() {
+      try {
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission !== "granted") {
+            deviceStatus.textContent = "未授权访问传感器，请在系统设置中允许「方向」权限。";
+            return;
+          }
+        } else if (!("DeviceOrientationEvent" in window)) {
+          deviceStatus.textContent = "设备未提供重力传感器，使用拖拽模式继续冒险。";
+          return;
+        }
+        window.addEventListener("deviceorientation", handleOrientation, true);
+        tiltBtn.disabled = true;
+        tiltBtn.textContent = "重力感应已开启";
+        deviceStatus.textContent = "捕捉到你的心跳啦，轻轻倾斜手机开始吧。";
+      } catch (error) {
+        deviceStatus.textContent = "唤起重力传感器失败，稍后再试～";
+      }
+    }
+
+    function startGame() {
+      resetLevel();
+      playing = true;
+      startTime = performance.now();
+      lastFrame = startTime;
+      statusText.textContent = "心动已发射，慢慢倾斜、顺着光走。";
+      startBtn.textContent = "重新挑战";
+      cancelAnimationFrame(animationId);
+      animationId = requestAnimationFrame(loop);
+    }
+
+    function stopGame(message) {
+      playing = false;
+      cancelAnimationFrame(animationId);
+      if (message) {
+        statusText.textContent = message;
+      }
+    }
+
+    function winGame() {
+      const msg = collected === level.hearts.length
+        ? "心动满满抵达终点！解锁第245天的耀眼好成绩。"
+        : "抵达终点啦，再回去收集所有心动会更浪漫～";
+      stopGame(msg);
+      if (collected === level.hearts.length) {
+        saveBestTime(elapsed);
+      }
+    }
+
+    function loseGame(reason) {
+      stopGame("哎呀，" + reason + "。把心握紧，再来一次！");
+    }
+
+    function resolveWall(wall) {
+      if (
+        ball.x + ball.radius > wall.x &&
+        ball.x - ball.radius < wall.x + wall.w &&
+        ball.y + ball.radius > wall.y &&
+        ball.y - ball.radius < wall.y + wall.h
+      ) {
+        const overlapX =
+          ball.x < wall.x
+            ? (ball.x + ball.radius) - wall.x
+            : (wall.x + wall.w) - (ball.x - ball.radius);
+        const overlapY =
+          ball.y < wall.y
+            ? (ball.y + ball.radius) - wall.y
+            : (wall.y + wall.h) - (ball.y - ball.radius);
+
+        if (overlapX < overlapY) {
+          ball.x += ball.x < wall.x ? -overlapX : overlapX;
+          ball.vx *= -0.35;
+        } else {
+          ball.y += ball.y < wall.y ? -overlapY : overlapY;
+          ball.vy *= -0.35;
+        }
+      }
+    }
+
+    function checkHearts() {
+      level.hearts.forEach((heart) => {
+        if (heart.collected) return;
+        const dist = Math.hypot(ball.x - heart.x, ball.y - heart.y);
+        if (dist < ball.radius + heart.r) {
+          heart.collected = true;
+          collected += 1;
+          heartLabel.textContent = `${collected} / ${level.hearts.length}`;
+          statusText.textContent = ["丁香色的风带走一颗心动 💗", "又收集到一个特别瞬间 ✨", "心动值正在累计，别停"].sort(() => 0.5 - Math.random())[0];
+        }
+      });
+    }
+
+    function checkHoles() {
+      for (const hole of level.holes) {
+        const dist = Math.hypot(ball.x - hole.x, ball.y - hole.y);
+        if (dist < hole.r - 4) {
+          loseGame("小球掉进星洞啦");
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function checkGoal() {
+      const { goal } = level;
+      if (
+        ball.x > goal.x + 6 &&
+        ball.x < goal.x + goal.w - 6 &&
+        ball.y > goal.y + 6 &&
+        ball.y < goal.y + goal.h - 6
+      ) {
+        winGame();
+      }
+    }
+
+    function containBall() {
+      const minX = ball.radius + 8;
+      const maxX = level.width - ball.radius - 8;
+      const minY = ball.radius + 8;
+      const maxY = level.height - ball.radius - 8;
+
+      if (ball.x < minX) {
+        ball.x = minX;
+        ball.vx *= -0.4;
+      } else if (ball.x > maxX) {
+        ball.x = maxX;
+        ball.vx *= -0.4;
+      }
+
+      if (ball.y < minY) {
+        ball.y = minY;
+        ball.vy *= -0.4;
+      } else if (ball.y > maxY) {
+        ball.y = maxY;
+        ball.vy *= -0.4;
+      }
+    }
+
+    function update(dt) {
+      if (!playing) return;
+      const tiltX = clamp(physics.tilt.x + (physics.pointer.active ? physics.pointer.x : 0), -physics.maxTilt, physics.maxTilt);
+      const tiltY = clamp(physics.tilt.y + (physics.pointer.active ? physics.pointer.y : 0), -physics.maxTilt, physics.maxTilt);
+
+      ball.vx += tiltX * physics.gravity * dt;
+      ball.vy += tiltY * physics.gravity * dt;
+
+      ball.vx *= physics.damping;
+      ball.vy *= physics.damping;
+
+      ball.x += ball.vx * dt;
+      ball.y += ball.vy * dt;
+
+      containBall();
+      level.walls.forEach(resolveWall);
+      if (!checkHoles()) {
+        checkHearts();
+        checkGoal();
+      }
+
+      elapsed = performance.now() - startTime;
+      timerLabel.textContent = formatTime(elapsed);
+    }
+
+    function drawBackground() {
+      const gradient = ctx.createLinearGradient(0, 0, 0, level.height);
+      gradient.addColorStop(0, "#130018");
+      gradient.addColorStop(1, "#22061f");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, level.width, level.height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.02)";
+      ctx.lineWidth = 1;
+      for (let y = 20; y < level.height; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(20, y);
+        ctx.lineTo(level.width - 20, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawGoal() {
+      const { goal } = level;
+      const gradient = ctx.createLinearGradient(goal.x, goal.y, goal.x + goal.w, goal.y + goal.h);
+      gradient.addColorStop(0, "rgba(142, 246, 255, 0.2)");
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0.7)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(goal.x, goal.y, goal.w, goal.h);
+      ctx.strokeStyle = "rgba(142, 246, 255, 0.8)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(goal.x + 4, goal.y + 4, goal.w - 8, goal.h - 8);
+    }
+
+    function drawWalls() {
+      ctx.fillStyle = "rgba(255, 111, 162, 0.35)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.lineWidth = 1;
+      level.walls.forEach((wall) => {
+        ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+        ctx.strokeRect(wall.x, wall.y, wall.w, wall.h);
+      });
+    }
+
+    function drawHoles() {
+      level.holes.forEach((hole) => {
+        const gradient = ctx.createRadialGradient(hole.x, hole.y, 4, hole.x, hole.y, hole.r);
+        gradient.addColorStop(0, "rgba(0,0,0,0.7)");
+        gradient.addColorStop(1, "rgba(20, 0, 30, 0.05)");
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(hole.x, hole.y, hole.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 111, 162, 0.25)";
+        ctx.stroke();
+      });
+    }
+
+    function drawHearts() {
+      level.hearts.forEach((heart) => {
+        if (heart.collected) return;
+        ctx.save();
+        ctx.translate(heart.x, heart.y);
+        ctx.scale(0.8, 0.8);
+        ctx.fillStyle = "rgba(255, 111, 162, 0.9)";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-15, -15, -28, 5, 0, 22);
+        ctx.bezierCurveTo(28, 5, 15, -15, 0, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawBall() {
+      const gradient = ctx.createRadialGradient(ball.x - 4, ball.y - 4, 2, ball.x, ball.y, ball.radius);
+      gradient.addColorStop(0, "#ffffff");
+      gradient.addColorStop(1, "#ff94c1");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.stroke();
+    }
+
+    function drawStartGlow() {
+      ctx.fillStyle = "rgba(255, 111, 162, 0.12)";
+      ctx.beginPath();
+      ctx.arc(level.start.x, level.start.y, 32, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function loop(timestamp) {
+      const delta = Math.min((timestamp - lastFrame) / 1000, 0.05);
+      lastFrame = timestamp;
+
+      update(delta);
+
+      ctx.save();
+      drawBackground();
+      drawStartGlow();
+      drawGoal();
+      drawWalls();
+      drawHoles();
+      drawHearts();
+      drawBall();
+      ctx.restore();
+
+      if (playing) {
+        animationId = requestAnimationFrame(loop);
+      }
+    }
+
+    function pointerToTilt(event) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      physics.pointer.x = clamp((x - 0.5) * 2.2, -physics.maxTilt, physics.maxTilt);
+      physics.pointer.y = clamp((y - 0.5) * 2.2, -physics.maxTilt, physics.maxTilt);
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      physics.pointer.active = true;
+      pointerToTilt(event);
+    });
+
+    window.addEventListener("pointerup", () => {
+      physics.pointer.active = false;
+      physics.pointer.x = 0;
+      physics.pointer.y = 0;
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!physics.pointer.active) return;
+      pointerToTilt(event);
+    });
+
+    startBtn.addEventListener("click", startGame);
+    tiltBtn.addEventListener("click", enableTilt);
+
+    loadBestTime();
+    resetLevel();
+    animationId = requestAnimationFrame(function initialDraw(ts) {
+      lastFrame = ts;
+      loop(ts);
+    });
+  </script>
+</body>
+</html>
+
