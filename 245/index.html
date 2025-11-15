@@ -409,22 +409,61 @@
       physics.tilt.y = normalizedY;
     }
 
+    function handleMotion(event) {
+      const accel = event.accelerationIncludingGravity;
+      if (!accel) return;
+      const normX = clamp(accel.y / 10, -physics.maxTilt, physics.maxTilt);
+      const normY = clamp(accel.x / 10, -physics.maxTilt, physics.maxTilt);
+      physics.tilt.x = normX;
+      physics.tilt.y = normY;
+    }
+
+    function bindOrientationSensor() {
+      window.addEventListener("deviceorientation", handleOrientation, true);
+    }
+
+    function bindMotionSensor() {
+      window.addEventListener("devicemotion", handleMotion, true);
+    }
+
+    async function requestPermissionIfNeeded(api) {
+      if (!api || typeof api.requestPermission !== "function") return "granted";
+      try {
+        return await api.requestPermission();
+      } catch (error) {
+        return "denied";
+      }
+    }
+
     async function enableTilt() {
       try {
-        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
-          const permission = await DeviceOrientationEvent.requestPermission();
-          if (permission !== "granted") {
-            deviceStatus.textContent = "未授权访问传感器，请在系统设置中允许「方向」权限。";
-            return;
+        let bound = false;
+        if (typeof DeviceOrientationEvent !== "undefined") {
+          const result = await requestPermissionIfNeeded(DeviceOrientationEvent);
+          if (result === "granted") {
+            bindOrientationSensor();
+            bound = true;
           }
-        } else if (!("DeviceOrientationEvent" in window)) {
-          deviceStatus.textContent = "设备未提供重力传感器，使用拖拽模式继续冒险。";
+        }
+        if (!bound && typeof DeviceMotionEvent !== "undefined") {
+          const result = await requestPermissionIfNeeded(DeviceMotionEvent);
+          if (result === "granted") {
+            bindMotionSensor();
+            bound = true;
+          }
+        }
+
+        if (!bound) {
+          deviceStatus.textContent = "未能开启传感器，使用拖拽模式也同样有趣。";
           return;
         }
-        window.addEventListener("deviceorientation", handleOrientation, true);
+
         tiltBtn.disabled = true;
         tiltBtn.textContent = "重力感应已开启";
         deviceStatus.textContent = "捕捉到你的心跳啦，轻轻倾斜手机开始吧。";
+        if (!playing) {
+          startGame();
+        }
       } catch (error) {
         deviceStatus.textContent = "唤起重力传感器失败，稍后再试～";
       }
@@ -692,6 +731,9 @@
     }
 
     canvas.addEventListener("pointerdown", (event) => {
+      if (!playing) {
+        startGame();
+      }
       physics.pointer.active = true;
       pointerToTilt(event);
     });
