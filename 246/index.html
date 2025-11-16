@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>第246天的纪念航线</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        font-family: "Poppins", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+        background: #01030b;
+        color: #f3f6ff;
+        overflow: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 120, 180, 0.15),
+            transparent 45%
+          ),
+          radial-gradient(circle at 70% 10%, rgba(70, 180, 255, 0.2), transparent 50%);
+        z-index: 0;
+      }
+      canvas {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        background: linear-gradient(180deg, #040f25 0%, #030b18 45%, #050312 100%);
+        touch-action: none;
+      }
+      .hud {
+        position: fixed;
+        inset: 0 auto auto 0;
+        width: 100%;
+        padding: 14px 16px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .counter-card {
+        background: rgba(7, 11, 32, 0.65);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 18px;
+        padding: 10px 16px;
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4px;
+        width: fit-content;
+      }
+      .counter-card strong {
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+      }
+      .counter-card .tag {
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        color: #ff9ed9;
+      }
+      .counter-card p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+      .metrics {
+        display: flex;
+        gap: 12px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+      }
+      .metrics span {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-left: 6px;
+      }
+      .love-meter {
+        width: 100%;
+        max-width: 320px;
+        pointer-events: auto;
+      }
+      .love-meter .label {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        opacity: 0.75;
+      }
+      .love-meter .bar {
+        width: 100%;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        margin-top: 4px;
+      }
+      .love-meter .fill {
+        height: 100%;
+        width: 10%;
+        background: linear-gradient(90deg, #ff67b3, #ffd168);
+        border-radius: inherit;
+        transition: width 0.3s ease;
+      }
+      .ghost-btn {
+        pointer-events: auto;
+        align-self: flex-start;
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.08);
+        color: inherit;
+        font-size: 0.85rem;
+      }
+      #statusText {
+        min-height: 1.2em;
+      }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(3, 5, 18, 0.93);
+        z-index: 5;
+        transition: opacity 0.4s ease;
+        padding: 24px;
+      }
+      .overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .start-card {
+        width: min(420px, 100%);
+        background: rgba(10, 16, 38, 0.85);
+        border-radius: 32px;
+        padding: 28px 24px 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: center;
+        backdrop-filter: blur(20px);
+      }
+      .start-card h1 {
+        margin: 8px 0 12px;
+        font-size: 1.8rem;
+      }
+      .start-card p {
+        margin: 0 0 12px;
+        line-height: 1.6;
+      }
+      .start-card ul {
+        text-align: left;
+        padding-left: 18px;
+        margin: 0 auto 20px auto;
+        max-width: 320px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .start-card li + li {
+        margin-top: 6px;
+      }
+      .start-card button {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 18px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #startBtn {
+        background: linear-gradient(120deg, #ff8ad7, #ffa46d);
+        color: #1b0620;
+        margin-bottom: 12px;
+      }
+      #motionBtn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #f8f8ff;
+      }
+      .eyebrow {
+        letter-spacing: 0.3em;
+        font-size: 0.75rem;
+        color: #ffacd9;
+        margin-bottom: 6px;
+      }
+      .summary {
+        margin-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      .summary div span {
+        display: block;
+        font-size: 0.8rem;
+        letter-spacing: 0.2em;
+        opacity: 0.7;
+      }
+      .summary div strong {
+        font-size: 1.3rem;
+      }
+      small {
+        display: block;
+        margin-top: 8px;
+        opacity: 0.7;
+      }
+      @media (min-width: 640px) {
+        .hud {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .metrics {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="hud">
+      <div class="counter-card">
+        <span class="tag">LOVE DAY</span>
+        <strong>246</strong>
+        <p id="statusText">等待起航</p>
+      </div>
+      <div class="metrics">
+        <div>得分 <span id="scoreValue">0</span></div>
+        <div>旅程 <span id="distanceValue">0.0 km</span></div>
+      </div>
+      <div class="love-meter">
+        <div class="label">甜蜜能量</div>
+        <div class="bar">
+          <div class="fill" id="loveFill"></div>
+        </div>
+      </div>
+      <button class="ghost-btn" id="calibrateBtn" type="button">校准倾斜</button>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="start-card">
+        <p class="eyebrow">纪念恋爱第246天</p>
+        <h1 id="overlayTitle">倾斜导航 · 云海巡礼</h1>
+        <p id="overlayMessage">
+          玩家化身纸飞机／热气球驾驶员，左右倾斜控制方向，上下倾斜改变速度，穿越爱心环圈并避开云墙。
+        </p>
+        <ul>
+          <li>请在移动端浏览器全屏体验，保持竖屏</li>
+          <li>点击“开启重力感应”授予体感权限</li>
+          <li>若无法获取重力传感器，可按住屏幕拖拽飞行</li>
+        </ul>
+        <div class="summary" id="resultStats" style="display: none">
+          <div>
+            <span>得分</span>
+            <strong id="statScore">0</strong>
+          </div>
+          <div>
+            <span>旅程</span>
+            <strong id="statDistance">0</strong>
+          </div>
+          <div>
+            <span>心环</span>
+            <strong id="statRings">0</strong>
+          </div>
+        </div>
+        <button id="startBtn" type="button">开始纪念航线</button>
+        <button id="motionBtn" type="button">开启重力感应</button>
+        <small id="permissionHint">若提示被拒绝，可在系统设置中打开体感权限</small>
+      </div>
+    </div>
+    <script>
+      (() => {
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const overlay = document.getElementById("overlay");
+        const startBtn = document.getElementById("startBtn");
+        const motionBtn = document.getElementById("motionBtn");
+        const statusText = document.getElementById("statusText");
+        const scoreEl = document.getElementById("scoreValue");
+        const distanceEl = document.getElementById("distanceValue");
+        const loveFill = document.getElementById("loveFill");
+        const statScore = document.getElementById("statScore");
+        const statDistance = document.getElementById("statDistance");
+        const statRings = document.getElementById("statRings");
+        const resultStats = document.getElementById("resultStats");
+        const calibrateBtn = document.getElementById("calibrateBtn");
+        const overlayTitle = document.getElementById("overlayTitle");
+        const overlayMessage = document.getElementById("overlayMessage");
+        const permissionHint = document.getElementById("permissionHint");
+
+        let playing = false;
+        let crashed = false;
+        let lastTime = 0;
+        let deviceMotionEnabled = false;
+
+        const player = {
+          x: window.innerWidth / 2,
+          y: window.innerHeight * 0.65,
+          vx: 0,
+          vy: 0,
+          radius: 18,
+        };
+
+        const config = {
+          baseSpeed: 120,
+          speedBoost: 140,
+          responsiveness: { x: 1.3, y: 45 },
+          drag: 0.92,
+          spawnCloud: 1.9,
+          spawnRing: 4.5,
+          maxTilt: 32,
+        };
+
+        const world = {
+          clouds: [],
+          rings: [],
+          stars: [],
+          distance: 0,
+          score: 0,
+          hearts: 0,
+          energy: 0.1,
+          cloudTimer: 0,
+          ringTimer: 0,
+        };
+
+        const orientation = { gamma: 0, beta: 0 };
+        const calibration = { gamma: 0, beta: 0 };
+        let orientationActive = false;
+
+        const pointerControl = {
+          active: false,
+          x: 0,
+          y: 0,
+        };
+
+        function clamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function setCanvasSize() {
+          const ratio = window.devicePixelRatio || 1;
+          canvas.width = window.innerWidth * ratio;
+          canvas.height = window.innerHeight * ratio;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(ratio, ratio);
+        }
+
+        function initStars() {
+          world.stars = Array.from({ length: 50 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 1.5 + 0.5,
+            speed: Math.random() * 0.2 + 0.05,
+            glow: Math.random() * 0.7 + 0.3,
+          }));
+        }
+
+        function handleOrientation(event) {
+          orientation.gamma = event.gamma ?? 0;
+          orientation.beta = event.beta ?? 0;
+          orientationActive = true;
+        }
+
+        async function enableMotion() {
+          if (!("DeviceOrientationEvent" in window)) {
+            flashStatus("设备无重力传感器，使用拖拽模式", 2200);
+            permissionHint.textContent = "当前设备仅支持拖拽控制，也能体验哦";
+            return false;
+          }
+          if (
+            typeof DeviceOrientationEvent.requestPermission === "function" &&
+            !deviceMotionEnabled
+          ) {
+            try {
+              const response = await DeviceOrientationEvent.requestPermission();
+              if (response !== "granted") {
+                flashStatus("需要开启“运动与方向”权限", 2200);
+                return false;
+              }
+            } catch (err) {
+              flashStatus("授权失败，请在设置中打开权限", 2200);
+              return false;
+            }
+          }
+          if (!deviceMotionEnabled) {
+            window.addEventListener("deviceorientation", handleOrientation, true);
+            deviceMotionEnabled = true;
+            flashStatus("已连接重力感应，倾斜即控制", 1800);
+          }
+          return true;
+        }
+
+        function calibrate() {
+          calibration.gamma = orientation.gamma;
+          calibration.beta = orientation.beta;
+          flashStatus("已校准当前角度为中立位", 1600);
+        }
+
+        function normalizedTilt() {
+          if (pointerControl.active) {
+            const nx = clamp((pointerControl.x / window.innerWidth) * 2 - 1, -1, 1);
+            const ny = clamp((pointerControl.y / window.innerHeight) * 2 - 1, -1, 1);
+            return { x: nx, y: ny };
+          }
+          if (!orientationActive) {
+            return { x: 0, y: 0 };
+          }
+          const nx = clamp(
+            (orientation.gamma - calibration.gamma) / config.maxTilt,
+            -1,
+            1
+          );
+          const ny = clamp(
+            (orientation.beta - calibration.beta) / config.maxTilt,
+            -1,
+            1
+          );
+          return { x: nx, y: ny };
+        }
+
+        function flashStatus(text, duration = 1400) {
+          statusText.textContent = text;
+          if (statusText._timer) clearTimeout(statusText._timer);
+          statusText._timer = setTimeout(() => {
+            statusText.textContent = crashed ? "等待重新起航" : "顺风而行";
+          }, duration);
+        }
+
+        function createCloud() {
+          const gapWidth = clamp(
+            120 + Math.random() * 120 - world.score * 0.8,
+            90,
+            210
+          );
+          world.clouds.push({
+            y: -80,
+            gapCenter: 80 + Math.random() * (window.innerWidth - 160),
+            gapWidth,
+            thickness: 45 + Math.random() * 25,
+            color: `rgba(120,${150 + Math.random() * 60},${230 + Math.random() * 15},0.25)`,
+            scored: false,
+          });
+        }
+
+        function createRing() {
+          world.rings.push({
+            x: 70 + Math.random() * (window.innerWidth - 140),
+            y: -150,
+            inner: 36 + Math.random() * 28,
+            thickness: 12 + Math.random() * 12,
+            glow: Math.random() * 0.4 + 0.6,
+            collected: false,
+          });
+        }
+
+        function resetGame() {
+          playing = true;
+          crashed = false;
+          overlay.classList.add("hidden");
+          resultStats.style.display = "none";
+          overlayTitle.textContent = "倾斜导航 · 云海巡礼";
+          overlayMessage.textContent =
+            "玩家化身纸飞机／气球驾驶员，左右倾斜控制方向，上下倾斜改变速度，穿越爱心环圈并避开云墙。";
+          player.x = window.innerWidth / 2;
+          player.y = window.innerHeight * 0.65;
+          player.vx = 0;
+          player.vy = 0;
+          world.clouds = [];
+          world.rings = [];
+          world.distance = 0;
+          world.score = 0;
+          world.hearts = 0;
+          world.energy = 0.12;
+          world.cloudTimer = 0;
+          world.ringTimer = 0;
+          lastTime = 0;
+          flashStatus("纪念航线起飞！");
+          requestAnimationFrame(loop);
+        }
+
+        function endGame(reason) {
+          crashed = true;
+          playing = false;
+          overlay.classList.remove("hidden");
+          overlayTitle.textContent = reason || "旅途暂告一段落";
+          overlayMessage.textContent = "再试一次，让第246天更浪漫。";
+          resultStats.style.display = "grid";
+          statScore.textContent = world.score.toString();
+          statDistance.textContent = (world.distance / 1000).toFixed(2) + " km";
+          statRings.textContent = world.hearts.toString();
+          flashStatus("等待重新起航", 4000);
+        }
+
+        function updateHud() {
+          scoreEl.textContent = world.score.toString();
+          distanceEl.textContent = (world.distance / 1000).toFixed(2) + " km";
+          loveFill.style.width = (world.energy * 100).toFixed(1) + "%";
+        }
+
+        function update(delta) {
+          const tilt = normalizedTilt();
+          player.vx += tilt.x * config.responsiveness.x;
+          player.vy += tilt.y * (config.responsiveness.y * 0.01);
+          player.vx *= config.drag;
+          player.vy *= config.drag;
+          player.x += player.vx * delta * 60;
+          player.y += player.vy * delta * 60;
+          player.x = clamp(player.x, player.radius + 6, window.innerWidth - player.radius - 6);
+          player.y = clamp(player.y, window.innerHeight * 0.2, window.innerHeight * 0.85);
+
+          const scrollSpeed = config.baseSpeed + tilt.y * config.speedBoost;
+          world.distance += Math.max(scrollSpeed, 60) * delta;
+
+          world.cloudTimer += delta;
+          world.ringTimer += delta;
+          if (world.cloudTimer > config.spawnCloud) {
+            createCloud();
+            world.cloudTimer = 0;
+          }
+          if (world.ringTimer > config.spawnRing) {
+            createRing();
+            world.ringTimer = 0;
+          }
+
+          world.clouds = world.clouds.filter((cloud) => {
+            cloud.y += scrollSpeed * delta;
+            if (
+              player.y + player.radius > cloud.y &&
+              player.y - player.radius < cloud.y + cloud.thickness
+            ) {
+              const leftEdge = cloud.gapCenter - cloud.gapWidth / 2;
+              const rightEdge = cloud.gapCenter + cloud.gapWidth / 2;
+              if (player.x - player.radius < leftEdge || player.x + player.radius > rightEdge) {
+                endGame("撞上云墙啦");
+              }
+            }
+            if (!cloud.scored && cloud.y > player.y) {
+              cloud.scored = true;
+              world.score += 1;
+              world.energy = clamp(world.energy + 0.015, 0, 1);
+            }
+            return cloud.y < window.innerHeight + 120;
+          });
+
+          world.rings = world.rings.filter((ring) => {
+            ring.y += scrollSpeed * delta * 0.9;
+            const dist = Math.hypot(player.x - ring.x, player.y - ring.y);
+            if (!ring.collected && dist < ring.inner - player.radius * 0.15) {
+              ring.collected = true;
+              world.score += 3;
+              world.hearts += 1;
+              world.energy = clamp(world.energy + 0.08, 0, 1);
+              flashStatus("穿过心环 +3");
+            }
+            return ring.y < window.innerHeight + 200;
+          });
+
+          world.stars.forEach((star) => {
+            star.y += star.speed * scrollSpeed * delta * 0.2;
+            if (star.y > window.innerHeight) {
+              star.y = -10;
+              star.x = Math.random() * window.innerWidth;
+            }
+          });
+
+          if (!playing) return;
+          updateHud();
+        }
+
+        function drawPlayer() {
+          ctx.save();
+          ctx.translate(player.x, player.y);
+          ctx.rotate(player.vx * 0.01);
+          ctx.beginPath();
+          ctx.moveTo(0, -player.radius);
+          ctx.lineTo(player.radius * 0.8, player.radius);
+          ctx.lineTo(0, player.radius * 0.4);
+          ctx.lineTo(-player.radius * 0.8, player.radius);
+          ctx.closePath();
+          ctx.fillStyle = "#ffefef";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,125,195,0.8)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        function drawClouds() {
+          ctx.save();
+          world.clouds.forEach((cloud) => {
+            ctx.fillStyle = cloud.color;
+            const y = cloud.y;
+            ctx.fillRect(0, y, cloud.gapCenter - cloud.gapWidth / 2, cloud.thickness);
+            ctx.fillRect(
+              cloud.gapCenter + cloud.gapWidth / 2,
+              y,
+              window.innerWidth - (cloud.gapCenter + cloud.gapWidth / 2),
+              cloud.thickness
+            );
+          });
+          ctx.restore();
+        }
+
+        function drawRings() {
+          ctx.save();
+          world.rings.forEach((ring) => {
+            ctx.beginPath();
+            ctx.lineWidth = ring.thickness;
+            const gradient = ctx.createRadialGradient(
+              ring.x,
+              ring.y,
+              ring.inner - 10,
+              ring.x,
+              ring.y,
+              ring.inner + ring.thickness
+            );
+            gradient.addColorStop(0, "rgba(255,255,255,0)");
+            gradient.addColorStop(0.4, `rgba(255,156,214,${ring.glow})`);
+            gradient.addColorStop(1, "rgba(255,214,160,0.1)");
+            ctx.strokeStyle = gradient;
+            ctx.arc(ring.x, ring.y, ring.inner, 0, Math.PI * 2);
+            ctx.stroke();
+            if (!ring.collected) {
+              ctx.fillStyle = "rgba(255,255,255,0.15)";
+              ctx.beginPath();
+              ctx.arc(ring.x, ring.y, 6, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+          ctx.restore();
+        }
+
+        function drawStars() {
+          ctx.save();
+          ctx.fillStyle = "#ffffff";
+          world.stars.forEach((star) => {
+            ctx.globalAlpha = star.glow;
+            ctx.fillRect(star.x, star.y, star.size, star.size);
+          });
+          ctx.restore();
+          ctx.globalAlpha = 1;
+        }
+
+        function drawEnergyAura() {
+          ctx.save();
+          const size = 30 + world.energy * 40;
+          const gradient = ctx.createRadialGradient(
+            player.x,
+            player.y,
+            0,
+            player.x,
+            player.y,
+            size
+          );
+          gradient.addColorStop(0, "rgba(255,255,255,0.25)");
+          gradient.addColorStop(1, "rgba(255,120,180,0)");
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(player.x, player.y, size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function render() {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+          drawStars();
+          drawClouds();
+          drawRings();
+          drawEnergyAura();
+          drawPlayer();
+        }
+
+        function loop(timestamp) {
+          if (!playing) return;
+          if (!lastTime) lastTime = timestamp;
+          const delta = Math.min((timestamp - lastTime) / 1000, 0.033);
+          lastTime = timestamp;
+          update(delta);
+          render();
+          requestAnimationFrame(loop);
+        }
+
+        function attachPointerControls() {
+          canvas.addEventListener("pointerdown", (event) => {
+            pointerControl.active = true;
+            pointerControl.x = event.clientX;
+            pointerControl.y = event.clientY;
+          });
+          window.addEventListener("pointermove", (event) => {
+            if (!pointerControl.active) return;
+            pointerControl.x = event.clientX;
+            pointerControl.y = event.clientY;
+          });
+          window.addEventListener("pointerup", () => (pointerControl.active = false));
+          window.addEventListener("pointercancel", () => (pointerControl.active = false));
+        }
+
+        function bindUI() {
+          startBtn.addEventListener("click", async () => {
+            const granted = await enableMotion();
+            if (!granted) {
+              flashStatus("拖拽同样能起飞", 1800);
+            }
+            calibrate();
+            resetGame();
+          });
+          motionBtn.addEventListener("click", async () => {
+            const granted = await enableMotion();
+            overlayMessage.textContent = granted
+              ? "重力感应已就绪，左右/上下倾斜手机即可控制。"
+              : "未能启用重力感应，仍可拖动屏幕体验。";
+          });
+          calibrateBtn.addEventListener("click", calibrate);
+        }
+
+        function init() {
+          setCanvasSize();
+          initStars();
+          attachPointerControls();
+          bindUI();
+          window.addEventListener("resize", () => {
+            setCanvasSize();
+            initStars();
+          });
+        }
+
+        init();
+      })();
+    </script>
+  </body>
+</html>
