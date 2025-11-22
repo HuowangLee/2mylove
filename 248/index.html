@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>💝 恋爱248天纪念 - 爱的轨迹 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            padding: 5px;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
+        }
+
+        .hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 105, 180, 0.3);
+            animation: float 10s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 100%;
+            margin: 10px 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6b9d;
+            margin-bottom: 8px;
+            font-size: 1.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .level-info {
+            font-size: 1em;
+            color: #764ba2;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-start:active {
+            background: linear-gradient(135deg, #e083eb 0%, #e5475c 100%);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-reset:active {
+            background: linear-gradient(135deg, #566eda 0%, #663b92 100%);
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #764ba2;
+        }
+
+        .btn-clear:active {
+            background: linear-gradient(135deg, #eedcc2 0%, #eca68f 100%);
+        }
+
+        #gameCanvas {
+            border: 3px solid #ff6b9d;
+            border-radius: 12px;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(180deg, #e0f7ff 0%, #ffe6f0 100%);
+            touch-action: none;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            cursor: crosshair;
+        }
+
+        .instructions {
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 10px;
+            color: #764ba2;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        .instructions strong {
+            color: #f5576c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalPop 0.5s ease-out;
+            max-width: 90%;
+            margin: 0 10px;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #ff6b9d;
+            line-height: 1.3;
+        }
+
+        .modal p {
+            font-size: 1.1em;
+            color: #667eea;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            .container {
+                padding: 10px;
+                border-radius: 12px;
+            }
+            h1 {
+                font-size: 1.3em;
+                margin-bottom: 6px;
+            }
+            .subtitle {
+                font-size: 0.8em;
+                margin-bottom: 10px;
+            }
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+            .game-info {
+                margin-bottom: 10px;
+            }
+            .instructions {
+                font-size: 0.8em;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .modal h2 {
+                font-size: 1.5em;
+            }
+            .modal p {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 3px;
+            }
+            .container {
+                padding: 8px;
+                border-radius: 10px;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
+            .subtitle {
+                font-size: 0.75em;
+            }
+            .btn {
+                padding: 7px 10px;
+                font-size: 0.8em;
+            }
+            .level-info {
+                font-size: 0.9em;
+            }
+            .instructions {
+                font-size: 0.75em;
+            }
+        }
+
+        /* 横屏提示 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .container {
+                max-width: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+
+    <div class="container">
+        <h1>💖 恋爱248天纪念 💖</h1>
+        <p class="subtitle">用爱的轨迹，引导我们的小球走向幸福终点~</p>
+        
+        <div class="game-info">
+            <div class="level-info">关卡 <span id="levelDisplay">1</span></div>
+            <div class="btn-group">
+                <button class="btn btn-clear" id="clearBtn">清除</button>
+                <button class="btn btn-start" id="startBtn">开始</button>
+                <button class="btn btn-reset" id="resetBtn">重置</button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="instructions">
+            <strong>🎮 游戏说明：</strong><br>
+            1️⃣ 用手指画线，为小球创造轨道<br>
+            2️⃣ 点击"开始"后，粉色小球会沿着你画的线滚动<br>
+            3️⃣ 避开红色障碍和尖刺，让小球到达红心终点<br>
+            4️⃣ 完成关卡后进入下一关，一共248关！💝
+        </div>
+    </div>
+
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2>🎉 恭喜过关！🎉</h2>
+            <p id="winMessage">你真棒！</p>
+            <button class="btn btn-start" id="nextLevelBtn">下一关</button>
+        </div>
+    </div>
+
+    <script>
+        // 生成背景爱心
+        const heartsContainer = document.getElementById('hearts');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '💖';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.top = Math.random() * 100 + '%';
+            heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            heartsContainer.appendChild(heart);
+        }
+
+        // 游戏变量
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let currentLevel = 1;
+        const maxLevel = 248;
+        
+        let isDrawing = false;
+        let isGameRunning = false;
+        let drawnLines = [];
+        let currentLine = [];
+        
+        // 小球属性
+        let ball = {
+            x: 0,
+            y: 0,
+            radius: 12,
+            vx: 0,
+            vy: 0,
+            color: '#ff6b9d'
+        };
+        
+        // 物理参数
+        const gravity = 0.4;
+        const friction = 0.985;
+        const bounce = 0.65;
+        
+        // 关卡配置
+        let startPoint = { x: 50, y: 100 };
+        let endPoint = { x: 750, y: 100 };
+        let obstacles = [];
+        let spikes = [];
+        
+        // 设置Canvas尺寸自适应
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const containerWidth = container.clientWidth - 30; // 减去padding
+            const isMobile = window.innerWidth <= 768;
+            
+            // 移动端使用更大的画布比例
+            let canvasWidth, canvasHeight;
+            
+            if (isMobile) {
+                canvasWidth = Math.min(containerWidth, window.innerWidth - 40);
+                canvasHeight = Math.min(canvasWidth * 1.2, window.innerHeight * 0.55);
+            } else {
+                canvasWidth = Math.min(containerWidth, 800);
+                canvasHeight = canvasWidth * 0.625; // 16:10比例
+            }
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // 根据屏幕大小调整小球大小
+            ball.radius = Math.max(10, Math.min(canvasWidth, canvasHeight) * 0.025);
+            
+            // 重新初始化关卡（以适应新尺寸）
+            if (currentLevel) {
+                initLevel(currentLevel);
+                draw();
+            }
+        }
+        
+        // 初始设置和窗口大小改变时调整
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 初始化关卡
+        function initLevel(level) {
+            obstacles = [];
+            spikes = [];
+            
+            // 根据关卡数调整难度
+            const difficulty = Math.min(Math.floor(level / 10), 15);
+            
+            // 设置起点和终点（相对于canvas大小）
+            startPoint = { 
+                x: canvas.width * 0.08, 
+                y: canvas.height * 0.2 
+            };
+            endPoint = { 
+                x: canvas.width * 0.92, 
+                y: canvas.height * 0.85 
+            };
+            
+            // 生成障碍物（相对位置）
+            const numObstacles = 2 + Math.min(difficulty, 5);
+            for (let i = 0; i < numObstacles; i++) {
+                const xProgress = (i + 1) / (numObstacles + 1);
+                obstacles.push({
+                    x: canvas.width * 0.15 + (canvas.width * 0.7 * xProgress) + (Math.random() - 0.5) * 50,
+                    y: canvas.height * 0.3 + Math.random() * canvas.height * 0.4,
+                    width: canvas.width * 0.08 + Math.random() * 20,
+                    height: canvas.height * 0.06 + Math.random() * 15
+                });
+            }
+            
+            // 生成尖刺（相对位置）
+            const numSpikes = 1 + Math.floor(difficulty / 3);
+            for (let i = 0; i < numSpikes; i++) {
+                const xProgress = (i + 0.5) / numSpikes;
+                spikes.push({
+                    x: canvas.width * 0.2 + (canvas.width * 0.6 * xProgress) + (Math.random() - 0.5) * 40,
+                    y: canvas.height * 0.7 + Math.random() * canvas.height * 0.2,
+                    size: Math.min(canvas.width, canvas.height) * 0.025
+                });
+            }
+            
+            // 重置小球
+            resetBall();
+        }
+        
+        function resetBall() {
+            ball.x = startPoint.x;
+            ball.y = startPoint.y;
+            ball.vx = 0;
+            ball.vy = 0;
+        }
+        
+        // 绘制函数
+        function drawBackground() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#e0f7ff');
+            gradient.addColorStop(1, '#ffe6f0');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function drawStartPoint() {
+            const radius = Math.max(12, Math.min(canvas.width, canvas.height) * 0.03);
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(startPoint.x, startPoint.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 描边
+            ctx.strokeStyle = '#2E7D32';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${Math.max(10, radius * 0.8)}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('起点', startPoint.x, startPoint.y);
+        }
+        
+        function drawEndPoint() {
+            const scale = Math.max(1, Math.min(canvas.width, canvas.height) / 400);
+            
+            // 绘制红心
+            ctx.fillStyle = '#ff1744';
+            ctx.save();
+            ctx.translate(endPoint.x, endPoint.y);
+            ctx.scale(scale, scale);
+            ctx.beginPath();
+            ctx.moveTo(0, 5);
+            ctx.bezierCurveTo(-10, -5, -20, -5, -20, 5);
+            ctx.bezierCurveTo(-20, 15, 0, 25, 0, 25);
+            ctx.bezierCurveTo(0, 25, 20, 15, 20, 5);
+            ctx.bezierCurveTo(20, -5, 10, -5, 0, 5);
+            ctx.fill();
+            ctx.restore();
+            
+            // 添加光晕效果
+            const glowGradient = ctx.createRadialGradient(
+                endPoint.x, endPoint.y, 10 * scale, 
+                endPoint.x, endPoint.y, 30 * scale
+            );
+            glowGradient.addColorStop(0, 'rgba(255, 23, 68, 0.4)');
+            glowGradient.addColorStop(1, 'rgba(255, 23, 68, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.beginPath();
+            ctx.arc(endPoint.x, endPoint.y, 30 * scale, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function drawObstacles() {
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#ff5252';
+                ctx.strokeStyle = '#d32f2f';
+                ctx.lineWidth = 2;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+                
+                // 添加危险标志
+                ctx.fillStyle = '#ffeb3b';
+                const fontSize = Math.max(14, Math.min(obs.width, obs.height) * 0.6);
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚠', obs.x + obs.width / 2, obs.y + obs.height / 2);
+            });
+        }
+        
+        function drawSpikes() {
+            spikes.forEach(spike => {
+                ctx.fillStyle = '#ff1744';
+                ctx.beginPath();
+                const points = 8;
+                for (let i = 0; i < points; i++) {
+                    const angle = (Math.PI * 2 * i) / points;
+                    const radius = i % 2 === 0 ? spike.size : spike.size / 2;
+                    const x = spike.x + Math.cos(angle) * radius;
+                    const y = spike.y + Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+            });
+        }
+        
+        function drawLines() {
+            const lineWidth = Math.max(3, Math.min(canvas.width, canvas.height) * 0.01);
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            drawnLines.forEach(line => {
+                if (line.length < 2) return;
+                
+                // 绘制线条阴影
+                ctx.strokeStyle = 'rgba(118, 75, 162, 0.3)';
+                ctx.lineWidth = lineWidth + 2;
+                ctx.beginPath();
+                ctx.moveTo(line[0].x, line[0].y + 2);
+                for (let i = 1; i < line.length; i++) {
+                    ctx.lineTo(line[i].x, line[i].y + 2);
+                }
+                ctx.stroke();
+                
+                // 绘制主线条
+                ctx.strokeStyle = '#764ba2';
+                ctx.lineWidth = lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(line[0].x, line[0].y);
+                for (let i = 1; i < line.length; i++) {
+                    ctx.lineTo(line[i].x, line[i].y);
+                }
+                ctx.stroke();
+            });
+            
+            // 绘制当前正在画的线（更醒目）
+            if (currentLine.length > 1) {
+                ctx.strokeStyle = 'rgba(240, 147, 251, 0.5)';
+                ctx.lineWidth = lineWidth + 3;
+                ctx.beginPath();
+                ctx.moveTo(currentLine[0].x, currentLine[0].y);
+                for (let i = 1; i < currentLine.length; i++) {
+                    ctx.lineTo(currentLine[i].x, currentLine[i].y);
+                }
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#f093fb';
+                ctx.lineWidth = lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(currentLine[0].x, currentLine[0].y);
+                for (let i = 1; i < currentLine.length; i++) {
+                    ctx.lineTo(currentLine[i].x, currentLine[i].y);
+                }
+                ctx.stroke();
+            }
+        }
+        
+        function drawBall() {
+            // 小球阴影
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(ball.x, ball.y + ball.radius + 5, ball.radius * 0.8, ball.radius * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 小球主体
+            const ballGradient = ctx.createRadialGradient(
+                ball.x - ball.radius / 3, 
+                ball.y - ball.radius / 3, 
+                ball.radius / 4,
+                ball.x, 
+                ball.y, 
+                ball.radius
+            );
+            ballGradient.addColorStop(0, '#ffb3d9');
+            ballGradient.addColorStop(1, ball.color);
+            ctx.fillStyle = ballGradient;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 小球轮廓
+            ctx.strokeStyle = '#ff1744';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        function draw() {
+            drawBackground();
+            drawStartPoint();
+            drawEndPoint();
+            drawObstacles();
+            drawSpikes();
+            drawLines();
+            drawBall();
+        }
+        
+        // 物理更新
+        function updateBall() {
+            if (!isGameRunning) return;
+            
+            // 应用重力
+            ball.vy += gravity;
+            
+            // 应用速度
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            
+            // 与绘制的线碰撞检测
+            drawnLines.forEach(line => {
+                for (let i = 0; i < line.length - 1; i++) {
+                    const p1 = line[i];
+                    const p2 = line[i + 1];
+                    const collision = checkLineCircleCollision(p1, p2, ball);
+                    
+                    if (collision) {
+                        // 计算线段方向向量
+                        const dx = p2.x - p1.x;
+                        const dy = p2.y - p1.y;
+                        const len = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (len === 0) continue;
+                        
+                        // 单位切向量（沿着线段）
+                        const tx = dx / len;
+                        const ty = dy / len;
+                        
+                        // 单位法向量（垂直于线段，向上）
+                        let nx = -dy / len;
+                        let ny = dx / len;
+                        
+                        // 确保法向量指向小球的一侧
+                        const toBallX = ball.x - collision.x;
+                        const toBallY = ball.y - collision.y;
+                        const dotToNormal = toBallX * nx + toBallY * ny;
+                        
+                        if (dotToNormal < 0) {
+                            nx = -nx;
+                            ny = -ny;
+                        }
+                        
+                        // 计算速度在法向和切向上的分量
+                        const vn = ball.vx * nx + ball.vy * ny;
+                        const vt = ball.vx * tx + ball.vy * ty;
+                        
+                        // 如果小球正在向线移动（vn < 0），则进行反弹
+                        if (vn < 0) {
+                            // 分解速度：保留切向速度，反弹法向速度
+                            ball.vx = vt * tx - vn * nx * bounce;
+                            ball.vy = vt * ty - vn * ny * bounce;
+                            
+                            // 位置修正：将小球推出线外
+                            ball.x = collision.x + nx * (ball.radius + 0.5);
+                            ball.y = collision.y + ny * (ball.radius + 0.5);
+                        }
+                    }
+                }
+            });
+            
+            // 应用摩擦（放在碰撞后）
+            ball.vx *= friction;
+            ball.vy *= friction;
+            
+            // 画布边界碰撞
+            if (ball.y + ball.radius > canvas.height) {
+                ball.y = canvas.height - ball.radius;
+                ball.vy *= -bounce;
+                ball.vx *= 0.95;
+            }
+            
+            if (ball.x + ball.radius > canvas.width) {
+                ball.x = canvas.width - ball.radius;
+                ball.vx *= -bounce;
+            }
+            
+            if (ball.x - ball.radius < 0) {
+                ball.x = ball.radius;
+                ball.vx *= -bounce;
+            }
+            
+            if (ball.y - ball.radius < 0) {
+                ball.y = ball.radius;
+                ball.vy *= -bounce;
+            }
+            
+            // 障碍物碰撞检测
+            obstacles.forEach(obs => {
+                if (checkRectCircleCollision(obs, ball)) {
+                    gameOver();
+                }
+            });
+            
+            // 尖刺碰撞检测
+            spikes.forEach(spike => {
+                const dist = Math.sqrt((ball.x - spike.x) ** 2 + (ball.y - spike.y) ** 2);
+                if (dist < ball.radius + spike.size) {
+                    gameOver();
+                }
+            });
+            
+            // 检查是否到达终点
+            const distToEnd = Math.sqrt((ball.x - endPoint.x) ** 2 + (ball.y - endPoint.y) ** 2);
+            if (distToEnd < ball.radius + 20) {
+                levelComplete();
+            }
+        }
+        
+        // 碰撞检测函数（改进版）
+        function checkLineCircleCollision(p1, p2, circle) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const lenSq = dx * dx + dy * dy;
+            
+            if (lenSq === 0) {
+                // 线段退化为点
+                const dist = Math.sqrt((circle.x - p1.x) ** 2 + (circle.y - p1.y) ** 2);
+                if (dist < circle.radius) {
+                    return { x: p1.x, y: p1.y };
+                }
+                return null;
+            }
+            
+            // 计算投影参数
+            let t = ((circle.x - p1.x) * dx + (circle.y - p1.y) * dy) / lenSq;
+            
+            // 限制在线段范围内
+            t = Math.max(0, Math.min(1, t));
+            
+            // 计算线段上最近的点
+            const closestX = p1.x + t * dx;
+            const closestY = p1.y + t * dy;
+            
+            // 计算距离
+            const distX = circle.x - closestX;
+            const distY = circle.y - closestY;
+            const dist = Math.sqrt(distX * distX + distY * distY);
+            
+            // 检测碰撞
+            if (dist < circle.radius + 2) {  // 增加一点容差
+                return { x: closestX, y: closestY };
+            }
+            
+            return null;
+        }
+        
+        function checkRectCircleCollision(rect, circle) {
+            const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+            const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+            
+            const dist = Math.sqrt((circle.x - closestX) ** 2 + (circle.y - closestY) ** 2);
+            
+            return dist < circle.radius;
+        }
+        
+        // 游戏状态
+        function gameOver() {
+            isGameRunning = false;
+            canvas.style.cursor = 'crosshair';
+            
+            // 使用模态框而不是alert
+            setTimeout(() => {
+                if (confirm('💔 哎呀！撞到障碍物了！\n\n点击"确定"重新开始，"取消"回到画线')) {
+                    resetBall();
+                } else {
+                    resetBall();
+                }
+            }, 100);
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+        
+        function levelComplete() {
+            isGameRunning = false;
+            canvas.style.cursor = 'crosshair';
+            
+            const messages = [
+                `💖 第${currentLevel}天，每一天都是爱的见证！`,
+                `🌹 恭喜过关！我们的爱情已经走过${currentLevel}天了！`,
+                `💝 太棒了！第${currentLevel}天，爱你不变！`,
+                `✨ 完美！${currentLevel}天的陪伴，是最美的时光！`,
+                `🎉 成功！${currentLevel}天的相守，每一天都是幸福！`
+            ];
+            
+            document.getElementById('winMessage').textContent = messages[Math.floor(Math.random() * messages.length)];
+            document.getElementById('winModal').style.display = 'flex';
+            
+            // 通关震动反馈
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+        }
+        
+        // 游戏循环
+        function gameLoop() {
+            updateBall();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 鼠标/触摸事件
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+        
+        // 统一的绘制开始处理
+        function handleDrawStart(e) {
+            if (e.cancelable) e.preventDefault();
+            if (isGameRunning) return;
+            isDrawing = true;
+            const pos = getMousePos(e);
+            currentLine = [pos];
+            
+            // 添加触摸反馈
+            canvas.style.cursor = 'grabbing';
+        }
+        
+        // 统一的绘制移动处理
+        function handleDrawMove(e) {
+            if (e.cancelable) e.preventDefault();
+            if (!isDrawing || isGameRunning) return;
+            const pos = getMousePos(e);
+            
+            // 优化线条采样，避免点太密集
+            const lastPoint = currentLine[currentLine.length - 1];
+            const dist = Math.sqrt((pos.x - lastPoint.x) ** 2 + (pos.y - lastPoint.y) ** 2);
+            if (dist > 3) {  // 只有距离大于3像素才添加点
+                currentLine.push(pos);
+                draw();
+            }
+        }
+        
+        // 统一的绘制结束处理
+        function handleDrawEnd(e) {
+            if (e.cancelable) e.preventDefault();
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (currentLine.length > 1) {
+                drawnLines.push([...currentLine]);
+            }
+            currentLine = [];
+            canvas.style.cursor = 'crosshair';
+            draw();
+        }
+        
+        // 鼠标事件
+        canvas.addEventListener('mousedown', handleDrawStart);
+        canvas.addEventListener('mousemove', handleDrawMove);
+        canvas.addEventListener('mouseup', handleDrawEnd);
+        canvas.addEventListener('mouseleave', handleDrawEnd);
+        
+        // 触摸事件
+        canvas.addEventListener('touchstart', handleDrawStart, { passive: false });
+        canvas.addEventListener('touchmove', handleDrawMove, { passive: false });
+        canvas.addEventListener('touchend', handleDrawEnd, { passive: false });
+        canvas.addEventListener('touchcancel', handleDrawEnd, { passive: false });
+        
+        // 防止页面滚动
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.target === canvas) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // 按钮事件
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (drawnLines.length === 0) {
+                alert('请先画一些线条来引导小球哦~');
+                return;
+            }
+            isGameRunning = true;
+            canvas.style.cursor = 'default';
+            
+            // 添加触感反馈（支持的设备）
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            isGameRunning = false;
+            drawnLines = [];
+            currentLine = [];
+            initLevel(currentLevel);
+            canvas.style.cursor = 'crosshair';
+            draw();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(30);
+            }
+        });
+        
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (isGameRunning) return;
+            drawnLines = [];
+            currentLine = [];
+            draw();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(30);
+            }
+        });
+        
+        document.getElementById('nextLevelBtn').addEventListener('click', () => {
+            document.getElementById('winModal').style.display = 'none';
+            currentLevel++;
+            if (currentLevel > maxLevel) {
+                alert('🎊 恭喜！你已经完成了所有248关！我们的爱情会一直延续下去！💕');
+                currentLevel = 1;
+            }
+            document.getElementById('levelDisplay').textContent = currentLevel;
+            drawnLines = [];
+            currentLine = [];
+            initLevel(currentLevel);
+            canvas.style.cursor = 'crosshair';
+            draw();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 100, 50]);
+            }
+        });
+        
+        // 初始化游戏
+        initLevel(currentLevel);
+        draw();
+        gameLoop();
+    </script>
+</body>
+</html>
