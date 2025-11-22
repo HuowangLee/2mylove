@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>数独游戏 - 恋爱249天纪念 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin: 20px 0;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .love-info {
+            font-size: 16px;
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .heart {
+            color: #ff6b9d;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            background: #333;
+            border: 3px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            user-select: none;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .cell:nth-child(9n+4),
+        .cell:nth-child(9n+5),
+        .cell:nth-child(9n+6) {
+            background: #f8f8f8;
+        }
+
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) {
+            background: #f8f8f8;
+        }
+
+        .cell:nth-child(9n+4):nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(9n+5):nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(9n+6):nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(9n+4):nth-child(n+46):nth-child(-n+54),
+        .cell:nth-child(9n+5):nth-child(n+46):nth-child(-n+54),
+        .cell:nth-child(9n+6):nth-child(n+46):nth-child(-n+54) {
+            background: white;
+        }
+
+        .cell.fixed {
+            color: #333;
+            background-color: #e8eaf6;
+            font-weight: 900;
+        }
+
+        .cell.editable {
+            color: #667eea;
+        }
+
+        .cell.selected {
+            background: #bbdefb !important;
+            box-shadow: inset 0 0 0 2px #2196f3;
+        }
+
+        .cell.highlight {
+            background: #e3f2fd !important;
+        }
+
+        .cell.error {
+            background: #ffcdd2 !important;
+            color: #c62828;
+        }
+
+        .cell.draft-mode {
+            font-size: 10px;
+            padding: 2px;
+        }
+
+        .draft-numbers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            width: 100%;
+            height: 100%;
+            font-size: 8px;
+            color: #999;
+        }
+
+        .draft-numbers span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 数字键盘弹窗 */
+        .number-pad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .number-pad-overlay.show {
+            display: flex;
+        }
+
+        .number-pad {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+            max-width: 320px;
+            width: 90%;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .number-pad-header {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .number-pad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .number-btn {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(102,126,234,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .number-btn:active {
+            transform: scale(0.9);
+        }
+
+        .number-pad-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.draft {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .action-btn.draft.active {
+            background: #e65100;
+            color: white;
+        }
+
+        .action-btn.clear {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .action-btn.close {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 胜利弹窗 */
+        .victory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .victory-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .victory-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .victory-content h2 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .victory-content .emoji {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: rotate 2s ease infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .victory-content p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .cell {
+                font-size: 16px;
+            }
+            
+            .btn {
+                font-size: 13px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💕 数独游戏 💕</h1>
+        <div class="love-info">
+            <span>恋爱第</span>
+            <span class="heart">249</span>
+            <span>天纪念</span>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">简单</button>
+            <button class="difficulty-btn" data-difficulty="medium">中等</button>
+            <button class="difficulty-btn" data-difficulty="hard">困难</button>
+        </div>
+
+        <div class="stats">
+            <span>⏱️ <span id="timer">00:00</span></span>
+            <span>💡 提示: <span id="hints">3</span></span>
+        </div>
+
+        <div class="sudoku-board" id="board"></div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="game.newGame()">🎮 新游戏</button>
+            <button class="btn btn-success" onclick="game.checkSolution()">✅ 检查</button>
+            <button class="btn btn-info" onclick="game.getHint()">💡 提示</button>
+        </div>
+    </div>
+
+    <!-- 数字键盘弹窗 -->
+    <div class="number-pad-overlay" id="numberPad">
+        <div class="number-pad">
+            <div class="number-pad-header">
+                选择数字 (长按切换草稿模式)
+            </div>
+            <div class="number-pad-grid">
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+                <button class="number-btn" data-number="7">7</button>
+                <button class="number-btn" data-number="8">8</button>
+                <button class="number-btn" data-number="9">9</button>
+            </div>
+            <div class="number-pad-actions">
+                <button class="action-btn draft" id="draftToggle">📝 草稿</button>
+                <button class="action-btn clear" onclick="game.clearCell()">🗑️ 清除</button>
+                <button class="action-btn close" onclick="game.closeNumberPad()">❌ 关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 胜利弹窗 -->
+    <div class="victory-modal" id="victoryModal">
+        <div class="victory-content">
+            <h2>🎉 恭喜完成！🎉</h2>
+            <div class="emoji">💖</div>
+            <p>太棒了！你们的爱情和这个数独一样完美！</p>
+            <p>用时: <strong><span id="finalTime">00:00</span></strong></p>
+            <button class="btn btn-primary" onclick="game.closeVictoryModal()">继续挑战</button>
+        </div>
+    </div>
+
+    <script>
+        class SudokuGame {
+            constructor() {
+                this.board = Array(9).fill().map(() => Array(9).fill(0));
+                this.solution = Array(9).fill().map(() => Array(9).fill(0));
+                this.initialBoard = Array(9).fill().map(() => Array(9).fill(0));
+                this.selectedCell = null;
+                this.difficulty = 'easy';
+                this.timer = 0;
+                this.timerInterval = null;
+                this.hints = 3;
+                this.draftMode = false;
+                this.drafts = Array(9).fill().map(() => Array(9).fill().map(() => new Set()));
+                this.longPressTimer = null;
+                this.longPressTriggered = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.renderBoard();
+                this.setupEventListeners();
+                this.newGame();
+            }
+
+            setupEventListeners() {
+                // 难度选择
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.difficulty = e.target.dataset.difficulty;
+                        this.newGame();
+                    });
+                });
+
+                // 数字键盘按钮
+                document.querySelectorAll('.number-btn').forEach(btn => {
+                    // 点击事件
+                    btn.addEventListener('click', (e) => {
+                        if (!this.longPressTriggered) {
+                            const num = parseInt(e.target.dataset.number);
+                            this.fillNumber(num);
+                        }
+                        this.longPressTriggered = false;
+                    });
+
+                    // 长按开始
+                    btn.addEventListener('touchstart', (e) => {
+                        this.longPressTriggered = false;
+                        this.longPressTimer = setTimeout(() => {
+                            this.longPressTriggered = true;
+                            this.draftMode = !this.draftMode;
+                            this.updateDraftToggle();
+                            navigator.vibrate && navigator.vibrate(50);
+                        }, 500);
+                    });
+
+                    // 长按结束
+                    btn.addEventListener('touchend', () => {
+                        clearTimeout(this.longPressTimer);
+                    });
+
+                    // 鼠标长按
+                    btn.addEventListener('mousedown', (e) => {
+                        this.longPressTriggered = false;
+                        this.longPressTimer = setTimeout(() => {
+                            this.longPressTriggered = true;
+                            this.draftMode = !this.draftMode;
+                            this.updateDraftToggle();
+                        }, 500);
+                    });
+
+                    btn.addEventListener('mouseup', () => {
+                        clearTimeout(this.longPressTimer);
+                    });
+
+                    btn.addEventListener('mouseleave', () => {
+                        clearTimeout(this.longPressTimer);
+                    });
+                });
+
+                // 草稿模式切换
+                document.getElementById('draftToggle').addEventListener('click', () => {
+                    this.draftMode = !this.draftMode;
+                    this.updateDraftToggle();
+                });
+
+                // 点击遮罩层关闭
+                document.getElementById('numberPad').addEventListener('click', (e) => {
+                    if (e.target.id === 'numberPad') {
+                        this.closeNumberPad();
+                    }
+                });
+            }
+
+            updateDraftToggle() {
+                const toggle = document.getElementById('draftToggle');
+                if (this.draftMode) {
+                    toggle.classList.add('active');
+                    toggle.textContent = '✏️ 草稿';
+                } else {
+                    toggle.classList.remove('active');
+                    toggle.textContent = '📝 草稿';
+                }
+            }
+
+            renderBoard() {
+                const boardEl = document.getElementById('board');
+                boardEl.innerHTML = '';
+
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+                        
+                        cell.addEventListener('click', () => {
+                            this.selectCell(i, j);
+                        });
+
+                        boardEl.appendChild(cell);
+                    }
+                }
+            }
+
+            generateSudoku() {
+                // 生成完整的数独解决方案
+                this.solution = Array(9).fill().map(() => Array(9).fill(0));
+                this.fillBoard(this.solution);
+                
+                // 复制解决方案到当前板
+                this.board = this.solution.map(row => [...row]);
+                
+                // 根据难度移除数字
+                const cellsToRemove = {
+                    'easy': 30,
+                    'medium': 40,
+                    'hard': 50
+                }[this.difficulty];
+
+                const cells = [];
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        cells.push([i, j]);
+                    }
+                }
+
+                // 随机打乱
+                for (let i = cells.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [cells[i], cells[j]] = [cells[j], cells[i]];
+                }
+
+                // 移除数字
+                for (let i = 0; i < cellsToRemove; i++) {
+                    const [row, col] = cells[i];
+                    this.board[row][col] = 0;
+                }
+
+                this.initialBoard = this.board.map(row => [...row]);
+                this.drafts = Array(9).fill().map(() => Array(9).fill().map(() => new Set()));
+            }
+
+            fillBoard(board, row = 0, col = 0) {
+                if (row === 9) return true;
+                if (col === 9) return this.fillBoard(board, row + 1, 0);
+                
+                const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                for (let i = numbers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+                }
+
+                for (const num of numbers) {
+                    if (this.isValidMove(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (this.fillBoard(board, row, col + 1)) return true;
+                        board[row][col] = 0;
+                    }
+                }
+                
+                return false;
+            }
+
+            isValidMove(board, row, col, num) {
+                // 检查行
+                for (let x = 0; x < 9; x++) {
+                    if (board[row][x] === num) return false;
+                }
+
+                // 检查列
+                for (let x = 0; x < 9; x++) {
+                    if (board[x][col] === num) return false;
+                }
+
+                // 检查3x3宫格
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (board[startRow + i][startCol + j] === num) return false;
+                    }
+                }
+
+                return true;
+            }
+
+            updateBoard() {
+                const cells = document.querySelectorAll('.cell');
+                cells.forEach((cell, index) => {
+                    const row = Math.floor(index / 9);
+                    const col = index % 9;
+                    const value = this.board[row][col];
+                    const drafts = this.drafts[row][col];
+
+                    cell.classList.remove('fixed', 'editable', 'selected', 'highlight', 'error', 'draft-mode');
+
+                    if (drafts.size > 0 && value === 0) {
+                        cell.classList.add('draft-mode');
+                        const draftHtml = Array(9).fill().map((_, i) => {
+                            return drafts.has(i + 1) ? `<span>${i + 1}</span>` : '<span></span>';
+                        }).join('');
+                        cell.innerHTML = `<div class="draft-numbers">${draftHtml}</div>`;
+                    } else if (value !== 0) {
+                        cell.textContent = value;
+                        if (this.initialBoard[row][col] !== 0) {
+                            cell.classList.add('fixed');
+                        } else {
+                            cell.classList.add('editable');
+                        }
+                    } else {
+                        cell.textContent = '';
+                    }
+
+                    // 高亮选中的单元格
+                    if (this.selectedCell && this.selectedCell.row === row && this.selectedCell.col === col) {
+                        cell.classList.add('selected');
+                    }
+
+                    // 高亮相关单元格
+                    if (this.selectedCell && value !== 0 && value === this.board[this.selectedCell.row][this.selectedCell.col]) {
+                        cell.classList.add('highlight');
+                    }
+                });
+            }
+
+            selectCell(row, col) {
+                if (this.initialBoard[row][col] !== 0) return; // 不能选择初始单元格
+
+                this.selectedCell = { row, col };
+                this.updateBoard();
+                this.showNumberPad();
+            }
+
+            showNumberPad() {
+                document.getElementById('numberPad').classList.add('show');
+                this.draftMode = false;
+                this.updateDraftToggle();
+            }
+
+            closeNumberPad() {
+                document.getElementById('numberPad').classList.remove('show');
+                this.selectedCell = null;
+                this.updateBoard();
+            }
+
+            fillNumber(num) {
+                if (!this.selectedCell) return;
+
+                const { row, col } = this.selectedCell;
+
+                if (this.draftMode) {
+                    // 草稿模式
+                    if (this.drafts[row][col].has(num)) {
+                        this.drafts[row][col].delete(num);
+                    } else {
+                        this.drafts[row][col].add(num);
+                    }
+                    this.board[row][col] = 0; // 清除数字
+                } else {
+                    // 正常填写模式
+                    this.board[row][col] = num;
+                    this.drafts[row][col].clear(); // 清除草稿
+                }
+
+                this.updateBoard();
+                this.checkWin();
+            }
+
+            clearCell() {
+                if (!this.selectedCell) return;
+
+                const { row, col } = this.selectedCell;
+                this.board[row][col] = 0;
+                this.drafts[row][col].clear();
+                this.updateBoard();
+            }
+
+            checkSolution() {
+                let hasError = false;
+                const cells = document.querySelectorAll('.cell');
+
+                cells.forEach((cell, index) => {
+                    const row = Math.floor(index / 9);
+                    const col = index % 9;
+                    const value = this.board[row][col];
+
+                    if (value !== 0 && value !== this.solution[row][col]) {
+                        cell.classList.add('error');
+                        hasError = true;
+                    }
+                });
+
+                if (hasError) {
+                    setTimeout(() => {
+                        this.updateBoard();
+                    }, 1500);
+                } else {
+                    alert('目前为止没有错误！继续加油！💪');
+                }
+            }
+
+            getHint() {
+                if (this.hints <= 0) {
+                    alert('提示次数已用完！');
+                    return;
+                }
+
+                // 找到一个空单元格并填入正确答案
+                const emptyCells = [];
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (this.board[i][j] === 0) {
+                            emptyCells.push([i, j]);
+                        }
+                    }
+                }
+
+                if (emptyCells.length === 0) return;
+
+                const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                this.board[row][col] = this.solution[row][col];
+                this.initialBoard[row][col] = this.solution[row][col];
+                this.drafts[row][col].clear();
+
+                this.hints--;
+                document.getElementById('hints').textContent = this.hints;
+                this.updateBoard();
+                this.checkWin();
+            }
+
+            checkWin() {
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (this.board[i][j] !== this.solution[i][j]) {
+                            return false;
+                        }
+                    }
+                }
+
+                this.stopTimer();
+                this.showVictoryModal();
+                return true;
+            }
+
+            showVictoryModal() {
+                const modal = document.getElementById('victoryModal');
+                document.getElementById('finalTime').textContent = document.getElementById('timer').textContent;
+                modal.classList.add('show');
+            }
+
+            closeVictoryModal() {
+                document.getElementById('victoryModal').classList.remove('show');
+                this.newGame();
+            }
+
+            newGame() {
+                this.stopTimer();
+                this.generateSudoku();
+                this.updateBoard();
+                this.hints = 3;
+                document.getElementById('hints').textContent = this.hints;
+                this.startTimer();
+            }
+
+            startTimer() {
+                this.timer = 0;
+                this.updateTimerDisplay();
+                this.timerInterval = setInterval(() => {
+                    this.timer++;
+                    this.updateTimerDisplay();
+                }, 1000);
+            }
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timer / 60);
+                const seconds = this.timer % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // 启动游戏
+        const game = new SudokuGame();
+    </script>
+</body>
+</html>
