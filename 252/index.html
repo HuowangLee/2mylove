@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>恋爱252天 - 爱的链反应 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 5px;
+            }
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            width: 100%;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+                margin-bottom: 5px;
+            }
+            
+            .header .subtitle {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header .subtitle {
+                font-size: 0.9em;
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(1.05); }
+            20%, 40% { transform: scale(1); }
+        }
+
+        #gameCanvas {
+            display: block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            cursor: crosshair;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            max-width: 100%;
+            touch-action: none;
+        }
+
+        @media (max-width: 768px) {
+            #gameCanvas {
+                border-radius: 15px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            color: white;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .info-item strong {
+            color: #ffd700;
+        }
+
+        @media (max-width: 768px) {
+            .info-panel {
+                font-size: 0.95em;
+                margin-top: 10px;
+                gap: 8px;
+            }
+            
+            .info-item {
+                padding: 8px 15px;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-panel {
+                font-size: 0.85em;
+                gap: 5px;
+            }
+            
+            .info-item {
+                padding: 6px 10px;
+                min-width: 90px;
+                font-size: 0.9em;
+            }
+        }
+
+        #restartBtn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 40px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 10;
+            font-weight: bold;
+            transition: transform 0.3s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #restartBtn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        #restartBtn:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            #restartBtn {
+                padding: 12px 30px;
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #restartBtn {
+                padding: 10px 25px;
+                font-size: 1em;
+            }
+        }
+
+        .instructions {
+            text-align: center;
+            color: white;
+            margin-top: 15px;
+            font-size: 0.95em;
+            opacity: 0.9;
+            width: 100%;
+            max-width: 800px;
+            padding: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .instructions {
+                font-size: 0.85em;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .instructions {
+                font-size: 0.75em;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>💕 恋爱252天 💕</h1>
+            <div class="subtitle">爱的链反应</div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <button id="restartBtn">重新开始 💖</button>
+        
+        <div class="info-panel">
+            <div class="info-item">
+                剩余爱心: <strong id="remainingHearts">0</strong>
+            </div>
+            <div class="info-item">
+                剩余机会: <strong id="clicksRemaining">3</strong>
+            </div>
+            <div class="info-item">
+                爆炸次数: <strong id="explosionCount">0</strong>
+            </div>
+            <div class="info-item">
+                状态: <strong id="gameStatus">点击开始</strong>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            💡 你有3次点击机会，每次点击会引爆一个爱心，让爱的能量传递，引发连锁反应！
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        // 设置画布大小
+        function setCanvasSize() {
+            const width = Math.min(800, window.innerWidth - 20);
+            const height = Math.min(600, window.innerHeight - 300);
+            
+            // 移动端优化
+            if (window.innerWidth <= 768) {
+                canvas.width = Math.min(width, window.innerWidth - 10);
+                canvas.height = Math.min(height, window.innerHeight - 250);
+            } else {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        }
+        
+        setCanvasSize();
+
+        // 游戏状态
+        let hearts = [];
+        let explosions = [];
+        let particles = [];
+        let gameStarted = false;
+        let clicksRemaining = 3; // 允许点击3次
+        let explosionCount = 0;
+
+        // 爱心点类
+        class Heart {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                // 根据屏幕大小调整爱心半径
+                if (window.innerWidth <= 480) {
+                    this.radius = 12;
+                } else if (window.innerWidth <= 768) {
+                    this.radius = 13;
+                } else {
+                    this.radius = 15;
+                }
+                this.color = this.getRandomColor();
+                this.alive = true;
+                this.pulse = Math.random() * Math.PI * 2;
+            }
+
+            getRandomColor() {
+                const colors = [
+                    '#ff6b9d',
+                    '#ffc3a0',
+                    '#ff758c',
+                    '#ff6b6b',
+                    '#ee5a6f',
+                    '#ff9a9e',
+                    '#fecfef'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            draw() {
+                if (!this.alive) return;
+
+                this.pulse += 0.05;
+                const pulseSize = Math.sin(this.pulse) * 2;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // 绘制发光效果
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius + pulseSize + 10);
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(0.5, this.color + '88');
+                gradient.addColorStop(1, this.color + '00');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius + pulseSize + 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 绘制爱心
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                const size = (this.radius + pulseSize) / 15;
+                ctx.moveTo(0, 5 * size);
+                ctx.bezierCurveTo(-15 * size, -5 * size, -25 * size, 5 * size, 0, 25 * size);
+                ctx.bezierCurveTo(25 * size, 5 * size, 15 * size, -5 * size, 0, 5 * size);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            explode() {
+                if (!this.alive) return;
+                
+                this.alive = false;
+                explosionCount++;
+                
+                // 创建爆炸效果
+                explosions.push(new Explosion(this.x, this.y, this.color));
+                
+                // 根据设备性能调整粒子数量
+                const particleCount = window.innerWidth <= 480 ? 10 : window.innerWidth <= 768 ? 15 : 20;
+                
+                // 创建粒子
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle(this.x, this.y, this.color));
+                }
+                
+                updateStatus();
+            }
+        }
+
+        // 爆炸波类
+        class Explosion {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                // 移动端减小爆炸半径
+                this.maxRadius = window.innerWidth <= 480 ? 70 : window.innerWidth <= 768 ? 85 : 100;
+                this.color = color;
+                this.alpha = 1;
+                this.expanding = true;
+            }
+
+            update() {
+                if (this.expanding) {
+                    this.radius += 4;
+                    if (this.radius >= this.maxRadius) {
+                        this.expanding = false;
+                    }
+
+                    // 检测碰撞
+                    hearts.forEach(heart => {
+                        if (heart.alive) {
+                            const dist = Math.hypot(heart.x - this.x, heart.y - this.y);
+                            if (dist < this.radius && dist > this.radius - 10) {
+                                heart.explode();
+                            }
+                        }
+                    });
+                } else {
+                    this.alpha -= 0.02;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                
+                // 绘制冲击波
+                // 确保内半径不小于0
+                const innerRadius = Math.max(0, this.radius - 10);
+                const gradient = ctx.createRadialGradient(this.x, this.y, innerRadius, this.x, this.y, this.radius);
+                gradient.addColorStop(0, this.color + '00');
+                gradient.addColorStop(0.5, this.color + 'AA');
+                gradient.addColorStop(1, this.color + '00');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.alpha <= 0;
+            }
+        }
+
+        // 粒子类
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 6;
+                this.vy = (Math.random() - 0.5) * 6;
+                this.radius = Math.random() * 4 + 2;
+                this.color = color;
+                this.alpha = 1;
+                this.life = 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.1; // 重力
+                this.alpha -= 0.015;
+                this.life -= 0.015;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        // 初始化游戏
+        function initGame() {
+            hearts = [];
+            explosions = [];
+            particles = [];
+            gameStarted = false;
+            clicksRemaining = 3; // 重置点击次数
+            explosionCount = 0;
+
+            // 根据屏幕大小调整爱心数量
+            let numHearts = 52;
+            if (window.innerWidth <= 480) {
+                numHearts = 35; // 小屏幕减少爱心数量
+            } else if (window.innerWidth <= 768) {
+                numHearts = 42; // 中等屏幕适度减少
+            }
+            
+            const margin = window.innerWidth <= 480 ? 30 : 50;
+            const minDistance = window.innerWidth <= 480 ? 45 : 60;
+            
+            for (let i = 0; i < numHearts; i++) {
+                let x, y, validPosition;
+                let attempts = 0;
+                const maxAttempts = 100;
+                
+                do {
+                    validPosition = true;
+                    x = margin + Math.random() * (canvas.width - margin * 2);
+                    y = margin + Math.random() * (canvas.height - margin * 2);
+                    
+                    // 确保爱心之间有一定距离
+                    for (let heart of hearts) {
+                        const dist = Math.hypot(heart.x - x, heart.y - y);
+                        if (dist < minDistance) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    
+                    attempts++;
+                    if (attempts >= maxAttempts) break;
+                } while (!validPosition);
+                
+                if (attempts < maxAttempts) {
+                    hearts.push(new Heart(x, y));
+                }
+            }
+
+            updateStatus();
+            restartBtn.style.display = 'none';
+        }
+
+        // 更新状态显示
+        function updateStatus() {
+            const remaining = hearts.filter(h => h.alive).length;
+            document.getElementById('remainingHearts').textContent = remaining;
+            document.getElementById('clicksRemaining').textContent = clicksRemaining;
+            document.getElementById('explosionCount').textContent = explosionCount;
+            
+            if (!gameStarted) {
+                document.getElementById('gameStatus').textContent = '点击开始';
+            } else if (remaining === 0) {
+                document.getElementById('gameStatus').textContent = '完美！💖';
+                document.getElementById('gameStatus').style.color = '#ffd700';
+                setTimeout(() => {
+                    restartBtn.style.display = 'block';
+                }, 2000);
+            } else if (clicksRemaining === 0 && explosions.length === 0 && particles.filter(p => !p.isDead()).length === 0) {
+                // 用完所有机会且没有爆炸在进行中
+                if (remaining < 10) {
+                    document.getElementById('gameStatus').textContent = '差一点！';
+                } else {
+                    document.getElementById('gameStatus').textContent = '再试一次';
+                }
+                setTimeout(() => {
+                    restartBtn.style.display = 'block';
+                }, 1000);
+            } else {
+                document.getElementById('gameStatus').textContent = '进行中...';
+                document.getElementById('gameStatus').style.color = '#ffd700';
+            }
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景网格效果（桌面端才显示）
+            if (window.innerWidth > 768) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < canvas.width; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < canvas.height; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+            }
+
+            // 更新和绘制爆炸
+            explosions = explosions.filter(explosion => {
+                explosion.update();
+                explosion.draw();
+                return !explosion.isDead();
+            });
+
+            // 更新和绘制粒子
+            particles = particles.filter(particle => {
+                particle.update();
+                particle.draw();
+                return !particle.isDead();
+            });
+
+            // 绘制爱心
+            hearts.forEach(heart => heart.draw());
+
+            // 绘制"252"水印
+            ctx.save();
+            const fontSize = window.innerWidth <= 480 ? 60 : window.innerWidth <= 768 ? 80 : 120;
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('252', canvas.width / 2, canvas.height / 2);
+            ctx.restore();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 点击/触摸事件处理函数
+        function handleInteraction(e) {
+            if (clicksRemaining <= 0) return; // 没有剩余机会
+
+            e.preventDefault(); // 防止移动端默认行为
+
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+
+            // 处理触摸事件
+            if (e.type === 'touchstart') {
+                const touch = e.touches[0];
+                x = touch.clientX - rect.left;
+                y = touch.clientY - rect.top;
+            } else {
+                // 处理鼠标点击事件
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+
+            gameStarted = true;
+            clicksRemaining--; // 减少剩余次数
+
+            // 在点击位置创建爆炸
+            const clickColor = '#ffff00';
+            explosions.push(new Explosion(x, y, clickColor));
+            
+            // 根据设备性能调整初始粒子数量
+            const initialParticleCount = window.innerWidth <= 480 ? 15 : window.innerWidth <= 768 ? 20 : 30;
+            
+            // 创建初始粒子
+            for (let i = 0; i < initialParticleCount; i++) {
+                particles.push(new Particle(x, y, clickColor));
+            }
+
+            updateStatus();
+        }
+
+        // 绑定事件
+        canvas.addEventListener('click', handleInteraction);
+        canvas.addEventListener('touchstart', handleInteraction, { passive: false });
+
+        // 重新开始按钮
+        restartBtn.addEventListener('click', () => {
+            initGame();
+        });
+        
+        // 防止移动端双指缩放
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+        
+        // 防止移动端双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // 响应式调整
+        window.addEventListener('resize', () => {
+            const oldWidth = canvas.width;
+            const oldHeight = canvas.height;
+            
+            setCanvasSize();
+            
+            // 只有尺寸显著变化时才重新初始化
+            if (Math.abs(oldWidth - canvas.width) > 50 || Math.abs(oldHeight - canvas.height) > 50) {
+                initGame();
+            }
+        });
+
+        // 启动游戏
+        initGame();
+        gameLoop();
+    </script>
+</body>
+</html>
