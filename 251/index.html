@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💖 251天的颜色冲刺 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #feca57;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(254, 202, 87, 0.5);
+        }
+
+        .description {
+            font-size: 14px;
+            color: #aaa;
+            max-width: 300px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .button {
+            padding: 15px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #ff9ff3);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: 0 3px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        #score, #bestScore {
+            position: absolute;
+            top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        #score {
+            left: 20px;
+        }
+
+        #bestScore {
+            right: 20px;
+            font-size: 18px;
+            color: #feca57;
+        }
+
+        #colorIndicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            border: 4px solid white;
+            transition: background-color 0.2s;
+        }
+
+        #tapHint {
+            position: absolute;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .game-info {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .hearts {
+            font-size: 36px;
+            margin: 20px 0;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+        }
+
+        .love-message {
+            font-size: 16px;
+            color: #ff9ff3;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="particles"></canvas>
+        <canvas id="gameCanvas"></canvas>
+        <div id="score">0</div>
+        <div id="bestScore">最高: 0</div>
+        <div id="colorIndicator"></div>
+        <div id="tapHint">点击屏幕：切换颜色 + 向上跳 💖</div>
+
+        <div id="startScreen">
+            <div class="title">💖 颜色冲刺 💖</div>
+            <div class="subtitle">纪念我们在一起的第 251 天</div>
+            <div class="hearts">❤️ 💛 💙 💚</div>
+            <div class="description">
+                <p><span class="highlight">点击屏幕</span>：切换颜色 + 向上跳</p>
+                <p>穿过<span class="highlight">同色障碍</span>得分</p>
+                <p>碰到不同色障碍会失败哦~</p>
+            </div>
+            <div class="love-message">愿我们的爱情像彩虹一样绚烂 🌈</div>
+            <button class="button" onclick="startGame()">开始游戏</button>
+        </div>
+
+        <div id="gameOverScreen" style="display: none;">
+            <div class="title">游戏结束</div>
+            <div class="hearts">💔</div>
+            <div class="game-info">得分: <span id="finalScore">0</span></div>
+            <div class="game-info">最高: <span id="finalBestScore">0</span></div>
+            <div class="love-message" id="loveMessage">继续努力，为我们的爱情加油！</div>
+            <button class="button" onclick="restartGame()">再来一次</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const particleCanvas = document.getElementById('particles');
+        const particleCtx = particleCanvas.getContext('2d');
+        const colorIndicator = document.getElementById('colorIndicator');
+
+        let width, height;
+        let gameRunning = false;
+        let score = 0;
+        let bestScore = localStorage.getItem('colorDash251Best') || 0;
+
+        // 游戏颜色
+        const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3'];
+        let currentColorIndex = 0;
+
+        // 玩家
+        let player = {
+            x: 0,
+            y: 0,
+            radius: 15,
+            color: colors[0],
+            speed: 0,
+            gravity: 0.3,
+            jumpForce: -7
+        };
+
+        // 障碍物
+        let obstacles = [];
+        let obstacleSpeed = 3;
+        let obstacleTimer = 0;
+        let obstacleInterval = 100;
+
+        // 粒子效果
+        let particles = [];
+
+        function resizeCanvas() {
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+            particleCanvas.width = width;
+            particleCanvas.height = height;
+            player.x = width / 2;
+            player.y = height / 3;
+        }
+
+        function init() {
+            resizeCanvas();
+            document.getElementById('bestScore').textContent = '最高: ' + bestScore;
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 点击事件
+            canvas.addEventListener('click', handleClick);
+            canvas.addEventListener('touchstart', handleClick);
+        }
+
+        function handleClick(e) {
+            e.preventDefault();
+            if (gameRunning) {
+                // 切换颜色
+                currentColorIndex = (currentColorIndex + 1) % colors.length;
+                player.color = colors[currentColorIndex];
+                colorIndicator.style.backgroundColor = player.color;
+                
+                // 向上跳跃
+                player.speed = player.jumpForce;
+                
+                // 创建切换特效
+                createColorChangeEffect();
+            }
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameRunning = true;
+            score = 0;
+            obstacles = [];
+            obstacleSpeed = 3;
+            obstacleTimer = 0;
+            currentColorIndex = 0;
+            player.color = colors[0];
+            player.y = height / 3;
+            player.speed = 0;
+            colorIndicator.style.backgroundColor = player.color;
+            gameLoop();
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            startGame();
+        }
+
+        function createObstacle() {
+            const gap = 150;
+            const minHeight = 80;
+            const maxHeight = height - gap - minHeight;
+            const topHeight = minHeight + Math.random() * (maxHeight - minHeight);
+            
+            const obstacleColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            obstacles.push({
+                x: width,
+                topHeight: topHeight,
+                gap: gap,
+                color: obstacleColor,
+                passed: false,
+                width: 60
+            });
+        }
+
+        function createColorChangeEffect() {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: player.x,
+                    y: player.y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    radius: Math.random() * 4 + 2,
+                    color: player.color,
+                    life: 1
+                });
+            }
+        }
+
+        function createExplosion() {
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: player.x,
+                    y: player.y,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    radius: Math.random() * 5 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1
+                });
+            }
+        }
+
+        function updateParticles() {
+            particleCtx.clearRect(0, 0, width, height);
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+                
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+                
+                particleCtx.globalAlpha = p.life;
+                particleCtx.fillStyle = p.color;
+                particleCtx.beginPath();
+                particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                particleCtx.fill();
+            }
+            
+            particleCtx.globalAlpha = 1;
+        }
+
+        function checkCollision(obstacle) {
+            // 检查是否在障碍物的 x 范围内
+            if (player.x + player.radius > obstacle.x && 
+                player.x - player.radius < obstacle.x + obstacle.width) {
+                
+                // 检查是否碰到障碍物
+                if (player.y - player.radius < obstacle.topHeight || 
+                    player.y + player.radius > obstacle.topHeight + obstacle.gap) {
+                    
+                    // 如果颜色不同，游戏结束
+                    if (player.color !== obstacle.color) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('colorDash251Best', bestScore);
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalBestScore').textContent = bestScore;
+            
+            // 随机爱的寄语
+            const messages = [
+                "不要灰心，我们的爱情需要闯关！💪",
+                "251天的相伴，每一天都是新的开始！🌟",
+                "就像游戏一样，我们一起面对挑战！💖",
+                "爱你每一天，包括今天的第251天！💕",
+                "再试一次，就像我每天都想见到你！❤️",
+                "我们的爱情值得最高分！🏆"
+            ];
+            document.getElementById('loveMessage').textContent = 
+                messages[Math.floor(Math.random() * messages.length)];
+            
+            createExplosion();
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            // 更新玩家
+            player.speed += player.gravity;
+            player.y += player.speed;
+
+            // 边界检查
+            if (player.y - player.radius < 0) {
+                player.y = player.radius;
+                player.speed = 0;
+            }
+            if (player.y + player.radius > height) {
+                gameOver();
+                return;
+            }
+
+            // 增加难度
+            if (score > 0 && score % 5 === 0) {
+                obstacleSpeed = 3 + score * 0.1;
+            }
+
+            // 创建障碍物
+            obstacleTimer++;
+            if (obstacleTimer > obstacleInterval) {
+                createObstacle();
+                obstacleTimer = 0;
+                obstacleInterval = 80 + Math.random() * 40;
+            }
+
+            // 更新障碍物
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obstacle = obstacles[i];
+                obstacle.x -= obstacleSpeed;
+
+                // 检查碰撞
+                if (checkCollision(obstacle)) {
+                    gameOver();
+                    return;
+                }
+
+                // 记分
+                if (!obstacle.passed && obstacle.x + obstacle.width < player.x) {
+                    obstacle.passed = true;
+                    score++;
+                    document.getElementById('score').textContent = score;
+                }
+
+                // 移除屏幕外的障碍物
+                if (obstacle.x + obstacle.width < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            // 清空画布
+            ctx.fillStyle = 'rgba(26, 26, 46, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+
+            // 绘制星星背景
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 137.5 + Date.now() * 0.01) % width;
+                const y = (i * 97.3) % height;
+                ctx.fillRect(x, y, 2, 2);
+            }
+
+            // 绘制障碍物
+            for (const obstacle of obstacles) {
+                // 渐变效果
+                const gradient = ctx.createLinearGradient(
+                    obstacle.x, 0, obstacle.x + obstacle.width, 0
+                );
+                gradient.addColorStop(0, obstacle.color);
+                gradient.addColorStop(1, obstacle.color + 'aa');
+
+                // 上方障碍
+                ctx.fillStyle = gradient;
+                ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
+                
+                // 下方障碍
+                ctx.fillRect(
+                    obstacle.x, 
+                    obstacle.topHeight + obstacle.gap, 
+                    obstacle.width, 
+                    height - obstacle.topHeight - obstacle.gap
+                );
+
+                // 障碍物边框
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(obstacle.x, 0, obstacle.width, obstacle.topHeight);
+                ctx.strokeRect(
+                    obstacle.x, 
+                    obstacle.topHeight + obstacle.gap, 
+                    obstacle.width, 
+                    height - obstacle.topHeight - obstacle.gap
+                );
+            }
+
+            // 绘制玩家
+            const gradient = ctx.createRadialGradient(
+                player.x, player.y, 0,
+                player.x, player.y, player.radius
+            );
+            gradient.addColorStop(0, player.color);
+            gradient.addColorStop(1, player.color + 'aa');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 玩家外圈
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 绘制爱心在玩家中心
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❤️', player.x, player.y);
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            updateParticles();
+            
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
