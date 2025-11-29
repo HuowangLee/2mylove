@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💕 254天的爱之迷宫 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #feca57 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            touch-action: none;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .game-container {
+            position: relative;
+            width: 95vmin;
+            height: 95vmin;
+            max-width: 600px;
+            max-height: 600px;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+            touch-action: none;
+        }
+
+        #gameCanvas:active {
+            cursor: grabbing;
+        }
+
+        .title {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        .info {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .victory-content {
+            text-align: center;
+            color: white;
+            animation: zoomIn 0.5s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .victory-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .victory-message {
+            font-size: 24px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .hearts {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: heartBeat 1s ease infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .restart-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 20px;
+            color: white;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+        }
+
+        .restart-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 22px;
+                top: -50px;
+            }
+            .info {
+                font-size: 14px;
+                bottom: -40px;
+            }
+            .victory-title {
+                font-size: 36px;
+            }
+            .victory-message {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="title">💕 第254天的爱之迷宫 💕</div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="info">拖动屏幕倾斜迷宫，让爱心到达终点</div>
+    </div>
+
+    <div class="victory-overlay" id="victoryOverlay">
+        <div class="victory-content">
+            <div class="victory-title">🎉 恭喜通关！🎉</div>
+            <div class="hearts">💖💕💗</div>
+            <div class="victory-message">
+                在254天的爱情迷宫中<br>
+                我们一起克服重重障碍<br>
+                找到了彼此的心❤️<br>
+                <br>
+                愿我们的爱情<br>
+                如同这场游戏一样<br>
+                充满惊喜与甜蜜<br>
+                直到永远💑
+            </div>
+            <button class="restart-btn" onclick="location.reload()">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const victoryOverlay = document.getElementById('victoryOverlay');
+
+        // 设置canvas尺寸
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const size = Math.min(container.offsetWidth, container.offsetHeight);
+            canvas.width = size;
+            canvas.height = size;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 游戏状态
+        let tiltX = 0; // 倾斜角度 X
+        let tiltY = 0; // 倾斜角度 Y
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        let gameWon = false;
+
+        // 小球属性
+        const ball = {
+            x: 0,
+            y: 0,
+            radius: 0,
+            vx: 0,
+            vy: 0,
+            color: '#ff69b4'
+        };
+
+        // 终点属性
+        const endpoint = {
+            x: 0,
+            y: 0,
+            radius: 0
+        };
+
+        // 迷宫墙壁（相对坐标 0-1）
+        const walls = [
+            // 外墙
+            {x1: 0.02, y1: 0.02, x2: 0.98, y2: 0.02, thickness: 0.02}, // 上
+            {x1: 0.98, y1: 0.02, x2: 0.98, y2: 0.98, thickness: 0.02}, // 右
+            {x1: 0.98, y1: 0.98, x2: 0.02, y2: 0.98, thickness: 0.02}, // 下
+            {x1: 0.02, y1: 0.98, x2: 0.02, y2: 0.02, thickness: 0.02}, // 左
+            
+            // 数字 "2" 的形状
+            {x1: 0.15, y1: 0.15, x2: 0.28, y2: 0.15, thickness: 0.02},
+            {x1: 0.28, y1: 0.15, x2: 0.28, y2: 0.28, thickness: 0.02},
+            {x1: 0.28, y1: 0.28, x2: 0.15, y2: 0.28, thickness: 0.02},
+            {x1: 0.15, y1: 0.28, x2: 0.15, y2: 0.41, thickness: 0.02},
+            {x1: 0.15, y1: 0.41, x2: 0.28, y2: 0.41, thickness: 0.02},
+            
+            // 数字 "5" 的形状
+            {x1: 0.38, y1: 0.15, x2: 0.51, y2: 0.15, thickness: 0.02},
+            {x1: 0.38, y1: 0.15, x2: 0.38, y2: 0.28, thickness: 0.02},
+            {x1: 0.38, y1: 0.28, x2: 0.51, y2: 0.28, thickness: 0.02},
+            {x1: 0.51, y1: 0.28, x2: 0.51, y2: 0.41, thickness: 0.02},
+            {x1: 0.51, y1: 0.41, x2: 0.38, y2: 0.41, thickness: 0.02},
+            
+            // 数字 "4" 的形状
+            {x1: 0.61, y1: 0.15, x2: 0.61, y2: 0.28, thickness: 0.02},
+            {x1: 0.61, y1: 0.28, x2: 0.74, y2: 0.28, thickness: 0.02},
+            {x1: 0.74, y1: 0.15, x2: 0.74, y2: 0.41, thickness: 0.02},
+            
+            // 中间障碍物（心形路径）
+            {x1: 0.15, y1: 0.55, x2: 0.35, y2: 0.55, thickness: 0.02},
+            {x1: 0.35, y1: 0.55, x2: 0.35, y2: 0.75, thickness: 0.02},
+            
+            {x1: 0.65, y1: 0.55, x2: 0.85, y2: 0.55, thickness: 0.02},
+            {x1: 0.65, y1: 0.55, x2: 0.65, y2: 0.75, thickness: 0.02},
+            
+            // 下方通道
+            {x1: 0.15, y1: 0.75, x2: 0.45, y2: 0.75, thickness: 0.02},
+            {x1: 0.55, y1: 0.75, x2: 0.85, y2: 0.75, thickness: 0.02},
+        ];
+
+        // 初始化游戏
+        function init() {
+            const size = canvas.width;
+            ball.x = size * 0.10;
+            ball.y = size * 0.10;
+            ball.radius = size * 0.025;
+            ball.vx = 0;
+            ball.vy = 0;
+            
+            endpoint.x = size * 0.88;
+            endpoint.y = size * 0.88;
+            endpoint.radius = size * 0.04;
+            
+            gameWon = false;
+        }
+
+        // 绘制函数
+        function draw() {
+            const size = canvas.width;
+            ctx.clearRect(0, 0, size, size);
+            
+            // 绘制背景渐变
+            const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            gradient.addColorStop(0, '#fff5f7');
+            gradient.addColorStop(1, '#ffe4e9');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 绘制墙壁
+            walls.forEach(wall => {
+                ctx.strokeStyle = '#d4a5d7';
+                ctx.lineWidth = wall.thickness * size;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(wall.x1 * size, wall.y1 * size);
+                ctx.lineTo(wall.x2 * size, wall.y2 * size);
+                ctx.stroke();
+            });
+            
+            // 绘制终点（爱心）
+            drawHeart(endpoint.x, endpoint.y, endpoint.radius);
+            
+            // 绘制小球（脉动的心）
+            ctx.save();
+            ctx.translate(ball.x, ball.y);
+            const scale = 1 + Math.sin(Date.now() / 200) * 0.1;
+            ctx.scale(scale, scale);
+            ctx.beginPath();
+            ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+            const ballGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, ball.radius);
+            ballGradient.addColorStop(0, '#ff69b4');
+            ballGradient.addColorStop(1, '#ff1493');
+            ctx.fillStyle = ballGradient;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+            
+            // 绘制倾斜指示器
+            drawTiltIndicator();
+        }
+
+        // 绘制爱心
+        function drawHeart(x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.beginPath();
+            const topCurveHeight = size * 0.3;
+            ctx.moveTo(0, topCurveHeight);
+            // 左侧曲线
+            ctx.bezierCurveTo(
+                -size, -size * 0.5,
+                -size * 0.5, topCurveHeight + size * 0.3,
+                0, size
+            );
+            // 右侧曲线
+            ctx.bezierCurveTo(
+                size * 0.5, topCurveHeight + size * 0.3,
+                size, -size * 0.5,
+                0, topCurveHeight
+            );
+            const heartGradient = ctx.createLinearGradient(-size, -size, size, size);
+            heartGradient.addColorStop(0, '#ff6b9d');
+            heartGradient.addColorStop(1, '#c06c84');
+            ctx.fillStyle = heartGradient;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 绘制倾斜指示器
+        function drawTiltIndicator() {
+            const size = canvas.width;
+            const centerX = size * 0.5;
+            const centerY = size * 0.5;
+            const indicatorSize = size * 0.08;
+            
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, indicatorSize, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ff69b4';
+            ctx.beginPath();
+            ctx.arc(
+                centerX + tiltX * indicatorSize * 2,
+                centerY + tiltY * indicatorSize * 2,
+                indicatorSize * 0.3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 物理更新
+        function update() {
+            if (gameWon) return;
+            
+            const size = canvas.width;
+            const gravity = size * 0.0008;
+            const friction = 0.98;
+            const maxSpeed = size * 0.015;
+            
+            // 根据倾斜应用重力
+            ball.vx += tiltX * gravity;
+            ball.vy += tiltY * gravity;
+            
+            // 限制最大速度
+            const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+            if (speed > maxSpeed) {
+                ball.vx = (ball.vx / speed) * maxSpeed;
+                ball.vy = (ball.vy / speed) * maxSpeed;
+            }
+            
+            // 应用摩擦力
+            ball.vx *= friction;
+            ball.vy *= friction;
+            
+            // 更新位置
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            
+            // 墙壁碰撞检测
+            checkWallCollisions();
+            
+            // 边界检测
+            if (ball.x - ball.radius < 0) {
+                ball.x = ball.radius;
+                ball.vx *= -0.5;
+            }
+            if (ball.x + ball.radius > size) {
+                ball.x = size - ball.radius;
+                ball.vx *= -0.5;
+            }
+            if (ball.y - ball.radius < 0) {
+                ball.y = ball.radius;
+                ball.vy *= -0.5;
+            }
+            if (ball.y + ball.radius > size) {
+                ball.y = size - ball.radius;
+                ball.vy *= -0.5;
+            }
+            
+            // 检查是否到达终点
+            const dx = ball.x - endpoint.x;
+            const dy = ball.y - endpoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < endpoint.radius) {
+                winGame();
+            }
+        }
+
+        // 墙壁碰撞检测
+        function checkWallCollisions() {
+            const size = canvas.width;
+            
+            walls.forEach(wall => {
+                const x1 = wall.x1 * size;
+                const y1 = wall.y1 * size;
+                const x2 = wall.x2 * size;
+                const y2 = wall.y2 * size;
+                const thickness = wall.thickness * size / 2;
+                
+                // 计算点到线段的最短距离
+                const A = ball.x - x1;
+                const B = ball.y - y1;
+                const C = x2 - x1;
+                const D = y2 - y1;
+                
+                const dot = A * C + B * D;
+                const lenSq = C * C + D * D;
+                let param = -1;
+                
+                if (lenSq !== 0) param = dot / lenSq;
+                
+                let xx, yy;
+                
+                if (param < 0) {
+                    xx = x1;
+                    yy = y1;
+                } else if (param > 1) {
+                    xx = x2;
+                    yy = y2;
+                } else {
+                    xx = x1 + param * C;
+                    yy = y1 + param * D;
+                }
+                
+                const dx = ball.x - xx;
+                const dy = ball.y - yy;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < ball.radius + thickness) {
+                    // 碰撞响应
+                    const overlap = ball.radius + thickness - distance;
+                    if (distance > 0) {
+                        ball.x += (dx / distance) * overlap;
+                        ball.y += (dy / distance) * overlap;
+                        
+                        // 反弹
+                        const normalX = dx / distance;
+                        const normalY = dy / distance;
+                        const dotProduct = ball.vx * normalX + ball.vy * normalY;
+                        ball.vx -= 2 * dotProduct * normalX;
+                        ball.vy -= 2 * dotProduct * normalY;
+                        ball.vx *= 0.5;
+                        ball.vy *= 0.5;
+                    }
+                }
+            });
+        }
+
+        // 胜利
+        function winGame() {
+            if (!gameWon) {
+                gameWon = true;
+                setTimeout(() => {
+                    victoryOverlay.style.display = 'flex';
+                }, 500);
+            }
+        }
+
+        // 输入处理
+        function handleStart(x, y) {
+            isDragging = true;
+            lastX = x;
+            lastY = y;
+        }
+
+        function handleMove(x, y) {
+            if (!isDragging) return;
+            
+            const deltaX = x - lastX;
+            const deltaY = y - lastY;
+            
+            tiltX += deltaX * 0.02;
+            tiltY += deltaY * 0.02;
+            
+            // 限制倾斜角度
+            tiltX = Math.max(-1, Math.min(1, tiltX));
+            tiltY = Math.max(-1, Math.min(1, tiltY));
+            
+            lastX = x;
+            lastY = y;
+        }
+
+        function handleEnd() {
+            isDragging = false;
+            // 缓慢回正
+            const decay = 0.95;
+            const decayInterval = setInterval(() => {
+                if (!isDragging) {
+                    tiltX *= decay;
+                    tiltY *= decay;
+                    if (Math.abs(tiltX) < 0.01 && Math.abs(tiltY) < 0.01) {
+                        tiltX = 0;
+                        tiltY = 0;
+                        clearInterval(decayInterval);
+                    }
+                } else {
+                    clearInterval(decayInterval);
+                }
+            }, 16);
+        }
+
+        // 触摸事件
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleStart(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleMove(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleEnd();
+        }, { passive: false });
+
+        // 鼠标事件
+        canvas.addEventListener('mousedown', (e) => {
+            handleStart(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            handleMove(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            handleEnd();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            handleEnd();
+        });
+
+        // 游戏循环
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 启动游戏
+        init();
+        gameLoop();
+
+        // 防止页面滚动
+        document.body.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
+
