@@ -2,21 +2,37 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="爱的时光轴">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="description" content="记录我们在一起的每一个美好瞬间">
     <title>💕 爱的纪念日 - Love Timeline 💕</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* 优化移动端滚动 */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* 浮动的心形背景 */
@@ -85,6 +101,8 @@
             text-shadow: 0 4px 10px rgba(0,0,0,0.3);
             margin-bottom: 10px;
             animation: pulse 2s infinite;
+            /* 防止双击缩放 */
+            touch-action: manipulation;
         }
 
         @keyframes pulse {
@@ -157,6 +175,16 @@
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
             animation-fill-mode: both;
+            /* 增加触摸目标大小 */
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 防止触摸时的选中效果 */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         @keyframes slideUp {
@@ -190,6 +218,19 @@
             transform: translateY(-10px);
             box-shadow: 0 12px 30px rgba(0,0,0,0.2);
             background: white;
+        }
+
+        /* 移动端触摸反馈 */
+        .day-card:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        /* 桌面端hover效果保留 */
+        @media (hover: hover) and (pointer: fine) {
+            .day-card:active {
+                transform: translateY(-10px) scale(0.98);
+            }
         }
 
         .day-number {
@@ -233,47 +274,192 @@
             transform: translateY(-10px) scale(1.05);
         }
 
+        .day-card.special:active {
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .day-card.special:active {
+                transform: translateY(-10px) scale(1.02);
+            }
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                margin-bottom: 30px;
+            }
+
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+                margin-bottom: 8px;
             }
             
             .header p {
                 font-size: 1rem;
+                padding: 0 10px;
             }
 
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            .stats {
                 gap: 15px;
-            }
-
-            .day-card {
-                padding: 20px;
-            }
-
-            .day-number {
-                font-size: 2rem;
+                margin: 20px 0;
             }
 
             .stat-card {
-                padding: 15px 25px;
+                padding: 15px 30px;
+                min-width: 140px;
             }
 
             .stat-card h3 {
                 font-size: 2rem;
             }
+
+            .stat-card p {
+                font-size: 0.9rem;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 12px;
+            }
+
+            .day-card {
+                padding: 18px 12px;
+                min-height: 110px;
+                border-radius: 12px;
+            }
+
+            .day-icon {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+
+            .day-number {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .day-label {
+                font-size: 0.85rem;
+            }
+
+            footer {
+                margin-top: 30px;
+                padding: 20px 10px;
+                font-size: 1rem;
+            }
+
+            .love-quote {
+                font-size: 1.05rem;
+            }
         }
 
-        /* 加载动画延迟 */
-        .day-card:nth-child(1) { animation-delay: 0.05s; }
-        .day-card:nth-child(2) { animation-delay: 0.1s; }
-        .day-card:nth-child(3) { animation-delay: 0.15s; }
-        .day-card:nth-child(4) { animation-delay: 0.2s; }
-        .day-card:nth-child(5) { animation-delay: 0.25s; }
-        .day-card:nth-child(6) { animation-delay: 0.3s; }
-        .day-card:nth-child(7) { animation-delay: 0.35s; }
-        .day-card:nth-child(8) { animation-delay: 0.4s; }
+        /* 小屏幕手机优化 */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px 20px;
+                min-width: 120px;
+            }
+
+            .stat-card h3 {
+                font-size: 1.8rem;
+            }
+
+            .stat-card p {
+                font-size: 0.85rem;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+                gap: 10px;
+            }
+
+            .day-card {
+                padding: 15px 8px;
+                min-height: 100px;
+                border-radius: 10px;
+            }
+
+            .day-icon {
+                font-size: 1.5rem;
+                margin-bottom: 6px;
+            }
+
+            .day-number {
+                font-size: 1.6rem;
+                margin-bottom: 4px;
+            }
+
+            .day-label {
+                font-size: 0.75rem;
+            }
+
+            footer {
+                font-size: 0.9rem;
+            }
+
+            .love-quote {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* 横屏优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+
+            .stats {
+                margin: 15px 0;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+        }
+
+        /* 加载动画延迟 - 桌面端 */
+        @media (min-width: 769px) {
+            .day-card:nth-child(1) { animation-delay: 0.05s; }
+            .day-card:nth-child(2) { animation-delay: 0.1s; }
+            .day-card:nth-child(3) { animation-delay: 0.15s; }
+            .day-card:nth-child(4) { animation-delay: 0.2s; }
+            .day-card:nth-child(5) { animation-delay: 0.25s; }
+            .day-card:nth-child(6) { animation-delay: 0.3s; }
+            .day-card:nth-child(7) { animation-delay: 0.35s; }
+            .day-card:nth-child(8) { animation-delay: 0.4s; }
+        }
+
+        /* 移动端减少动画延迟 */
+        @media (max-width: 768px) {
+            .day-card {
+                animation-duration: 0.3s;
+            }
+        }
 
         footer {
             text-align: center;
@@ -294,9 +480,101 @@
             margin-top: 20px;
             opacity: 0.95;
         }
+
+        /* 加载指示器 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            font-size: 4rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:active {
+            transform: scale(0.9);
+        }
+
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 加载指示器 -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner">💕</div>
+            <div class="loading-text">加载爱的回忆中...</div>
+        </div>
+    </div>
+
     <!-- 浮动心形背景 -->
     <div class="hearts-bg" id="heartsContainer"></div>
 
@@ -328,7 +606,19 @@
         </footer>
     </div>
 
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" aria-label="回到顶部">
+        ↑
+    </button>
+
     <script>
+        // 页面加载完成后隐藏加载指示器
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
+        });
+
         // 生成日期卡片
         const daysGrid = document.getElementById('daysGrid');
         
@@ -392,12 +682,78 @@
             }, 15000);
         }
 
+        // 检测是否为移动设备
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        // 根据设备类型调整心形动画
+        const heartInterval = isMobile ? 3000 : 2000;  // 移动端降低频率
+        const initialHearts = isMobile ? 3 : 5;  // 移动端减少初始数量
+        
         // 定期创建浮动的心形
-        setInterval(createFloatingHeart, 2000);
+        setInterval(createFloatingHeart, heartInterval);
         
         // 初始创建一些心形
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < initialHearts; i++) {
             setTimeout(createFloatingHeart, i * 1000);
+        }
+
+        // 优化移动端滚动性能
+        if (isMobile) {
+            document.body.style.webkitOverflowScrolling = 'touch';
+        }
+
+        // 禁止移动端长按菜单（卡片）
+        document.querySelectorAll('.day-card').forEach(card => {
+            card.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+        });
+
+        // 回到顶部功能
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        // 监听滚动事件，显示/隐藏回到顶部按钮
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            }, 100);
+        }, { passive: true });
+
+        // 点击回到顶部
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 优化性能：使用 Intersection Observer 懒加载卡片动画
+        if ('IntersectionObserver' in window && isMobile) {
+            const cards = document.querySelectorAll('.day-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            cards.forEach(card => {
+                if (cards.length > 20) {
+                    card.style.opacity = '0';
+                    observer.observe(card);
+                }
+            });
         }
     </script>
 </body>
