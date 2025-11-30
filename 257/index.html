@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>💕 质数之心 - 恋爱257天 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 开始界面 */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #start-screen.hidden {
+            display: none;
+        }
+
+        .title {
+            font-size: 2.8rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 5px;
+        }
+
+        .day-info {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .prime-highlight {
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 90%;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .instructions h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .instructions p {
+            color: white;
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .prime-examples {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .prime-badge {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .start-btn {
+            padding: 18px 50px;
+            font-size: 1.5rem;
+            background: white;
+            color: #f5576c;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* HUD */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+        }
+
+        .hud-item {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .hud-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .hud-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        #time-value {
+            color: #f5576c;
+        }
+
+        #time-value.warning {
+            animation: timeWarning 0.5s infinite;
+        }
+
+        @keyframes timeWarning {
+            0%, 100% { color: #f5576c; }
+            50% { color: #ff0000; }
+        }
+
+        /* 进度条 */
+        #progress-bar {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            z-index: 50;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* 数字气泡 */
+        .number-bubble {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+            transition: transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .number-bubble.prime {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+        }
+
+        .number-bubble.composite {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            color: white;
+        }
+
+        .number-bubble:active {
+            transform: scale(0.85);
+        }
+
+        .number-bubble.pop {
+            animation: popOut 0.4s ease forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes popOut {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* 反馈文字 */
+        .feedback {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 100;
+            animation: feedbackFloat 1s ease forwards;
+        }
+
+        .feedback.correct {
+            color: #22c55e;
+            text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+        }
+
+        .feedback.wrong {
+            color: #ef4444;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+        }
+
+        @keyframes feedbackFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px);
+            }
+        }
+
+        /* 结束界面 */
+        #end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        #end-screen.show {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .end-title {
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .end-score {
+            font-size: 3rem;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .end-stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-item {
+            font-size: 1.1rem;
+            margin: 8px 0;
+        }
+
+        .end-message {
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            max-width: 90%;
+        }
+
+        .restart-btn {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .restart-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 粒子效果 */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* 动画 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 响应式 */
+        @media (max-width: 500px) {
+            .title { font-size: 2.2rem; }
+            .subtitle { font-size: 1.2rem; }
+            .day-info { font-size: 1rem; }
+            .instructions h3 { font-size: 1.1rem; }
+            .instructions p { font-size: 0.9rem; }
+            .start-btn { padding: 15px 40px; font-size: 1.3rem; }
+            .number-bubble { width: 60px; height: 60px; font-size: 1.5rem; }
+            .end-title { font-size: 2rem; }
+            .end-score { font-size: 2.5rem; }
+        }
+
+        @media (max-height: 700px) {
+            .instructions { padding: 15px; margin-bottom: 20px; }
+            .day-info { margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开始界面 -->
+        <div id="start-screen">
+            <div class="title">💕 质数之心 💕</div>
+            <div class="subtitle">Prime Hearts</div>
+            <div class="day-info">
+                恋爱第<span class="prime-highlight">257</span>天<br>
+                <small>257 是第55个质数 | 257 = 2⁸ + 1</small>
+            </div>
+            <div class="instructions">
+                <h3>🎮 游戏规则</h3>
+                <p>✅ 点击<strong>质数</strong>气泡得分 +10分</p>
+                <p>❌ 点击合数气泡扣分 -5分</p>
+                <p>⏱️ 60秒倒计时挑战</p>
+                <p>🎯 达到<strong>257分</strong>即可通关！</p>
+                <div class="prime-examples">
+                    <div class="prime-badge">质数示例</div>
+                    <div class="prime-badge">2</div>
+                    <div class="prime-badge">3</div>
+                    <div class="prime-badge">5</div>
+                    <div class="prime-badge">7</div>
+                    <div class="prime-badge">11</div>
+                    <div class="prime-badge">13</div>
+                    <div class="prime-badge">17</div>
+                    <div class="prime-badge">19</div>
+                </div>
+            </div>
+            <button class="start-btn" onclick="game.start()">开始游戏</button>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="hud" style="display: none;">
+            <div class="hud-item">
+                <div class="hud-label">分数</div>
+                <div class="hud-value" id="score-value">0</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">时间</div>
+                <div class="hud-value" id="time-value">60</div>
+            </div>
+        </div>
+
+        <div id="progress-bar" style="display: none;">
+            <div id="progress-fill">0 / 257</div>
+        </div>
+
+        <!-- 结束界面 -->
+        <div id="end-screen">
+            <div class="end-title" id="end-title">时间到！</div>
+            <div class="end-score" id="end-score">0分</div>
+            <div class="end-stats">
+                <div class="stat-item">✅ 正确: <strong id="correct-count">0</strong></div>
+                <div class="stat-item">❌ 错误: <strong id="wrong-count">0</strong></div>
+                <div class="stat-item">🎯 准确率: <strong id="accuracy">0%</strong></div>
+            </div>
+            <div class="end-message" id="end-message">再来挑战一次吧！</div>
+            <button class="restart-btn" onclick="game.restart()">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        class PrimeGame {
+            constructor() {
+                this.score = 0;
+                this.timeLeft = 60;
+                this.isPlaying = false;
+                this.bubbles = [];
+                this.correctCount = 0;
+                this.wrongCount = 0;
+                this.bubbleSpawnInterval = null;
+                this.gameTimer = null;
+                this.won = false;
+                
+                // 质数列表（1-100）
+                this.primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                
+                this.initElements();
+            }
+
+            initElements() {
+                this.container = document.getElementById('game-container');
+                this.startScreen = document.getElementById('start-screen');
+                this.endScreen = document.getElementById('end-screen');
+                this.hud = document.getElementById('hud');
+                this.progressBar = document.getElementById('progress-bar');
+                this.scoreValue = document.getElementById('score-value');
+                this.timeValue = document.getElementById('time-value');
+                this.progressFill = document.getElementById('progress-fill');
+            }
+
+            start() {
+                this.score = 0;
+                this.timeLeft = 60;
+                this.correctCount = 0;
+                this.wrongCount = 0;
+                this.isPlaying = true;
+                this.won = false;
+                
+                // 清除所有气泡
+                this.bubbles.forEach(bubble => bubble.remove());
+                this.bubbles = [];
+                
+                // 显示游戏界面
+                this.startScreen.classList.add('hidden');
+                this.endScreen.classList.remove('show');
+                this.hud.style.display = 'flex';
+                this.progressBar.style.display = 'block';
+                
+                this.updateUI();
+                this.startBubbleSpawn();
+                this.startTimer();
+            }
+
+            startBubbleSpawn() {
+                // 初始生成几个气泡
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => this.spawnBubble(), i * 300);
+                }
+                
+                // 定期生成气泡
+                this.bubbleSpawnInterval = setInterval(() => {
+                    if (this.isPlaying && this.bubbles.length < 8) {
+                        this.spawnBubble();
+                    }
+                }, 1000);
+            }
+
+            startTimer() {
+                this.gameTimer = setInterval(() => {
+                    if (!this.isPlaying) return;
+                    
+                    this.timeLeft--;
+                    this.timeValue.textContent = this.timeLeft;
+                    
+                    if (this.timeLeft <= 10) {
+                        this.timeValue.classList.add('warning');
+                    }
+                    
+                    if (this.timeLeft <= 0) {
+                        this.gameOver();
+                    }
+                }, 1000);
+            }
+
+            spawnBubble() {
+                const bubble = document.createElement('div');
+                bubble.className = 'number-bubble';
+                
+                // 随机生成数字（1-100）
+                const number = Math.floor(Math.random() * 99) + 2;
+                const isPrime = this.isPrime(number);
+                
+                bubble.textContent = number;
+                bubble.classList.add(isPrime ? 'prime' : 'composite');
+                bubble.dataset.number = number;
+                bubble.dataset.isPrime = isPrime;
+                
+                // 随机位置（避免HUD区域）
+                const maxX = window.innerWidth - 80;
+                const maxY = window.innerHeight - 150;
+                const minY = 130;
+                
+                bubble.style.left = Math.random() * maxX + 10 + 'px';
+                bubble.style.top = Math.random() * (maxY - minY) + minY + 'px';
+                
+                // 随机浮动延迟
+                bubble.style.animationDelay = Math.random() * 3 + 's';
+                
+                // 点击事件
+                bubble.addEventListener('click', (e) => this.handleBubbleClick(e, bubble));
+                
+                this.container.appendChild(bubble);
+                this.bubbles.push(bubble);
+                
+                // 5秒后自动消失
+                setTimeout(() => {
+                    if (bubble.parentElement) {
+                        bubble.classList.add('pop');
+                        setTimeout(() => {
+                            bubble.remove();
+                            const index = this.bubbles.indexOf(bubble);
+                            if (index > -1) this.bubbles.splice(index, 1);
+                        }, 400);
+                    }
+                }, 5000);
+            }
+
+            handleBubbleClick(event, bubble) {
+                if (!this.isPlaying) return;
+                
+                const isPrime = bubble.dataset.isPrime === 'true';
+                const rect = bubble.getBoundingClientRect();
+                
+                if (isPrime) {
+                    // 点击质数 +10分
+                    this.score += 10;
+                    this.correctCount++;
+                    this.showFeedback(rect.left + rect.width / 2, rect.top, '+10', 'correct');
+                    this.createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#22c55e');
+                } else {
+                    // 点击合数 -5分
+                    this.score -= 5;
+                    this.wrongCount++;
+                    this.showFeedback(rect.left + rect.width / 2, rect.top, '-5', 'wrong');
+                    this.createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ef4444');
+                }
+                
+                // 确保分数不为负
+                this.score = Math.max(0, this.score);
+                
+                this.updateUI();
+                
+                // 移除气泡
+                bubble.classList.add('pop');
+                setTimeout(() => {
+                    bubble.remove();
+                    const index = this.bubbles.indexOf(bubble);
+                    if (index > -1) this.bubbles.splice(index, 1);
+                }, 400);
+                
+                // 检查是否达到257分
+                if (this.score >= 257 && !this.won) {
+                    this.won = true;
+                    setTimeout(() => this.gameWin(), 500);
+                }
+            }
+
+            isPrime(num) {
+                return this.primes.includes(num);
+            }
+
+            showFeedback(x, y, text, type) {
+                const feedback = document.createElement('div');
+                feedback.className = `feedback ${type}`;
+                feedback.textContent = text;
+                feedback.style.left = x + 'px';
+                feedback.style.top = y + 'px';
+                this.container.appendChild(feedback);
+                
+                setTimeout(() => feedback.remove(), 1000);
+            }
+
+            createParticles(x, y, color) {
+                for (let i = 0; i < 8; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.background = color;
+                    this.container.appendChild(particle);
+                    
+                    const angle = (Math.PI * 2 * i) / 8;
+                    const velocity = 3;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity;
+                    
+                    this.animateParticle(particle, x, y, vx, vy);
+                }
+            }
+
+            animateParticle(particle, startX, startY, vx, vy) {
+                let x = startX;
+                let y = startY;
+                let opacity = 1;
+                
+                const animate = () => {
+                    x += vx;
+                    y += vy;
+                    opacity -= 0.03;
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                animate();
+            }
+
+            updateUI() {
+                this.scoreValue.textContent = this.score;
+                const progress = Math.min((this.score / 257) * 100, 100);
+                this.progressFill.style.width = progress + '%';
+                this.progressFill.textContent = `${this.score} / 257`;
+                
+                if (this.score >= 257) {
+                    this.progressFill.style.background = 'linear-gradient(90deg, #ffd700 0%, #ff6b9d 100%)';
+                }
+            }
+
+            gameWin() {
+                this.isPlaying = false;
+                clearInterval(this.bubbleSpawnInterval);
+                clearInterval(this.gameTimer);
+                
+                // 移除所有气泡
+                this.bubbles.forEach(bubble => bubble.remove());
+                this.bubbles = [];
+                
+                this.showEndScreen('🎉 恭喜通关！🎉', 
+                    `就像257是独特的质数，<br>我们的爱情也是独一无二的！<br><br>` +
+                    `你成功识别了质数，<br>证明了你对数字的敏锐直觉，<br>` +
+                    `就像我对你的爱一样精准！💕`
+                );
+            }
+
+            gameOver() {
+                this.isPlaying = false;
+                clearInterval(this.bubbleSpawnInterval);
+                clearInterval(this.gameTimer);
+                
+                // 移除所有气泡
+                this.bubbles.forEach(bubble => bubble.remove());
+                this.bubbles = [];
+                
+                let message = '';
+                if (this.score >= 257) {
+                    message = `太棒了！你达到了257分！<br>质数的魅力，爱的完美！💖`;
+                } else if (this.score >= 150) {
+                    message = `很不错！差一点就到257了！<br>质数需要耐心寻找，<br>就像我们的爱情需要用心经营！💕`;
+                } else {
+                    message = `继续加油！<br>质数虽然难找，<br>但我们的爱却近在咫尺！💗`;
+                }
+                
+                this.showEndScreen('时间到！', message);
+            }
+
+            showEndScreen(title, message) {
+                document.getElementById('end-title').textContent = title;
+                document.getElementById('end-score').textContent = this.score + '分';
+                document.getElementById('correct-count').textContent = this.correctCount;
+                document.getElementById('wrong-count').textContent = this.wrongCount;
+                
+                const total = this.correctCount + this.wrongCount;
+                const accuracy = total > 0 ? Math.round((this.correctCount / total) * 100) : 0;
+                document.getElementById('accuracy').textContent = accuracy + '%';
+                
+                document.getElementById('end-message').innerHTML = message;
+                
+                this.endScreen.classList.add('show');
+                this.hud.style.display = 'none';
+                this.progressBar.style.display = 'none';
+            }
+
+            restart() {
+                this.endScreen.classList.remove('show');
+                this.startScreen.classList.remove('hidden');
+            }
+        }
+
+        // 启动游戏
+        const game = new PrimeGame();
+        
+        // 防止页面滚动
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
+

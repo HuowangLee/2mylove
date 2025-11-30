@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>💕 二进制之爱 - 恋爱256天 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .day-info {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .binary {
+            font-family: 'Courier New', monospace;
+            color: #ffd700;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .info-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeIn 0.6s ease 0.2s both;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-board {
+            background: rgba(187, 173, 160, 0.4);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            animation: fadeIn 0.6s ease 0.4s both;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            background: rgba(187, 173, 160, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(238, 228, 218, 0.35);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #776e65;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .cell.tile {
+            animation: pop 0.2s ease;
+        }
+
+        .cell.merged {
+            animation: merge 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes merge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* 不同数字的颜色 - 8位色彩风格 */
+        .cell[data-value="2"] {
+            background: linear-gradient(135deg, #eee4da 0%, #ede0c8 100%);
+            color: #776e65;
+        }
+
+        .cell[data-value="4"] {
+            background: linear-gradient(135deg, #ede0c8 0%, #f2b179 100%);
+            color: #776e65;
+        }
+
+        .cell[data-value="8"] {
+            background: linear-gradient(135deg, #f2b179 0%, #f59563 100%);
+            color: #f9f6f2;
+        }
+
+        .cell[data-value="16"] {
+            background: linear-gradient(135deg, #f59563 0%, #f67c5f 100%);
+            color: #f9f6f2;
+        }
+
+        .cell[data-value="32"] {
+            background: linear-gradient(135deg, #f67c5f 0%, #f65e3b 100%);
+            color: #f9f6f2;
+        }
+
+        .cell[data-value="64"] {
+            background: linear-gradient(135deg, #f65e3b 0%, #edcf72 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 15px rgba(237, 207, 114, 0.5);
+        }
+
+        .cell[data-value="128"] {
+            background: linear-gradient(135deg, #edcf72 0%, #edcc61 100%);
+            color: #f9f6f2;
+            box-shadow: 0 0 20px rgba(237, 204, 97, 0.6);
+            font-size: 1.5rem;
+        }
+
+        .cell[data-value="256"] {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #ffd700 100%);
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            font-size: 1.5rem;
+            animation: glow 1s infinite, rotate 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 157, 0.8); }
+            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 1); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.6s ease 0.6s both;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-new {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-new:active {
+            transform: scale(0.95);
+        }
+
+        .instructions {
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            opacity: 0.9;
+            animation: fadeIn 0.6s ease 0.8s both;
+        }
+
+        /* 胜利弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            animation: zoomIn 0.5s ease;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .modal-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .modal-binary {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: #667eea;
+            margin: 20px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .modal-hearts {
+            font-size: 3rem;
+            margin: 20px 0;
+            animation: heartbeat 1s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 游戏结束提示 */
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(238, 228, 218, 0.8);
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .game-over-overlay.show {
+            display: flex;
+        }
+
+        .game-over-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #776e65;
+        }
+
+        @media (max-width: 500px) {
+            .title { font-size: 1.8rem; }
+            .subtitle { font-size: 1.1rem; }
+            .cell { font-size: 1.5rem; }
+            .cell[data-value="128"],
+            .cell[data-value="256"] { font-size: 1.2rem; }
+            .info-value { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">💕 二进制之爱 💕</div>
+            <div class="subtitle">Binary Love</div>
+            <div class="day-info">
+                恋爱第256天 | <span class="binary">256 = 2⁸</span>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-card">
+                <div class="info-label">分数</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">最高</div>
+                <div class="info-value" id="best">0</div>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="grid" id="grid">
+                <!-- 4x4 = 16 cells -->
+            </div>
+            <div class="game-over-overlay" id="gameOverOverlay">
+                <div class="game-over-text">游戏结束！</div>
+                <button class="btn btn-new" onclick="game.restart()">重新开始</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-new" onclick="game.restart()">新游戏</button>
+        </div>
+
+        <div class="instructions">
+            📱 滑动或使用方向键移动<br>
+            🎯 合并相同数字，目标达到 <strong>256</strong>！<br>
+            💖 2 → 4 → 8 → 16 → 32 → 64 → 128 → 256
+        </div>
+    </div>
+
+    <!-- 胜利弹窗 -->
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <div class="modal-title">🎉 恭喜达成256！🎉</div>
+            <div class="modal-hearts">💖💕💗</div>
+            <div class="modal-message">
+                就像二进制一样<br>
+                我们的爱从最简单的"1"开始<br>
+                经过256天的翻倍累积<br>
+                变得如此美好而强大！
+            </div>
+            <div class="modal-binary">
+                256 = 2⁸ = 0b11111111<br>
+                Love × Love = Love²⁵⁶
+            </div>
+            <div class="modal-message">
+                🌟 第256天，爱你的每一位都是1 🌟
+            </div>
+            <button class="btn btn-new" onclick="game.closeWinModal()">继续游戏</button>
+        </div>
+    </div>
+
+    <script>
+        class Game2048 {
+            constructor() {
+                this.size = 4;
+                this.grid = [];
+                this.score = 0;
+                this.best = localStorage.getItem('binary-love-256-best') || 0;
+                this.won = false;
+                
+                this.gridElement = document.getElementById('grid');
+                this.scoreElement = document.getElementById('score');
+                this.bestElement = document.getElementById('best');
+                this.gameOverOverlay = document.getElementById('gameOverOverlay');
+                this.winModal = document.getElementById('winModal');
+                
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                
+                this.init();
+            }
+
+            init() {
+                this.createGrid();
+                this.setupInput();
+                this.restart();
+            }
+
+            createGrid() {
+                for (let i = 0; i < this.size * this.size; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    this.gridElement.appendChild(cell);
+                }
+            }
+
+            setupInput() {
+                // 键盘控制
+                document.addEventListener('keydown', (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        e.preventDefault();
+                        this.handleInput(e.key);
+                    }
+                });
+
+                // 触摸控制
+                this.gridElement.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.touchStartX = e.touches[0].clientX;
+                    this.touchStartY = e.touches[0].clientY;
+                }, { passive: false });
+
+                this.gridElement.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    if (!this.touchStartX || !this.touchStartY) return;
+
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+
+                    const dx = touchEndX - this.touchStartX;
+                    const dy = touchEndY - this.touchStartY;
+
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+
+                    if (Math.max(absDx, absDy) < 30) return; // 最小滑动距离
+
+                    if (absDx > absDy) {
+                        this.handleInput(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
+                    } else {
+                        this.handleInput(dy > 0 ? 'ArrowDown' : 'ArrowUp');
+                    }
+
+                    this.touchStartX = 0;
+                    this.touchStartY = 0;
+                }, { passive: false });
+            }
+
+            handleInput(direction) {
+                if (this.isGameOver()) return;
+
+                const moved = this.move(direction);
+                if (moved) {
+                    this.addRandomTile();
+                    this.render();
+                    this.updateScore();
+                    
+                    if (this.checkWin()) {
+                        this.showWinModal();
+                    } else if (this.isGameOver()) {
+                        this.showGameOver();
+                    }
+                }
+            }
+
+            restart() {
+                this.grid = Array(this.size).fill().map(() => Array(this.size).fill(0));
+                this.score = 0;
+                this.won = false;
+                this.gameOverOverlay.classList.remove('show');
+                
+                this.addRandomTile();
+                this.addRandomTile();
+                this.render();
+                this.updateScore();
+            }
+
+            addRandomTile() {
+                const emptyCells = [];
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.grid[i][j] === 0) {
+                            emptyCells.push({ i, j });
+                        }
+                    }
+                }
+
+                if (emptyCells.length > 0) {
+                    const { i, j } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    this.grid[i][j] = Math.random() < 0.9 ? 2 : 4;
+                }
+            }
+
+            move(direction) {
+                const oldGrid = JSON.stringify(this.grid);
+                
+                switch (direction) {
+                    case 'ArrowLeft':
+                        this.moveLeft();
+                        break;
+                    case 'ArrowRight':
+                        this.moveRight();
+                        break;
+                    case 'ArrowUp':
+                        this.moveUp();
+                        break;
+                    case 'ArrowDown':
+                        this.moveDown();
+                        break;
+                }
+
+                return oldGrid !== JSON.stringify(this.grid);
+            }
+
+            moveLeft() {
+                for (let i = 0; i < this.size; i++) {
+                    this.grid[i] = this.mergeLine(this.grid[i]);
+                }
+            }
+
+            moveRight() {
+                for (let i = 0; i < this.size; i++) {
+                    this.grid[i] = this.mergeLine(this.grid[i].reverse()).reverse();
+                }
+            }
+
+            moveUp() {
+                for (let j = 0; j < this.size; j++) {
+                    let column = [];
+                    for (let i = 0; i < this.size; i++) {
+                        column.push(this.grid[i][j]);
+                    }
+                    column = this.mergeLine(column);
+                    for (let i = 0; i < this.size; i++) {
+                        this.grid[i][j] = column[i];
+                    }
+                }
+            }
+
+            moveDown() {
+                for (let j = 0; j < this.size; j++) {
+                    let column = [];
+                    for (let i = 0; i < this.size; i++) {
+                        column.push(this.grid[i][j]);
+                    }
+                    column = this.mergeLine(column.reverse()).reverse();
+                    for (let i = 0; i < this.size; i++) {
+                        this.grid[i][j] = column[i];
+                    }
+                }
+            }
+
+            mergeLine(line) {
+                // 移除0
+                let newLine = line.filter(cell => cell !== 0);
+                
+                // 合并相同数字
+                for (let i = 0; i < newLine.length - 1; i++) {
+                    if (newLine[i] === newLine[i + 1]) {
+                        newLine[i] *= 2;
+                        this.score += newLine[i];
+                        newLine.splice(i + 1, 1);
+                    }
+                }
+                
+                // 补充0
+                while (newLine.length < this.size) {
+                    newLine.push(0);
+                }
+                
+                return newLine;
+            }
+
+            render() {
+                const cells = this.gridElement.querySelectorAll('.cell');
+                let index = 0;
+                
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const cell = cells[index];
+                        const value = this.grid[i][j];
+                        
+                        if (value === 0) {
+                            cell.textContent = '';
+                            cell.removeAttribute('data-value');
+                            cell.classList.remove('tile', 'merged');
+                        } else {
+                            cell.textContent = value;
+                            cell.setAttribute('data-value', value);
+                            
+                            if (!cell.classList.contains('tile')) {
+                                cell.classList.add('tile');
+                            }
+                        }
+                        
+                        index++;
+                    }
+                }
+            }
+
+            updateScore() {
+                this.scoreElement.textContent = this.score;
+                
+                if (this.score > this.best) {
+                    this.best = this.score;
+                    localStorage.setItem('binary-love-256-best', this.best);
+                }
+                
+                this.bestElement.textContent = this.best;
+            }
+
+            checkWin() {
+                if (this.won) return false;
+                
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.grid[i][j] === 256) {
+                            this.won = true;
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            isGameOver() {
+                // 检查是否有空格
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.grid[i][j] === 0) return false;
+                    }
+                }
+
+                // 检查是否可以合并
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const current = this.grid[i][j];
+                        
+                        // 检查右边
+                        if (j < this.size - 1 && current === this.grid[i][j + 1]) return false;
+                        
+                        // 检查下面
+                        if (i < this.size - 1 && current === this.grid[i + 1][j]) return false;
+                    }
+                }
+
+                return true;
+            }
+
+            showGameOver() {
+                setTimeout(() => {
+                    this.gameOverOverlay.classList.add('show');
+                }, 500);
+            }
+
+            showWinModal() {
+                setTimeout(() => {
+                    this.winModal.classList.add('show');
+                }, 500);
+            }
+
+            closeWinModal() {
+                this.winModal.classList.remove('show');
+            }
+        }
+
+        // 启动游戏
+        const game = new Game2048();
+
+        // 防止页面滚动
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
+

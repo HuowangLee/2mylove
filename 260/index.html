@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>💕 爱心方块 - 恋爱260天 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .day-info {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        #game-canvas {
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            background: #000;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            min-width: 180px;
+        }
+
+        .info-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .info-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f5576c;
+        }
+
+        #next-canvas {
+            border-radius: 8px;
+            background: #1a1a2e;
+            margin-top: 10px;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 1rem;
+            background: white;
+            color: #f5576c;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-weight: bold;
+            color: #f5576c;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .control-btn.wide {
+            width: 130px;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 15px;
+            color: white;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            animation: bounceIn 0.5s ease;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #f5576c;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .modal-stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .modal-stat {
+            font-size: 1.1rem;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .modal-message {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .title { font-size: 1.6rem; }
+            .day-info { font-size: 1rem; }
+            
+            .game-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 500px) {
+            body { padding: 10px; }
+            .info-box { min-width: 140px; padding: 15px; }
+            .info-value { font-size: 1.5rem; }
+            .control-btn { width: 50px; height: 50px; font-size: 1.2rem; }
+            .control-btn.wide { width: 110px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">💕 爱心方块 💕</div>
+        <div class="day-info">恋爱第 260 天 | Tetris Love</div>
+    </div>
+
+    <div class="game-container">
+        <div class="main-panel">
+            <canvas id="game-canvas"></canvas>
+            
+            <div class="controls">
+                <button class="btn" id="start-btn">开始游戏</button>
+                <button class="btn" id="pause-btn" disabled>暂停</button>
+            </div>
+
+            <div class="mobile-controls">
+                <div class="control-row">
+                    <button class="control-btn" id="rotate-btn">↻</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" id="left-btn">←</button>
+                    <button class="control-btn" id="down-btn">↓</button>
+                    <button class="control-btn" id="right-btn">→</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn wide" id="drop-btn">快速下落</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="info-box">
+                <div class="info-title">分数</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-box">
+                <div class="info-title">等级</div>
+                <div class="info-value" id="level">1</div>
+            </div>
+            <div class="info-box">
+                <div class="info-title">消除行数</div>
+                <div class="info-value" id="lines">0</div>
+            </div>
+            <div class="info-box">
+                <div class="info-title">下一个</div>
+                <canvas id="next-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <strong>🎮 操作说明：</strong><br>
+        💻 PC端：← → 移动 | ↑ 旋转 | ↓ 加速下落 | 空格 快速落地<br>
+        📱 移动端：使用屏幕按钮控制
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <div class="modal-title">💔 游戏结束 💔</div>
+            <div class="modal-stats">
+                <div class="modal-stat">最终分数：<strong style="color: #f5576c;" id="final-score">0</strong></div>
+                <div class="modal-stat">最高等级：<strong style="color: #f5576c;" id="final-level">1</strong></div>
+                <div class="modal-stat">消除行数：<strong style="color: #f5576c;" id="final-lines">0</strong></div>
+            </div>
+            <div class="modal-message">
+                就像方块不断堆叠，<br>
+                我们的回忆也在不断累积！💕<br>
+                让我们重新开始吧！
+            </div>
+            <button class="btn" onclick="game.restart()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        class TetrisGame {
+            constructor() {
+                this.canvas = document.getElementById('game-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.nextCanvas = document.getElementById('next-canvas');
+                this.nextCtx = this.nextCanvas.getContext('2d');
+                
+                // 游戏参数
+                this.cols = 10;
+                this.rows = 20;
+                this.blockSize = 25;
+                
+                this.canvas.width = this.cols * this.blockSize;
+                this.canvas.height = this.rows * this.blockSize;
+                this.nextCanvas.width = 100;
+                this.nextCanvas.height = 100;
+                
+                // 游戏状态
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.isPlaying = false;
+                this.isPaused = false;
+                this.gameSpeed = 1000;
+                this.lastTime = 0;
+                this.dropCounter = 0;
+                
+                // 游戏板
+                this.board = this.createBoard();
+                this.currentPiece = null;
+                this.nextPiece = null;
+                
+                // 方块定义
+                this.pieces = {
+                    I: [[1,1,1,1]],
+                    O: [[1,1],[1,1]],
+                    T: [[0,1,0],[1,1,1]],
+                    S: [[0,1,1],[1,1,0]],
+                    Z: [[1,1,0],[0,1,1]],
+                    J: [[1,0,0],[1,1,1]],
+                    L: [[0,0,1],[1,1,1]]
+                };
+                
+                this.colors = {
+                    I: '#00f0f0',
+                    O: '#f0f000',
+                    T: '#a000f0',
+                    S: '#00f000',
+                    Z: '#f00000',
+                    J: '#0000f0',
+                    L: '#f0a000'
+                };
+                
+                this.initControls();
+                this.bindKeyboard();
+            }
+
+            createBoard() {
+                return Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+            }
+
+            initControls() {
+                document.getElementById('start-btn').addEventListener('click', () => this.start());
+                document.getElementById('pause-btn').addEventListener('click', () => this.togglePause());
+                
+                // 移动端按钮
+                document.getElementById('left-btn').addEventListener('click', () => this.move(-1));
+                document.getElementById('right-btn').addEventListener('click', () => this.move(1));
+                document.getElementById('down-btn').addEventListener('click', () => this.moveDown());
+                document.getElementById('rotate-btn').addEventListener('click', () => this.rotate());
+                document.getElementById('drop-btn').addEventListener('click', () => this.hardDrop());
+            }
+
+            bindKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    if (!this.isPlaying || this.isPaused) return;
+                    
+                    switch(e.key) {
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.move(-1);
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            this.move(1);
+                            break;
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            this.moveDown();
+                            break;
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            this.rotate();
+                            break;
+                        case ' ':
+                            e.preventDefault();
+                            this.hardDrop();
+                            break;
+                    }
+                });
+            }
+
+            start() {
+                this.score = 0;
+                this.level = 1;
+                this.lines = 0;
+                this.isPlaying = true;
+                this.isPaused = false;
+                this.gameSpeed = 1000;
+                this.board = this.createBoard();
+                
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('pause-btn').disabled = false;
+                
+                this.nextPiece = this.randomPiece();
+                this.spawnPiece();
+                this.updateUI();
+                this.lastTime = performance.now();
+                requestAnimationFrame((time) => this.gameLoop(time));
+            }
+
+            randomPiece() {
+                const pieces = Object.keys(this.pieces);
+                const type = pieces[Math.floor(Math.random() * pieces.length)];
+                return {
+                    shape: this.pieces[type],
+                    type: type,
+                    x: Math.floor(this.cols / 2) - 1,
+                    y: 0
+                };
+            }
+
+            spawnPiece() {
+                this.currentPiece = this.nextPiece;
+                this.nextPiece = this.randomPiece();
+                this.drawNextPiece();
+                
+                if (this.collision(this.currentPiece)) {
+                    this.gameOver();
+                }
+            }
+
+            collision(piece) {
+                const shape = piece.shape;
+                for (let y = 0; y < shape.length; y++) {
+                    for (let x = 0; x < shape[y].length; x++) {
+                        if (shape[y][x]) {
+                            const newX = piece.x + x;
+                            const newY = piece.y + y;
+                            
+                            if (newX < 0 || newX >= this.cols || newY >= this.rows) {
+                                return true;
+                            }
+                            if (newY >= 0 && this.board[newY][newX]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            move(dir) {
+                this.currentPiece.x += dir;
+                if (this.collision(this.currentPiece)) {
+                    this.currentPiece.x -= dir;
+                }
+            }
+
+            moveDown() {
+                this.currentPiece.y++;
+                if (this.collision(this.currentPiece)) {
+                    this.currentPiece.y--;
+                    this.merge();
+                    this.clearLines();
+                    this.spawnPiece();
+                }
+            }
+
+            hardDrop() {
+                while (!this.collision(this.currentPiece)) {
+                    this.currentPiece.y++;
+                }
+                this.currentPiece.y--;
+                this.merge();
+                this.clearLines();
+                this.spawnPiece();
+            }
+
+            rotate() {
+                const rotated = this.currentPiece.shape[0].map((_, i) =>
+                    this.currentPiece.shape.map(row => row[i]).reverse()
+                );
+                
+                const backup = this.currentPiece.shape;
+                this.currentPiece.shape = rotated;
+                
+                if (this.collision(this.currentPiece)) {
+                    this.currentPiece.shape = backup;
+                }
+            }
+
+            merge() {
+                const shape = this.currentPiece.shape;
+                for (let y = 0; y < shape.length; y++) {
+                    for (let x = 0; x < shape[y].length; x++) {
+                        if (shape[y][x]) {
+                            const newY = this.currentPiece.y + y;
+                            const newX = this.currentPiece.x + x;
+                            if (newY >= 0) {
+                                this.board[newY][newX] = this.currentPiece.type;
+                            }
+                        }
+                    }
+                }
+            }
+
+            clearLines() {
+                let linesCleared = 0;
+                
+                for (let y = this.rows - 1; y >= 0; y--) {
+                    if (this.board[y].every(cell => cell !== 0)) {
+                        this.board.splice(y, 1);
+                        this.board.unshift(Array(this.cols).fill(0));
+                        linesCleared++;
+                        y++;
+                    }
+                }
+                
+                if (linesCleared > 0) {
+                    this.lines += linesCleared;
+                    this.score += [0, 100, 300, 500, 800][linesCleared] * this.level;
+                    this.level = Math.floor(this.lines / 10) + 1;
+                    this.gameSpeed = Math.max(100, 1000 - (this.level - 1) * 100);
+                    this.updateUI();
+                }
+            }
+
+            gameLoop(time) {
+                if (!this.isPlaying) return;
+                
+                const deltaTime = time - this.lastTime;
+                this.lastTime = time;
+                
+                if (!this.isPaused) {
+                    this.dropCounter += deltaTime;
+                    
+                    if (this.dropCounter > this.gameSpeed) {
+                        this.moveDown();
+                        this.dropCounter = 0;
+                    }
+                }
+                
+                this.draw();
+                requestAnimationFrame((time) => this.gameLoop(time));
+            }
+
+            draw() {
+                // 清空画布
+                this.ctx.fillStyle = '#1a1a2e';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 绘制网格
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 0.5;
+                for (let x = 0; x <= this.cols; x++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x * this.blockSize, 0);
+                    this.ctx.lineTo(x * this.blockSize, this.canvas.height);
+                    this.ctx.stroke();
+                }
+                for (let y = 0; y <= this.rows; y++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y * this.blockSize);
+                    this.ctx.lineTo(this.canvas.width, y * this.blockSize);
+                    this.ctx.stroke();
+                }
+                
+                // 绘制已落下的方块
+                for (let y = 0; y < this.rows; y++) {
+                    for (let x = 0; x < this.cols; x++) {
+                        if (this.board[y][x]) {
+                            this.drawBlock(x, y, this.colors[this.board[y][x]]);
+                        }
+                    }
+                }
+                
+                // 绘制当前方块
+                if (this.currentPiece) {
+                    const shape = this.currentPiece.shape;
+                    const color = this.colors[this.currentPiece.type];
+                    for (let y = 0; y < shape.length; y++) {
+                        for (let x = 0; x < shape[y].length; x++) {
+                            if (shape[y][x]) {
+                                this.drawBlock(
+                                    this.currentPiece.x + x,
+                                    this.currentPiece.y + y,
+                                    color
+                                );
+                            }
+                        }
+                    }
+                }
+                
+                // 暂停提示
+                if (this.isPaused) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.font = 'bold 30px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('暂停', this.canvas.width / 2, this.canvas.height / 2);
+                }
+            }
+
+            drawBlock(x, y, color) {
+                const px = x * this.blockSize;
+                const py = y * this.blockSize;
+                
+                this.ctx.fillStyle = color;
+                this.ctx.fillRect(px + 1, py + 1, this.blockSize - 2, this.blockSize - 2);
+                
+                // 高光效果
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.fillRect(px + 2, py + 2, this.blockSize - 8, this.blockSize - 8);
+            }
+
+            drawNextPiece() {
+                this.nextCtx.fillStyle = '#1a1a2e';
+                this.nextCtx.fillRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
+                
+                if (!this.nextPiece) return;
+                
+                const shape = this.nextPiece.shape;
+                const color = this.colors[this.nextPiece.type];
+                const size = 20;
+                const offsetX = (this.nextCanvas.width - shape[0].length * size) / 2;
+                const offsetY = (this.nextCanvas.height - shape.length * size) / 2;
+                
+                for (let y = 0; y < shape.length; y++) {
+                    for (let x = 0; x < shape[y].length; x++) {
+                        if (shape[y][x]) {
+                            this.nextCtx.fillStyle = color;
+                            this.nextCtx.fillRect(
+                                offsetX + x * size + 1,
+                                offsetY + y * size + 1,
+                                size - 2,
+                                size - 2
+                            );
+                        }
+                    }
+                }
+            }
+
+            updateUI() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('lines').textContent = this.lines;
+            }
+
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                document.getElementById('pause-btn').textContent = this.isPaused ? '继续' : '暂停';
+            }
+
+            gameOver() {
+                this.isPlaying = false;
+                
+                document.getElementById('final-score').textContent = this.score;
+                document.getElementById('final-level').textContent = this.level;
+                document.getElementById('final-lines').textContent = this.lines;
+                
+                document.getElementById('game-over-modal').classList.add('show');
+            }
+
+            restart() {
+                document.getElementById('game-over-modal').classList.remove('show');
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('pause-btn').disabled = true;
+            }
+        }
+
+        // 启动游戏
+        const game = new TetrisGame();
+    </script>
+</body>
+</html>
+
