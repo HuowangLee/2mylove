@@ -1,0 +1,295 @@
+{
+  "anniversary_date": "2025-03-15",
+  "memories": [
+    {
+      "id": "20251130",
+      "date": "2025-11-30",
+      "type": "daily",
+      "content": "你一出现，我的世界就自动调成了温柔模式。",
+      "mood_score": 86,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251201",
+      "date": "2025-12-01",
+      "type": "daily",
+      "content": "风再冷也没关系，我想把你抱在我心里最热的地方。",
+      "mood_score": 84,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251202",
+      "date": "2025-12-02",
+      "type": "daily",
+      "content": "我不是爱上了某一天，我是爱上了有你的每一天。",
+      "mood_score": 88,
+      "importance": 5,
+      "has_ring": false
+    },
+    {
+      "id": "20251203",
+      "date": "2025-12-03",
+      "type": "daily",
+      "content": "想和你把平凡过成浪漫，把日常过成偏爱。",
+      "mood_score": 80,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251204",
+      "date": "2025-12-04",
+      "type": "daily",
+      "content": "我想念你，不是因为孤单，是因为你真的很值得。",
+      "mood_score": 85,
+      "importance": 7,
+      "has_ring": true
+    },
+    {
+      "id": "20251205",
+      "date": "2025-12-05",
+      "type": "daily",
+      "content": "我喜欢你，是那种想把未来都交给你的喜欢。",
+      "mood_score": 83,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251206",
+      "date": "2025-12-06",
+      "type": "daily",
+      "content": "醒来第一件事是想你，睡前最后一件事也是想你。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251207",
+      "date": "2025-12-07",
+      "type": "daily",
+      "content": "有你在身边，哪里都是我最想抵达的地方。",
+      "mood_score": 87,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251208",
+      "date": "2025-12-08",
+      "type": "daily",
+      "content": "你认真听我说话的样子，让我想把心都交给你保管。",
+      "mood_score": 90,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251209",
+      "date": "2025-12-09",
+      "type": "daily",
+      "content": "再忙也要抱抱你，因为你是我最重要的事。",
+      "mood_score": 89,
+      "importance": 7,
+      "has_ring": true
+    },
+    {
+      "id": "20251210",
+      "date": "2025-12-10",
+      "type": "daily",
+      "content": "和你说话的时候，我的心就会变得很安静很确定。",
+      "mood_score": 82,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251211",
+      "date": "2025-12-11",
+      "type": "daily",
+      "content": "你护着我的那一刻，我更确定：我想一直和你在一起。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251212",
+      "date": "2025-12-12",
+      "type": "daily",
+      "content": "我想做你的底气，也想做你转身就能看见的那个人。",
+      "mood_score": 86,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251213",
+      "date": "2025-12-13",
+      "type": "daily",
+      "content": "就算有小情绪，我也只想和你和好，和你更好。",
+      "mood_score": 78,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251214",
+      "date": "2025-12-14",
+      "type": "daily",
+      "content": "我想把未来写成我们，把每一站都写上你的名字。",
+      "mood_score": 88,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251215",
+      "date": "2025-12-15",
+      "type": "daily",
+      "content": "你说“我在”的时候，我就觉得全世界都站在我这边。",
+      "mood_score": 90,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251216",
+      "date": "2025-12-16",
+      "type": "daily",
+      "content": "我喜欢牵你的手，不是为了不走丢，是为了不放开。",
+      "mood_score": 87,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251217",
+      "date": "2025-12-17",
+      "type": "daily",
+      "content": "你对我的好，我都记得；我对你的爱，也会更用力。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251218",
+      "date": "2025-12-18",
+      "type": "daily",
+      "content": "想把我的偏爱都给你：明目张胆、理直气壮。",
+      "mood_score": 85,
+      "importance": 5,
+      "has_ring": false
+    },
+    {
+      "id": "20251219",
+      "date": "2025-12-19",
+      "type": "daily",
+      "content": "日子不必惊艳，但你要一直在我身边。",
+      "mood_score": 83,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251220",
+      "date": "2025-12-20",
+      "type": "daily",
+      "content": "我想和你把生活过成两个人的默契与甜。",
+      "mood_score": 86,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251221",
+      "date": "2025-12-21",
+      "type": "daily",
+      "content": "你给我的拥抱，是我所有委屈的解药。",
+      "mood_score": 81,
+      "importance": 7,
+      "has_ring": true
+    },
+    {
+      "id": "20251222",
+      "date": "2025-12-22",
+      "type": "daily",
+      "content": "你在的地方，就是我愿意奔赴的远方。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251223",
+      "date": "2025-12-23",
+      "type": "daily",
+      "content": "我想把余生都用来爱你：慢慢来，但一直爱。",
+      "mood_score": 88,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20251224",
+      "date": "2025-12-24",
+      "type": "daily",
+      "content": "今天也想认真爱你：把你放在心上，把你放在生活里。",
+      "mood_score": 87,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251225",
+      "date": "2025-12-25",
+      "type": "daily",
+      "content": "最好的礼物不是某个瞬间，是你一直在我身边的每一天。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251226",
+      "date": "2025-12-26",
+      "type": "daily",
+      "content": "我喜欢我们的小日常：不喧哗，但很踏实，很甜。",
+      "mood_score": 84,
+      "importance": 6,
+      "has_ring": false
+    },
+    {
+      "id": "20251227",
+      "date": "2025-12-27",
+      "type": "daily",
+      "content": "你一句“回家吧”，就能把我一天的疲惫都融化。",
+      "mood_score": 88,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251228",
+      "date": "2025-12-28",
+      "type": "daily",
+      "content": "想把偏爱写得更明显一点：我永远先站在你这边。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20251229",
+      "date": "2025-12-29",
+      "type": "daily",
+      "content": "我愿意和你一起把琐碎过成风景，把平凡过成浪漫。",
+      "mood_score": 86,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20251230",
+      "date": "2025-12-30",
+      "type": "daily",
+      "content": "越接近年末，越想抱紧你：谢谢你把我放进你的未来。",
+      "mood_score": 92,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20251231",
+      "date": "2025-12-31",
+      "type": "daily",
+      "content": "今年的最后一天，也想对你说：明年、后年、每一年，我都爱你。",
+      "mood_score": 95,
+      "importance": 10,
+      "has_ring": true
+    }
+  ]
+}
+
+
