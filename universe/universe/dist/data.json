@@ -288,6 +288,69 @@
       "mood_score": 95,
       "importance": 10,
       "has_ring": true
+    },
+    {
+      "id": "20260101",
+      "date": "2026-01-01",
+      "type": "daily",
+      "content": "新年的第一天，我想把第一个心愿交给你：平安、快乐、和我一起。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260102",
+      "date": "2026-01-02",
+      "type": "daily",
+      "content": "不管日子怎么赶，我都想慢慢靠近你，把喜欢说得更认真一点。",
+      "mood_score": 88,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260103",
+      "date": "2026-01-03",
+      "type": "daily",
+      "content": "你笑一下，我就觉得今天值得：心里亮亮的，风也温柔了。",
+      "mood_score": 91,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260104",
+      "date": "2026-01-04",
+      "type": "daily",
+      "content": "我想把爱做成日常：多一点陪伴，少一点委屈，你永远被偏爱。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260105",
+      "date": "2026-01-05",
+      "type": "daily",
+      "content": "今天也想牵着你往前走：不求轰轰烈烈，只求一直是我们。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260106",
+      "date": "2026-01-06",
+      "type": "daily",
+      "content": "想告诉你：你不用很完美，你只要在，我就会更勇敢、更踏实。",
+      "mood_score": 89,
+      "importance": 7,
+      "has_ring": true
+    },
+    {
+      "id": "20260107",
+      "date": "2026-01-07",
+      "type": "daily",
+      "content": "我爱你的方式很简单：想你、懂你、护着你，把未来写成你和我。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
     }
   ]
 }
