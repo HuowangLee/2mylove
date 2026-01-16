@@ -351,6 +351,105 @@
       "mood_score": 94,
       "importance": 9,
       "has_ring": true
+    },
+    {
+      "id": "20260108",
+      "date": "2026-01-08",
+      "type": "daily",
+      "content": "今天也想把你放在第一顺位：先照顾你的感受，再安排世界的喧闹。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260109",
+      "date": "2026-01-09",
+      "type": "daily",
+      "content": "我喜欢我们的小默契：不用多说，一个眼神就能把彼此抱紧。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260110",
+      "date": "2026-01-10",
+      "type": "daily",
+      "content": "你一靠近，我就想更温柔一点：把所有好脾气都留给你。",
+      "mood_score": 88,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260111",
+      "date": "2026-01-11",
+      "type": "daily",
+      "content": "想和你把日子过得更像家：有烟火、有牵挂、有我们。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260112",
+      "date": "2026-01-12",
+      "type": "daily",
+      "content": "你不用逞强，累了就靠着我；我会用抱抱把你的小委屈慢慢哄好。",
+      "mood_score": 89,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260113",
+      "date": "2026-01-13",
+      "type": "daily",
+      "content": "我想把未来做得更具体：一起吃饭、一起散步、一起把喜欢坚持到底。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260114",
+      "date": "2026-01-14",
+      "type": "daily",
+      "content": "你是我最坚定的偏爱：不需要比较，你永远是唯一答案。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260115",
+      "date": "2026-01-15",
+      "type": "daily",
+      "content": "今天也想对你说谢谢：谢谢你出现，让我学会更认真地爱与被爱。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260116",
+      "date": "2026-01-16",
+      "type": "daily",
+      "content": "我希望你每天都被温柔对待；而我会一直是那个最先抱住你的人。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260117",
+      "date": "2026-01-17",
+      "type": "daily",
+      "content": "想把喜欢藏进细节里：多问一句“你还好吗”，多说一句“有我在”。",
+      "mood_score": 88,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260118",
+      "date": "2026-01-18",
+      "type": "daily",
+      "content": "我想一直把你宠成小朋友：有人爱、有人哄、有人把你当全世界。",
+      "mood_score": 95,
+      "importance": 10,
+      "has_ring": true
     }
   ]
 }
