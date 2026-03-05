@@ -891,69 +891,6 @@
       "mood_score": 95,
       "importance": 10,
       "has_ring": true
-    },
-    {
-      "id": "20260309",
-      "date": "2026-03-09",
-      "type": "daily",
-      "content": "你不需要时时闪闪发光，在我这里，你平常的样子就已经很好看。",
-      "mood_score": 90,
-      "importance": 8,
-      "has_ring": false
-    },
-    {
-      "id": "20260310",
-      "date": "2026-03-10",
-      "type": "daily",
-      "content": "有你在，我愿意慢一点走路、慢一点说话，好把爱表达得更完整。",
-      "mood_score": 89,
-      "importance": 7,
-      "has_ring": false
-    },
-    {
-      "id": "20260311",
-      "date": "2026-03-11",
-      "type": "daily",
-      "content": "今天想把“我在乎你”翻译成行动：多抱抱你，多理解你，多陪你。",
-      "mood_score": 92,
-      "importance": 8,
-      "has_ring": true
-    },
-    {
-      "id": "20260312",
-      "date": "2026-03-12",
-      "type": "daily",
-      "content": "植树节，想和你种下一些慢慢长大的东西：信任、耐心，还有并肩的勇气。",
-      "mood_score": 93,
-      "importance": 9,
-      "has_ring": true
-    },
-    {
-      "id": "20260313",
-      "date": "2026-03-13",
-      "type": "daily",
-      "content": "快到我们的日子了，心里有点紧张也很期待，像重新爱你一遍。",
-      "mood_score": 94,
-      "importance": 9,
-      "has_ring": true
-    },
-    {
-      "id": "20260314",
-      "date": "2026-03-14",
-      "type": "daily",
-      "content": "白色情人节快乐。谢谢你让“被爱”不再抽象，而是每天都能感受到。",
-      "mood_score": 95,
-      "importance": 10,
-      "has_ring": true
-    },
-    {
-      "id": "20260315",
-      "date": "2026-03-15",
-      "type": "daily",
-      "content": "一周年快乐。原来最好的爱情不是惊天动地，而是这一年里，我们始终没有松开彼此的手。",
-      "mood_score": 98,
-      "importance": 10,
-      "has_ring": true
     }
   ]
 }
