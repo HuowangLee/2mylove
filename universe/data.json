@@ -1017,6 +1017,132 @@
       "mood_score": 93,
       "importance": 9,
       "has_ring": true
+    },
+    {
+      "id": "20260323",
+      "date": "2026-03-23",
+      "type": "daily",
+      "content": "新的一周也想和你并肩开始，忙一点没关系，只要心是靠在一起的。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260324",
+      "date": "2026-03-24",
+      "type": "daily",
+      "content": "你给我的安心，不是轰烈的承诺，而是每次都能被你稳稳接住。",
+      "mood_score": 92,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260325",
+      "date": "2026-03-25",
+      "type": "daily",
+      "content": "今天也想把偏爱写在细节里：先问你累不累，再问世界怎么了。",
+      "mood_score": 89,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260326",
+      "date": "2026-03-26",
+      "type": "daily",
+      "content": "我喜欢我们把普通日子过得很认真，这种认真就是最踏实的浪漫。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260327",
+      "date": "2026-03-27",
+      "type": "daily",
+      "content": "有你在的时候，我会更想把话说温柔一点，把爱表达清楚一点。",
+      "mood_score": 90,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260328",
+      "date": "2026-03-28",
+      "type": "daily",
+      "content": "今天想谢谢你，始终愿意听我说那些琐碎，也愿意陪我慢慢变好。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260329",
+      "date": "2026-03-29",
+      "type": "daily",
+      "content": "和你在一起后，我开始相信，真正的爱是舒展的，不是拧巴的。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260330",
+      "date": "2026-03-30",
+      "type": "daily",
+      "content": "今天也想做你最稳定的后盾：不吵闹，但在你回头时一定看得见我。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260331",
+      "date": "2026-03-31",
+      "type": "daily",
+      "content": "三月的最后一天，还是想说同一句话：我会一直认真爱你。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260401",
+      "date": "2026-04-01",
+      "type": "daily",
+      "content": "四月第一天，想把所有“会更好”的期待，都和你一起慢慢兑现。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260402",
+      "date": "2026-04-02",
+      "type": "daily",
+      "content": "你看向我的那种认真，让我每次都忍不住再心动一次。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260403",
+      "date": "2026-04-03",
+      "type": "daily",
+      "content": "今天也想把生活过简单一点：和你吃顿饭，散散步，就很幸福。",
+      "mood_score": 89,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260404",
+      "date": "2026-04-04",
+      "type": "daily",
+      "content": "清明了，想起很多关于珍惜的事。谢谢你在我身边，让“当下”变得特别值得。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260405",
+      "date": "2026-04-05",
+      "type": "daily",
+      "content": "这个春天最确定的事，还是我会继续爱你，像今天一样，像每一天一样。",
+      "mood_score": 95,
+      "importance": 10,
+      "has_ring": true
     }
   ]
 }
