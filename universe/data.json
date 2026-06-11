@@ -1521,6 +1521,285 @@
       "mood_score": 96,
       "importance": 10,
       "has_ring": true
+    },
+    {
+      "id": "20260518",
+      "date": "2026-05-18",
+      "type": "daily",
+      "content": "新的一周又开始了，有你这份惦记在心里，连忙碌都变得有意义。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260519",
+      "date": "2026-05-19",
+      "type": "daily",
+      "content": "我越来越喜欢我们现在的默契，不用多说也能感受到彼此在认真爱着。",
+      "mood_score": 92,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260520",
+      "date": "2026-05-20",
+      "type": "daily",
+      "content": "520快乐。今天想大声说给你听：我爱你，不止今天，是每天都在更爱你。",
+      "mood_score": 99,
+      "importance": 10,
+      "has_ring": true
+    },
+    {
+      "id": "20260521",
+      "date": "2026-05-21",
+      "type": "daily",
+      "content": "昨天的告白还在心里回响，原来喜欢一个人久了，会把每个普通日子都过成节日。",
+      "mood_score": 95,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260522",
+      "date": "2026-05-22",
+      "type": "daily",
+      "content": "周五的快乐之一，是想到周末可以把更多时间留给你，慢慢聊、慢慢爱。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260523",
+      "date": "2026-05-23",
+      "type": "daily",
+      "content": "你在身边的时候，我总会不自觉地放松下来，像回到最安心的地方。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260524",
+      "date": "2026-05-24",
+      "type": "daily",
+      "content": "今天想把所有温柔都给你，给你拥抱，给你耐心，也给你我不变的偏爱。",
+      "mood_score": 95,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260525",
+      "date": "2026-05-25",
+      "type": "daily",
+      "content": "新的一周，新的忙碌，但我最确定的安排还是：继续好好爱你。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260526",
+      "date": "2026-05-26",
+      "type": "daily",
+      "content": "你一句简单的关心，就能把我一天的疲惫轻轻融掉。谢谢你一直这么暖。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260527",
+      "date": "2026-05-27",
+      "type": "daily",
+      "content": "我喜欢我们把爱放进细节里，放进每次回应里，也放进每一个“我在”。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260528",
+      "date": "2026-05-28",
+      "type": "daily",
+      "content": "今天也想认真做你的倾听者，接住你的情绪，陪你把难题一件件走过去。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260529",
+      "date": "2026-05-29",
+      "type": "daily",
+      "content": "又到周五了，最开心的事还是能和你靠近一点，把想念变成陪伴。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260530",
+      "date": "2026-05-30",
+      "type": "daily",
+      "content": "周末适合把节奏放慢，也适合把“我爱你”再多说几遍，认真又笃定。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260531",
+      "date": "2026-05-31",
+      "type": "daily",
+      "content": "五月最后一天，谢谢这个月的我们，依然在彼此身边，把日子过得柔软又有光。",
+      "mood_score": 96,
+      "importance": 10,
+      "has_ring": true
+    },
+    {
+      "id": "20260601",
+      "date": "2026-06-01",
+      "type": "daily",
+      "content": "六月第一天，想和你约定：这个月也要好好吃饭、好好睡觉、好好相爱。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260602",
+      "date": "2026-06-02",
+      "type": "daily",
+      "content": "今天又被你的小细节打动，原来爱是这样一点点积累出来的笃定。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260603",
+      "date": "2026-06-03",
+      "type": "daily",
+      "content": "有你在，我会更愿意和生活和解，也更愿意把未来想得明亮一点。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260604",
+      "date": "2026-06-04",
+      "type": "daily",
+      "content": "今天想告诉你，哪怕只是短短几句聊天，也足够让我心里安定很久。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260605",
+      "date": "2026-06-05",
+      "type": "daily",
+      "content": "周五快乐。愿你这周的辛苦都被温柔回收，我会一直站在你这边。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260606",
+      "date": "2026-06-06",
+      "type": "daily",
+      "content": "今天也很想你，想和你慢慢散步，慢慢说话，慢慢把喜欢说到心里去。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260607",
+      "date": "2026-06-07",
+      "type": "daily",
+      "content": "周末的尾声总会有点舍不得，但想到明天还能继续爱你，就又充满动力。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260608",
+      "date": "2026-06-08",
+      "type": "daily",
+      "content": "新一周开始啦，愿我们都顺顺利利，也别忘了在忙碌里好好拥抱彼此。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260609",
+      "date": "2026-06-09",
+      "type": "daily",
+      "content": "你总是能在我最需要的时候出现，这种被惦记的感觉，真的很珍贵。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260610",
+      "date": "2026-06-10",
+      "type": "daily",
+      "content": "今天也要夸夸你：认真生活、认真爱人、认真对待一切细节的你，特别迷人。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260611",
+      "date": "2026-06-11",
+      "type": "daily",
+      "content": "平凡的一天，因为心里有你，连风吹过来都像在提醒我：我很幸福。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260612",
+      "date": "2026-06-12",
+      "type": "daily",
+      "content": "周五啦，今天想把烦恼先放下，和你一起把生活过得轻一点、甜一点。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260613",
+      "date": "2026-06-13",
+      "type": "daily",
+      "content": "今天的好心情有你一半功劳，你一个笑、一个眼神，都够我回味很久。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260614",
+      "date": "2026-06-14",
+      "type": "daily",
+      "content": "又到周末尾巴，想把这两天的温柔打包收藏，留着在下周想你的时候慢慢拆开。",
+      "mood_score": 93,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260615",
+      "date": "2026-06-15",
+      "type": "daily",
+      "content": "又到十五号。每个月这一天都像一个小纪念：原来我们已经认真相爱了这么久。",
+      "mood_score": 98,
+      "importance": 10,
+      "has_ring": true
+    },
+    {
+      "id": "20260616",
+      "date": "2026-06-16",
+      "type": "daily",
+      "content": "今天也想做你最稳定的依靠，不一定最会说话，但一定会一直在你身旁。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260617",
+      "date": "2026-06-17",
+      "type": "daily",
+      "content": "六月过半，最开心的结论还是一样：有你在的日子，真的一天比一天更值得。",
+      "mood_score": 95,
+      "importance": 10,
+      "has_ring": true
     }
   ]
 }
