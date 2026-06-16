@@ -55,6 +55,24 @@ jobs:
           mkdir -p site/universe
           rsync -av apps/universe/dist/ site/universe/
 
+          # Keep the old source-like URL working by redirecting it to the built app.
+          mkdir -p site/apps/universe
+          cat > site/apps/universe/index.html <<'EOF'
+          <!doctype html>
+          <html lang="zh-CN">
+            <head>
+              <meta charset="UTF-8" />
+              <meta http-equiv="refresh" content="0; url=../../universe/" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Redirecting...</title>
+              <script>
+                window.location.replace('../../universe/');
+              </script>
+            </head>
+            <body></body>
+          </html>
+          EOF
+
           # Avoid Jekyll processing on GitHub Pages
           touch site/.nojekyll
 
