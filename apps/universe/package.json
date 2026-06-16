@@ -6,7 +6,8 @@
   "scripts": {
     "prepare:data": "node ./scripts/sync-data.mjs",
     "dev": "npm run prepare:data && vite",
-    "build": "npm run prepare:data && tsc -b && vite build",
+    "export:compat": "node ./scripts/export-compat.mjs",
+    "build": "npm run prepare:data && tsc -b && vite build && npm run export:compat",
     "lint": "eslint .",
     "preview": "vite preview"
   },

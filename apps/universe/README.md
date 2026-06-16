@@ -11,9 +11,10 @@ React/Vite anniversary experience rendered as a starfield of memories.
 ## Scripts
 
 - `npm run dev`: sync data, then start Vite dev server
-- `npm run build`: sync data, type-check, then build production assets
+- `npm run build`: sync data, type-check, build production assets, then refresh the root `universe/` compatibility publish folder
 - `npm run lint`: run ESLint
 
 ## Publish path
 
 GitHub Pages publishes the built app under `/universe/`.
+The build also refreshes the repository-root `universe/` folder for branch-based Pages compatibility.
