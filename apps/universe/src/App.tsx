@@ -75,7 +75,7 @@ function App() {
             <div className="mt-2 text-sm leading-6">
               {state.error}
               <br />
-              请检查 `public/data.json` 的 JSON 结构是否正确。
+              请检查 `data/memories.json` 以及数据同步脚本是否正常。
             </div>
           </div>
         </div>

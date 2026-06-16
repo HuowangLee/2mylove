@@ -622,21 +622,24 @@
         // 生成日期卡片
         const daysGrid = document.getElementById('daysGrid');
         
-        // 从221到255的所有天数
+        // 从221到260的所有天数
         const days = [];
-        for (let i = 221; i <= 255; i++) {
+        for (let i = 221; i <= 260; i++) {
             days.push(i);
         }
 
         // 特殊日子（每10天标记为特殊）
-        const specialDays = [225, 230, 240, 250, 255];
+        const specialDays = [225, 230, 240, 250, 255, 260];
+
+        const isLocalSource = window.location.protocol === 'file:' ||
+            ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
         // 随机emoji数组
         const emojis = ['💖', '💕', '💗', '💓', '💝', '💘', '💞', '💌', '❤️', '🌹', '🌺', '🌸', '🌼', '🌻', '🎀', '🎁', '✨', '⭐', '🌟', '💫'];
 
         days.forEach((day, index) => {
             const card = document.createElement('a');
-            card.href = `${day}/index.html`;
+            card.href = isLocalSource ? `games/${day}/index.html` : `${day}/index.html`;
             card.className = 'day-card';
             
             if (specialDays.includes(day)) {

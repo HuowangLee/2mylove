@@ -8,6 +8,7 @@
 **/.vite/
 **/.turbo/
 **/.cache/
+site/
 
 # Logs
 *.log

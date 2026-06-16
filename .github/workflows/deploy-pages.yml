@@ -26,14 +26,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: universe/universe/package-lock.json
+          cache-dependency-path: apps/universe/package-lock.json
 
       - name: Install (universe)
-        working-directory: universe/universe
+        working-directory: apps/universe
         run: npm ci
 
       - name: Build (universe)
-        working-directory: universe/universe
+        working-directory: apps/universe
         run: npm run build
 
       - name: Assemble site
@@ -44,17 +44,16 @@ jobs:
           rm -rf site
           mkdir -p site
 
-          # Copy repo static content except source-only folders we don't want to publish.
-          # (We will publish the built universe app separately.)
-          rsync -av \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude "universe" \
-            ./ site/
+          cp index.html README.md site/
+
+          for day in $(seq 221 260); do
+            mkdir -p "site/${day}"
+            rsync -av "games/${day}/" "site/${day}/"
+          done
 
           # Publish the built universe app under /universe/
           mkdir -p site/universe
-          rsync -av universe/universe/dist/ site/universe/
+          rsync -av apps/universe/dist/ site/universe/
 
           # Avoid Jekyll processing on GitHub Pages
           touch site/.nojekyll
