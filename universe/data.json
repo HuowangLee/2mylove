@@ -2340,6 +2340,141 @@
       "mood_score": 95,
       "importance": 9,
       "has_ring": true
+    },
+    {
+      "id": "20260817",
+      "date": "2026-08-17",
+      "type": "daily",
+      "content": "新的一周开始了，想到还能继续和你分享日常，就觉得再忙也有盼头。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260818",
+      "date": "2026-08-18",
+      "type": "daily",
+      "content": "你一句简单的关心，总能把我从忙乱里轻轻拉回到安稳里。",
+      "mood_score": 89,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260819",
+      "date": "2026-08-19",
+      "type": "daily",
+      "content": "今天也想把偏爱写在细节里：先问你累不累，再问世界怎么了。",
+      "mood_score": 89,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260820",
+      "date": "2026-08-20",
+      "type": "daily",
+      "content": "我喜欢我们把普通日子过得很认真，这种认真就是最踏实的浪漫。",
+      "mood_score": 91,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260821",
+      "date": "2026-08-21",
+      "type": "daily",
+      "content": "有你在的时候，我会更想把话说温柔一点，把爱表达清楚一点。",
+      "mood_score": 90,
+      "importance": 7,
+      "has_ring": false
+    },
+    {
+      "id": "20260822",
+      "date": "2026-08-22",
+      "type": "daily",
+      "content": "周末到了，最想把时间留给你：慢慢聊、慢慢走，把想念都换成陪伴。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260823",
+      "date": "2026-08-23",
+      "type": "daily",
+      "content": "处暑到了。暑气渐消，而对你的喜欢却还是那样清清亮亮，一点都不减。",
+      "mood_score": 94,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260824",
+      "date": "2026-08-24",
+      "type": "daily",
+      "content": "周五快乐。愿你这周的辛苦都被温柔回收，我会一直站在你这边。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260825",
+      "date": "2026-08-25",
+      "type": "daily",
+      "content": "今天想谢谢你，始终愿意听我说那些琐碎，也愿意陪我慢慢变好。",
+      "mood_score": 93,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260826",
+      "date": "2026-08-26",
+      "type": "daily",
+      "content": "今天也想做你最稳定的后盾：不吵闹，但在你回头时一定看得见我。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260827",
+      "date": "2026-08-27",
+      "type": "daily",
+      "content": "新的一周，新的忙碌，但我最确定的安排还是：继续好好爱你。",
+      "mood_score": 90,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260828",
+      "date": "2026-08-28",
+      "type": "daily",
+      "content": "你给我的安心，不是轰烈的承诺，而是每次都能被你稳稳接住。",
+      "mood_score": 92,
+      "importance": 9,
+      "has_ring": true
+    },
+    {
+      "id": "20260829",
+      "date": "2026-08-29",
+      "type": "daily",
+      "content": "周末快乐。想和你把节奏放慢一点，把喜欢说清楚一点。",
+      "mood_score": 93,
+      "importance": 8,
+      "has_ring": true
+    },
+    {
+      "id": "20260830",
+      "date": "2026-08-30",
+      "type": "daily",
+      "content": "周末尾声也不想着急，只想把陪你的时间过得再认真一点。",
+      "mood_score": 92,
+      "importance": 8,
+      "has_ring": false
+    },
+    {
+      "id": "20260831",
+      "date": "2026-08-31",
+      "type": "daily",
+      "content": "八月最后一天，谢谢你陪我走过这一个月。接下来的日子，也想继续和你慢慢爱。",
+      "mood_score": 97,
+      "importance": 10,
+      "has_ring": true
     }
   ]
 }
